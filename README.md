@@ -12,6 +12,7 @@ Deployment entrypoint:
 - web server: [backend/src/server.js](backend/src/server.js)
 - start command: `npm start`
 - Render blueprint: [render.yaml](render.yaml)
+- live free-tier URL: `https://neural-rank-backend.onrender.com/health`
 
 Backend documentation anchor set:
 - [docs/backend/BACKEND_MASTER_SPEC.md](docs/backend/BACKEND_MASTER_SPEC.md)

@@ -62,6 +62,7 @@ Shared verification basis:
   - file: [backend/src/server.js](</D:/Neural Rank/backend/src/server.js>)
   - start command: `npm start`
   - Render blueprint: [render.yaml](</D:/Neural Rank/render.yaml>)
+  - deployed free-tier health URL: `https://neural-rank-backend.onrender.com/health`
 
 ## Final Verdict
 `FREEZE`

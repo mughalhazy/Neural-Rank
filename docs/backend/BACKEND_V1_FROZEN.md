@@ -45,6 +45,7 @@ Confirmation:
 - backend validation and aggregate test coverage are complete at the current backend runtime standard
 - backend web-service entrypoint exists and is validated
 - free-tier Render deployment blueprint exists
+- free-tier Render deployment is live at `https://neural-rank-backend.onrender.com/health`
 
 ## Frontend MVP Clarification
 Rule:
