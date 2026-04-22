@@ -20,6 +20,7 @@ Verdict: `PASS`
 Audit status:
 - rerun against the current backend state on `2026-04-22`
 - findings confirmed by runtime checks, executable module tests, and executable shared-backend tests
+- deployable HTTP server validation is now included in the backend QC evidence
 
 ## Executive Findings
 - all eight backend modules exist
@@ -27,6 +28,7 @@ Audit status:
 - all eight backend modules return executable `flow` output
 - all eight backend modules have executable module-level tests
 - all eight backend modules are exercised under one aggregate validation path at the same QC bar
+- deployable HTTP server coverage exists for health, module listing, default flow execution, and single-module execution
 - default orchestration includes all eight backend modules
 - unified workflow prioritization and action consolidation execute successfully
 
@@ -38,6 +40,7 @@ Checks run:
 - sample all-module execution path
 - executable test script per module
 - executable shared backend QC script
+- executable backend server validation script
 - executable full backend validation script
 - unified workflow prioritization check
 
@@ -57,10 +60,13 @@ Observed runtime facts:
   - `unified_workflow_layer`
 - executable shared backend QC script passed:
   - [backend/src/shared-backend.test.js](</D:/Neural Rank/backend/src/shared-backend.test.js>)
+- executable backend server validation script passed:
+  - [backend/src/server.test.js](</D:/Neural Rank/backend/src/server.test.js>)
+  - this script validates the deployable HTTP server entrypoint and route behavior
 - executable full backend validation script passed:
   - [backend/src/full-backend-validation.test.js](</D:/Neural Rank/backend/src/full-backend-validation.test.js>)
-  - this script runs all eight module test scripts plus the shared backend QC script under one consistent validation path
-  - this validation path covers core execution, insight/action generation, prioritization behavior, and shared orchestration coverage
+  - this script runs all eight module test scripts plus the shared backend QC script and server validation under one consistent validation path
+  - this validation path covers core execution, insight/action generation, prioritization behavior, shared orchestration coverage, and deployable HTTP server behavior
 
 ## Pass/Fail Per Module
 
@@ -169,6 +175,7 @@ None in backend runtime after the current corrected-rule-set fixes.
 - module boundaries remain explicit
 - unified workflow orchestration is active and aligned with the backend module set
 - shared service and activation utilities now align with the corrected rule set naming and behavior
+- a deployable HTTP server entrypoint now exists for backend execution on Render-compatible infrastructure
 
 ## Data Findings
 - module persistence paths are exercised through executable tests using the current query-backed runtime contract
@@ -181,6 +188,7 @@ None in backend runtime after the current corrected-rule-set fixes.
 - unified workflow consumes module `flow` outputs and returns ordered consolidated work
 - unified workflow now receives upstream module results correctly in default orchestration
 - shared orchestration coverage is enforced by the full backend validation script and the shared backend QC script together
+- the deployable HTTP layer invokes the existing backend orchestration surface rather than introducing a separate execution path
 
 ## Integration Findings
 - integration boundaries are explicit

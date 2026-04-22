@@ -10,10 +10,11 @@ const TEST_SUITES = [
   ["modules/creative-messaging-layer/service.test.js", require("./modules/creative-messaging-layer/service.test.js")],
   ["modules/unified-workflow-layer/service.test.js", require("./modules/unified-workflow-layer/service.test.js")],
   ["shared-backend.test.js", require("./shared-backend.test.js")],
+  ["server.test.js", require("./server.test.js")],
 ];
 
 async function run() {
-  assert.equal(TEST_SUITES.length, 9, "full backend validation should cover all module tests and the shared test");
+  assert.equal(TEST_SUITES.length, 10, "full backend validation should cover all module tests, the shared test, and the server test");
 
   for (const [relativePath, suite] of TEST_SUITES) {
     assert.equal(typeof suite.run, "function", `${relativePath} should export run()`);

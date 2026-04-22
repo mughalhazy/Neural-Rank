@@ -43,6 +43,8 @@ Confirmation:
 - backend activation is complete
 - backend module coverage is complete
 - backend validation and aggregate test coverage are complete at the current backend runtime standard
+- backend web-service entrypoint exists and is validated
+- free-tier Render deployment blueprint exists
 
 ## Frontend MVP Clarification
 Rule:

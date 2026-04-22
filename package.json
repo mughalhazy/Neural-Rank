@@ -1,4 +1,10 @@
 {
+  "name": "neural-rank",
+  "private": true,
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "test:backend": "node backend/src/full-backend-validation.test.js"
+  },
   "dependencies": {
     "@openai/codex": "^0.122.0"
   }

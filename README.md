@@ -8,6 +8,11 @@ Current backend status:
 - all eight backend modules are active
 - backend is marked `DEPLOYMENT_READY`
 
+Deployment entrypoint:
+- web server: [backend/src/server.js](backend/src/server.js)
+- start command: `npm start`
+- Render blueprint: [render.yaml](render.yaml)
+
 Backend documentation anchor set:
 - [docs/backend/BACKEND_MASTER_SPEC.md](docs/backend/BACKEND_MASTER_SPEC.md)
 - [docs/backend/BACKEND_QC_REPORT.md](docs/backend/BACKEND_QC_REPORT.md)
