@@ -5,7 +5,7 @@ Anchors:
 - `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER BUILD SPEC.md](</D:/Neural Rank/MASTER BUILD SPEC.md>)
 - [docs/backend/BACKEND_MASTER_SPEC.md](</D:/Neural Rank/docs/backend/BACKEND_MASTER_SPEC.md>)
 
-This document defines explicit backend module boundaries so implementation does not drift, merge modules, or collapse into a monolith.
+This document defines explicit backend module boundaries so implementation does not drift, merge modules, or collapse into a monolith. It covers all 18 modules: the original 8 plus the 10 SEO OS expansion modules added 2026-05-15.
 
 ## Boundary Rules
 
@@ -16,6 +16,8 @@ This document defines explicit backend module boundaries so implementation does 
 - shared primitives may exist only where genuinely reused
 - shared primitives must not erase module ownership
 - Unified Workflow Layer coordinates modules but does not replace them
+
+---
 
 ## Module 1: Review Analysis
 
@@ -61,9 +63,11 @@ Analyze review and customer feedback signals, cluster complaints, detect feature
 - provides review-derived outputs to orchestration
 - may be consumed by Unified Workflow Layer, but is not replaced by it
 
-### Initial Activation State
+### Activation State
 
-MVP-active
+`defaultActive: true`, `initialState: "mvp_active"`
+
+---
 
 ## Module 2: Content / Listing Insights
 
@@ -110,9 +114,11 @@ Analyze content quality for SEO, analyze listing quality for app stores, and con
 - provides content/listing outputs to orchestration
 - may be consumed by Unified Workflow Layer, but is not replaced by it
 
-### Initial Activation State
+### Activation State
 
-MVP-active
+`defaultActive: true`, `initialState: "mvp_active"`
+
+---
 
 ## Module 3: Keyword Analysis
 
@@ -158,9 +164,11 @@ Generate keyword suggestions, identify keyword opportunities, and support priori
 - provides keyword-derived outputs to orchestration
 - remains separate from Rank Tracking even when the same keywords are involved
 
-### Initial Activation State
+### Activation State
 
-MVP-active
+`defaultActive: true`, `initialState: "mvp_active"`
+
+---
 
 ## Module 4: Rank Tracking
 
@@ -206,9 +214,11 @@ Track keyword positions, monitor changes, and surface actionable rank movement.
 - provides ranking outputs to orchestration
 - remains separate from Keyword Analysis even when both operate on related keyword sets
 
-### Initial Activation State
+### Activation State
 
-MVP-active
+`defaultActive: true`, `initialState: "mvp_active"`
+
+---
 
 ## Module 5: Competitor Analysis
 
@@ -254,9 +264,13 @@ Track competitors, compare signals, and identify gaps and opportunities.
 - provides competitor outputs to orchestration when activated
 - may inform Unified Workflow Layer later, but remains separately bounded
 
-### Initial Activation State
+### Activation State
 
-Built-but-inactive initially
+`defaultActive: true`, `initialState: "backend_active"`
+
+(Corrected from original spec which listed this as built-but-inactive. As of 2026-05-15 this module is default-active.)
+
+---
 
 ## Module 6: Optimization Layer
 
@@ -301,9 +315,13 @@ Produce content suggestions, produce metadata improvement suggestions, and turn 
 - provides execution guidance outputs to orchestration when activated
 - does not replace source module ownership of upstream analysis
 
-### Initial Activation State
+### Activation State
 
-Built-but-inactive initially
+`defaultActive: true`, `initialState: "backend_active"`
+
+(Corrected from original spec which listed this as built-but-inactive. As of 2026-05-15 this module is default-active.)
+
+---
 
 ## Module 7: Creative / Messaging Layer
 
@@ -349,9 +367,13 @@ Critique screenshot/content presentation, generate messaging suggestions, and su
 - provides creative/messaging outputs to orchestration
 - may inform Unified Workflow Layer later, but remains separately bounded
 
-### Initial Activation State
+### Activation State
 
-Built-but-inactive initially
+`defaultActive: true`, `initialState: "backend_active"`
+
+(Corrected from original spec which listed this as built-but-inactive. As of 2026-05-15 this module is default-active.)
+
+---
 
 ## Module 8: Unified Workflow Layer
 
@@ -392,10 +414,332 @@ Combine all modules into one operating workflow, centralize insight and action p
 
 ### Orchestration Relationship
 
-- coordinates explicit modules
+- runs last in execution order; coordinates all preceding module outputs
 - depends on module outputs rather than reimplementing module internals
-- does not replace ownership of Review Analysis, Content / Listing Insights, Keyword Analysis, Rank Tracking, Competitor Analysis, Optimization Layer, or Creative / Messaging Layer
+- does not replace ownership of any of the 17 other modules
 
-### Initial Activation State
+### Activation State
 
-Built-but-inactive initially beyond MVP activation
+`defaultActive: true`, `initialState: "backend_active"`
+
+(Corrected from original spec which listed this as built-but-inactive beyond MVP activation. As of 2026-05-15 this module is default-active and always runs last in the execution order.)
+
+---
+
+## Module 9: Technical SEO Audit
+
+### Module Name
+
+Technical SEO Audit
+
+### Backend Purpose
+
+Audit the technical health of a website by evaluating crawl data, Core Web Vitals, robots/sitemap configuration, and structured data. Produces a ranked list of technical remediation actions. This module runs first in execution order because its outputs provide foundational signals for other modules.
+
+### Activation State
+
+`defaultActive: true`, `initialState: "backend_active"`
+
+### Input Contract
+
+Expects one or more of: `url` (string), `crawlData` (array of `{ url, statusCode, title? }`), `pageSpeedData` (`{ lcp, cls, inp }`), `robotsData` (`{ disallowedPaths, hasSitemapReference }`), `schemaData` (array). Normalizer: `normalizeAuditInput()` in `analysis.js`.
+
+### Output Contract
+
+Returns `{ moduleKey, status, flow: { input, analysis, insight, priority, action }, intakeResult, analysisResult, insightResult, actionResult, persistence, integrationStatus }`. Actions are prioritized technical remediation items (e.g. fix broken URLs, improve LCP, add sitemap reference).
+
+### Integration Boundary
+
+Checks for a registered adapter at `technical_seo_audit` key via `getModuleAdapter()`. Falls back gracefully to direct input if no adapter is connected.
+
+### Persistence
+
+Records table: `app_public.technical_seo_audit_records`. Factory: `createPostgresTechnicalSeoAuditRepository(query)`.
+
+---
+
+## Module 10: On-Page SEO Scorer
+
+### Module Name
+
+On-Page SEO Scorer
+
+### Backend Purpose
+
+Score individual pages against on-page SEO signals including title tags, meta descriptions, heading hierarchy, and keyword density. Produces per-page scoring insights and a ranked list of on-page improvement actions.
+
+### Activation State
+
+`defaultActive: true`, `initialState: "backend_active"`
+
+### Input Contract
+
+Expects `pages` (array of page objects with URL, title, meta description, headings, body content). Normalizer: `normalizeOnPageInput()` in `analysis.js`.
+
+### Output Contract
+
+Returns standard flow envelope with `{ flow: { input, analysis, insight, priority, action } }`. Actions are page-specific on-page fixes (missing/duplicate titles, thin content, missing keywords).
+
+### Integration Boundary
+
+Checks for a registered adapter at `on_page_seo_scorer` key via `getModuleAdapter()`. Falls back gracefully to direct input if no adapter is connected.
+
+### Persistence
+
+Records table: `app_public.on_page_seo_records`. Factory: `createPostgresOnPageSeoRepository(query)`.
+
+---
+
+## Module 11: Backlink Intelligence
+
+### Module Name
+
+Backlink Intelligence
+
+### Backend Purpose
+
+Analyze backlink profiles and referring domain data to evaluate link quality, anchor text distribution, and domain authority signals. Identifies link acquisition opportunities and flags toxic or unnatural links for disavow consideration.
+
+### Activation State
+
+`defaultActive: true`, `initialState: "backend_active"`
+
+### Input Contract
+
+Expects `backlinks` (array of `{ url, anchorText, domainAuthority? }`) and/or `referringDomains` (array of domain objects). Normalizer: `normalizeBacklinkInput()` in `analysis.js`.
+
+### Output Contract
+
+Returns standard flow envelope. Actions include link acquisition targets, disavow candidates, and anchor text diversification recommendations.
+
+### Integration Boundary
+
+Checks for a registered adapter at `backlink_intelligence` key via `getModuleAdapter()`. Falls back gracefully to direct input if no adapter is connected. Designed to accept output from third-party backlink tools (Ahrefs, Majestic, etc.) via adapter normalization.
+
+### Persistence
+
+Records table: `app_public.backlink_intelligence_records`. Factory: `createPostgresBacklinkIntelligenceRepository(query)`.
+
+---
+
+## Module 12: E-E-A-T Signals
+
+### Module Name
+
+E-E-A-T Signals
+
+### Backend Purpose
+
+Evaluate Google's Experience, Expertise, Authoritativeness, and Trustworthiness (E-E-A-T) signals across pages and site-level trust markers. Produces a scored assessment and a prioritized list of trust-building actions.
+
+### Activation State
+
+`defaultActive: true`, `initialState: "backend_active"`
+
+### Input Contract
+
+Expects `pages` (array of page objects with author, credentials, citations) and/or `trustSignals` (array of site-level trust indicators). Normalizer: `normalizeEeatInput()` in `analysis.js`.
+
+### Output Contract
+
+Returns standard flow envelope. Actions include adding author bios, improving About/Contact pages, acquiring editorial citations, and adding trust schema markup.
+
+### Integration Boundary
+
+Checks for a registered adapter at `eeat_signals` key via `getModuleAdapter()`. Falls back gracefully to direct input if no adapter is connected.
+
+### Persistence
+
+Records table: `app_public.eeat_signal_records`. Factory: `createPostgresEeatSignalsRepository(query)`.
+
+---
+
+## Module 13: Search Intent Classifier
+
+### Module Name
+
+Search Intent Classifier
+
+### Backend Purpose
+
+Classify keyword sets by search intent using the core heuristic token-based classifier (`core/intentClassifier.js`). Maps each keyword to an intent category and generates content-format alignment recommendations. This module uses the 4-intent taxonomy (informational, navigational, transactional, commercial) from the core classifier layer.
+
+### Activation State
+
+`defaultActive: true`, `initialState: "backend_active"`
+
+### Input Contract
+
+Expects `keywords` (array of keyword strings or objects with `keyword` field). Normalizer: `normalizeSearchIntentInput()` in `analysis.js`.
+
+### Output Contract
+
+Returns standard flow envelope. Actions include content-format recommendations aligned to detected intent (e.g. create comparison page for commercial intent, create how-to article for informational intent).
+
+### Integration Boundary
+
+Checks for a registered adapter at `search_intent_classifier` key via `getModuleAdapter()`. Falls back gracefully to direct input if no adapter is connected.
+
+### Persistence
+
+Records table: `app_public.search_intent_records`. Factory: `createPostgresSearchIntentRepository(query)`.
+
+---
+
+## Module 14: SERP Feature Analyzer
+
+### Module Name
+
+SERP Feature Analyzer
+
+### Backend Purpose
+
+Analyze SERP feature presence and ownership opportunities across target keywords. Identifies which features (featured snippets, AI overviews, local packs, knowledge panels, People Also Ask boxes) are triggering and whether the target URL owns them. Produces structured-data and content recommendations to capture unowned features.
+
+### Activation State
+
+`defaultActive: true`, `initialState: "backend_active"`
+
+### Input Contract
+
+Expects `serpEntries` (array of SERP result objects with `keyword`, `features`, `positions`). Normalizer: `normalizeFeatureInput()` in `analysis.js`.
+
+### Output Contract
+
+Returns standard flow envelope. Actions include implementing schema markup types, restructuring content for featured-snippet eligibility, and building local signals for local-pack inclusion.
+
+### Integration Boundary
+
+Checks for a registered adapter at `serp_feature_analyzer` key via `getModuleAdapter()`. Falls back gracefully to direct input if no adapter is connected. Designed to accept SERP provider data via adapter normalization.
+
+### Persistence
+
+Records table: `app_public.serp_feature_records`. Factory: `createPostgresSerpFeatureRepository(query)`.
+
+---
+
+## Module 15: Topical Authority
+
+### Module Name
+
+Topical Authority
+
+### Backend Purpose
+
+Evaluate the depth and breadth of a site's content coverage across target topic clusters. Identifies topical gaps — subtopics and related queries not covered by existing content — relative to authority targets. Produces a content cluster plan with gap-fill priorities.
+
+### Activation State
+
+`defaultActive: true`, `initialState: "backend_active"`
+
+### Input Contract
+
+Expects `targetTopics` (array of topic strings or objects) and/or `existingContent` (array of content objects with URL, title, topic tags). Normalizer: `normalizeTopicalInput()` in `analysis.js`.
+
+### Output Contract
+
+Returns standard flow envelope. Actions include creating new content pieces for identified gaps, consolidating thin topical coverage, and building internal links to strengthen cluster signals.
+
+### Integration Boundary
+
+Checks for a registered adapter at `topical_authority` key via `getModuleAdapter()`. Falls back gracefully to direct input if no adapter is connected.
+
+### Persistence
+
+Records table: `app_public.topical_authority_records`. Factory: `createPostgresTopicalAuthorityRepository(query)`.
+
+---
+
+## Module 16: Site Architecture
+
+### Module Name
+
+Site Architecture
+
+### Backend Purpose
+
+Analyze internal link structure, crawl depth, page hierarchy, and URL organization to evaluate how well the site's architecture supports search engine crawling and user navigation. Produces structural improvement recommendations.
+
+### Activation State
+
+`defaultActive: true`, `initialState: "backend_active"`
+
+### Input Contract
+
+Expects `pages` (array of page objects with URL, internal links, crawl depth, parent page). Normalizer: `normalizeArchitectureInput()` in `analysis.js`.
+
+### Output Contract
+
+Returns standard flow envelope. Actions include flattening deep crawl hierarchies, adding internal links to orphaned pages, improving URL structure, and creating hub pages for content clusters.
+
+### Integration Boundary
+
+Checks for a registered adapter at `site_architecture` key via `getModuleAdapter()`. Falls back gracefully to direct input if no adapter is connected.
+
+### Persistence
+
+Records table: `app_public.site_architecture_records`. Factory: `createPostgresSiteArchitectureRepository(query)`.
+
+---
+
+## Module 17: Analytics Integration
+
+### Module Name
+
+Analytics Integration
+
+### Backend Purpose
+
+Ingest Google Search Console search analytics and GA4 page metrics, correlate performance data with SEO signals across modules, and produce data-backed performance insights. This module bridges raw analytics data into the insight-and-action pipeline.
+
+### Activation State
+
+`defaultActive: true`, `initialState: "backend_active"`
+
+### Input Contract
+
+Expects `gsc` (`{ searchAnalytics: [] }`) and/or `ga4` (`{ pageMetrics: [] }`). Normalizer: `normalizeAnalyticsInput()` in `analysis.js`. Has direct-input detection: `gsc.searchAnalytics.length > 0 || ga4.pageMetrics.length > 0`.
+
+### Output Contract
+
+Returns standard flow envelope. Actions include traffic recovery recommendations, click-through-rate improvement actions for high-impression / low-CTR queries, and page performance improvement priorities.
+
+### Integration Boundary
+
+Checks for a registered adapter at `analytics_integration` key via `getModuleAdapter()`. Designed to accept GSC and GA4 data via adapter normalization. Falls back gracefully to direct input if no adapter is connected.
+
+### Persistence
+
+Records table: `app_public.analytics_integration_records`. Factory: `createPostgresAnalyticsIntegrationRepository(query)`.
+
+---
+
+## Module 18: Local SEO
+
+### Module Name
+
+Local SEO
+
+### Backend Purpose
+
+Analyze local citation consistency, Google Business Profile completeness, and geo-specific rank factors for businesses with physical locations or service areas. Produces local visibility insights and citation / profile improvement actions. This module is opt-in only and does not run in default orchestration.
+
+### Activation State
+
+`defaultActive: false`, `initialState: "backend_active"`. Present in `BUILT_BUT_INACTIVE_MODULES`. Must be activated via `resolveActivationState(overrides, { allowInactiveActivation: true })`.
+
+### Input Contract
+
+Expects `businessName` (string), `citations` (array of citation objects), and/or `localKeywords` (array of geo-targeted keyword strings). Normalizer: `normalizeLocalSeoInput()` in `analysis.js`.
+
+### Output Contract
+
+Returns standard flow envelope. Actions include NAP consistency fixes, Google Business Profile optimization recommendations, local schema markup implementation, and local link building targets.
+
+### Integration Boundary
+
+Checks for a registered adapter at `local_seo` key via `getModuleAdapter()`. Designed to accept GMB API and citation-provider data via adapter normalization. Falls back gracefully to direct input if no adapter is connected.
+
+### Persistence
+
+Records table: `app_public.local_seo_records`. Factory: `createPostgresLocalSeoRepository(query)`.
