@@ -15,7 +15,7 @@ Backend persistence must follow these principles:
 - Postgres is the source of truth for structured product data
 - persistence must preserve explicit module boundaries
 - persistence must support the mandatory backend flow `INPUT -> ANALYSIS -> INSIGHT -> PRIORITY -> ACTION`
-- persistence must support all eight modules from day 1
+- persistence must support all eighteen modules from day 1
 - persistence must support built-but-inactive modules without forcing immediate activation
 - persistence must support later activation without major structural rewrite
 - persistence must preserve source ownership when multiple modules relate to the same product subject
@@ -53,6 +53,49 @@ Architectural separation must remain clear:
 - Auth is not the primary persistence model for product data
 - Storage is not the source of truth for structured product state
 - Edge Functions do not redefine the core persistence model
+
+## Persistence Ownership Table — All 18 Modules
+
+All 18 modules share a uniform persistence shape provided by `core/persistence.js`. Each module writes to its own records table with foreign key to `app_public.product_targets`. The `defaultActive` column reflects the runtime activation state in `core/moduleCatalog.js`.
+
+| Module | records table | defaultActive | Migration file |
+|---|---|---|---|
+| Review Analysis | `review_analysis_records` | true | `20260422020600_backend_foundation.sql` |
+| Content / Listing Insights | `content_listing_insight_records` | true | `20260422020600_backend_foundation.sql` |
+| Keyword Analysis | `keyword_analysis_records` | true | `20260422020600_backend_foundation.sql` |
+| Rank Tracking | `rank_tracking_records` | true | `20260422020600_backend_foundation.sql` |
+| Competitor Analysis | `competitor_analysis_records` | true | `20260422020600_backend_foundation.sql` |
+| Optimization Layer | `optimization_layer_records` | true | `20260422020600_backend_foundation.sql` |
+| Creative / Messaging Layer | `creative_messaging_layer_records` | true | `20260422020600_backend_foundation.sql` |
+| Unified Workflow Layer | `unified_workflow_layer_records` | true | `20260422020600_backend_foundation.sql` |
+| Technical SEO Audit | `technical_seo_audit_records` | true | `20260516120000_seo_os_expansion_modules.sql` |
+| On-Page SEO Scorer | `on_page_seo_records` | true | `20260516120000_seo_os_expansion_modules.sql` |
+| Backlink Intelligence | `backlink_intelligence_records` | true | `20260516120000_seo_os_expansion_modules.sql` |
+| E-E-A-T Signals | `eeat_signal_records` | true | `20260516120000_seo_os_expansion_modules.sql` |
+| Search Intent Classifier | `search_intent_records` | true | `20260516120000_seo_os_expansion_modules.sql` |
+| SERP Feature Analyzer | `serp_feature_records` | true | `20260516120000_seo_os_expansion_modules.sql` |
+| Topical Authority | `topical_authority_records` | true | `20260516120000_seo_os_expansion_modules.sql` |
+| Site Architecture | `site_architecture_records` | true | `20260516120000_seo_os_expansion_modules.sql` |
+| Analytics Integration | `analytics_integration_records` | true | `20260516120000_seo_os_expansion_modules.sql` |
+| Local SEO | `local_seo_records` | **false** | `20260516120000_seo_os_expansion_modules.sql` |
+
+Note: `local_seo` is the only module with `defaultActive: false`. Its records table and schema exist and are structurally available; activation requires an explicit override.
+
+## Migration File Inventory
+
+All migration files live in `supabase/migrations/`.
+
+| Migration file | Purpose |
+|---|---|
+| `20260422020600_backend_foundation.sql` | Creates the initial backend schema: `app_public.product_targets` table plus module records tables for all 8 V1 modules (review_analysis, content_listing_insights, keyword_analysis, rank_tracking, competitor_analysis, optimization_layer, creative_messaging_layer, unified_workflow_layer). |
+| `20260506120000_execution_lifecycle_foundation.sql` | Creates execution lifecycle schema: recommendations, tasks, and task status history tables supporting the execution domain service. |
+| `20260506133000_governance_engine_foundation.sql` | Creates governance engine schema: governance rules, evaluation records, and policy state tables supporting the governance domain service. |
+| `20260506150000_measurement_attribution_foundation.sql` | Creates measurement attribution schema: metric sources, baseline snapshots, post-change snapshots, and attribution link tables supporting the measurement domain service. |
+| `20260506170000_search_intelligence_foundation.sql` | Creates search intelligence schema: query records, intent records, SERP pattern records, opportunity score records, and competitor result tables supporting the search-intelligence domain service. |
+| `20260506183000_business_intelligence_foundation.sql` | Creates business intelligence schema: business profile records and priority extension records supporting the business-intelligence domain service. |
+| `20260506193000_recommendation_scoring_foundation.sql` | Creates recommendation scoring schema: recommendation score dimension records supporting shared recommendation scoring infrastructure. |
+| `20260516120000_seo_os_expansion_modules.sql` | Creates module records tables for all 10 Phase 2 modules: technical_seo_audit, on_page_seo, backlink_intelligence, eeat_signal, search_intent, serp_feature, topical_authority, site_architecture, analytics_integration, local_seo. |
+| `20260516130000_fix_activation_defaults.sql` | Patches activation default records to align runtime catalog state with database defaults after Phase 2 expansion. |
 
 ## Data Separation Principles By Module
 
@@ -112,6 +155,66 @@ Persistence must preserve explicit module ownership.
 - owns persisted workflow planning outputs
 - owns persisted workflow-level prioritized actions
 
+### Technical SEO Audit
+
+- owns persisted PageSpeed and Lighthouse input payloads
+- owns persisted technical audit analysis results (CWV scores, failed audits)
+- owns persisted technical SEO insights and prioritized remediation actions
+
+### On-Page SEO Scorer
+
+- owns persisted on-page input payloads (URL, content, meta fields)
+- owns persisted on-page scoring analysis results
+- owns persisted on-page SEO insights and prioritized action outputs
+
+### Backlink Intelligence
+
+- owns persisted backlink input payloads (backlink lists, referring domain lists)
+- owns persisted backlink analysis results (authority score, toxicity risk, anchor distribution)
+- owns persisted backlink insights and link-building action outputs
+
+### E-E-A-T Signals
+
+- owns persisted E-E-A-T signal input payloads
+- owns persisted E-E-A-T analysis results
+- owns persisted E-E-A-T insights and signal-improvement action outputs
+
+### Search Intent Classifier
+
+- owns persisted keyword intent classification inputs
+- owns persisted intent analysis results (intent category, confidence, recommended formats)
+- owns persisted intent insights and content-alignment action outputs
+
+### SERP Feature Analyzer
+
+- owns persisted SERP feature input payloads (keyword lists, provider results)
+- owns persisted SERP feature analysis results (feature presence, organic positions)
+- owns persisted SERP feature insights and feature-capture action outputs
+
+### Topical Authority
+
+- owns persisted topical authority input payloads
+- owns persisted topical coverage analysis results
+- owns persisted topical authority insights and gap-filling action outputs
+
+### Site Architecture
+
+- owns persisted site architecture input payloads
+- owns persisted architecture analysis results (crawl structure, internal link patterns)
+- owns persisted architecture insights and structural improvement action outputs
+
+### Analytics Integration
+
+- owns persisted GA4 and analytics input payloads
+- owns persisted analytics analysis results (organic sessions, page performance)
+- owns persisted analytics insights and traffic-improvement action outputs
+
+### Local SEO
+
+- owns persisted local SEO input payloads (NAP data, local signals)
+- owns persisted local SEO analysis results
+- owns persisted local SEO insights and local-optimization action outputs
+
 Cross-module relationships may exist, but persistence must preserve source ownership instead of collapsing records into one vague shared domain.
 
 ## Activation-Aware Persistence Considerations
@@ -123,21 +226,9 @@ This means:
 - inactive modules still require structurally valid persistence support
 - active and inactive state must not force separate backend architectures
 - persistence design must allow later activation without replacing the existing data model
-- default active backend operation should only use the MVP-active module set, while built-but-inactive module persistence remains structurally available
+- default active backend operation should only use the default-active module set, while inactive module persistence remains structurally available
 
-Activation-aware persistence must support:
-
-- Review Analysis
-- Content / Listing Insights
-- Keyword Analysis
-- Rank Tracking
-
-as active by default, while still structurally supporting:
-
-- Competitor Analysis
-- Optimization Layer
-- Creative / Messaging Layer
-- Unified Workflow Layer beyond MVP activation
+As of 2026-05-15 expansion, 17 of 18 modules are `defaultActive: true`. The sole exception is `local_seo`, which is `defaultActive: false`. Its records table exists and is structurally ready for activation.
 
 ## Analysis Result Storage Considerations
 
@@ -182,9 +273,7 @@ Final table design is not defined here, but later schema design must follow thes
 
 This document does not define:
 
-- final table schema
-- final table names
-- final column sets
+- final table schema column sets
 - unagreed fields
 - alternate databases
 - search systems

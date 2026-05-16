@@ -78,7 +78,7 @@ async function testHealthRoute() {
     assert.equal(response.body.data.status, "ok");
     assert.equal(response.body.data.deployable, true);
     assert.equal(response.body.data.activeModuleCount, 17);
-    assert.equal(response.body.data.inactiveModules.length, 0);
+    assert.equal(response.body.data.inactiveModules.length, 1);
   });
 }
 

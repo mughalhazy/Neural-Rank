@@ -1,5 +1,19 @@
 # BACKEND_V1_FROZEN.md
 
+---
+
+## SCOPE NOTICE — READ BEFORE USING THIS DOCUMENT
+
+This document covers the **original 8-module backend scope only** (V1 freeze, audit date 2026-04-22).
+
+As of **2026-05-15**, the backend has been expanded to **18 modules**. The 10 new modules added in Phase 2 (technical_seo_audit, on_page_seo_scorer, backlink_intelligence, eeat_signals, search_intent_classifier, serp_feature_analyzer, topical_authority, site_architecture, analytics_integration, local_seo) are **not covered by this freeze record**.
+
+A Phase 2 QC and freeze for the 10 new modules is **pending**.
+
+The V1 freeze record below remains **valid and accurate** for the original 8 modules. It has not been altered.
+
+---
+
 Anchors:
 - `docs/backend/BACKEND_QC_FINAL.md`
 - `docs/backend/BACKEND_V1_HARDENED.md`

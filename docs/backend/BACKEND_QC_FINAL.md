@@ -1,5 +1,19 @@
 # BACKEND_QC_FINAL.md
 
+---
+
+## SCOPE NOTICE — READ BEFORE USING THIS DOCUMENT
+
+This document covers the **original 8-module backend scope only** (QC audit date 2026-04-22, final verdict FREEZE).
+
+As of **2026-05-15**, the backend has been expanded to **18 modules**. The 10 new modules added in Phase 2 (technical_seo_audit, on_page_seo_scorer, backlink_intelligence, eeat_signals, search_intent_classifier, serp_feature_analyzer, topical_authority, site_architecture, analytics_integration, local_seo) are **not covered by this QC record**.
+
+A Phase 2 QC and freeze for the 10 new modules is **pending**.
+
+The original QC record below remains **valid and accurate** for the original 8 modules. It has not been altered.
+
+---
+
 Anchors:
 - `MASTER_PRODUCT_BUILD_SPEC.md` as contained in `MASTER BUILD SPEC.md`
 - `docs/backend/BACKEND_MASTER_SPEC.md`

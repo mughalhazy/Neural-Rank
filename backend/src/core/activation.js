@@ -20,7 +20,9 @@ const DEFAULT_ACTIVE_MODULES = new Set([
   "analytics_integration",
 ]);
 
-const BUILT_BUT_INACTIVE_MODULES = new Set([]);
+const BUILT_BUT_INACTIVE_MODULES = new Set([
+  "local_seo",
+]);
 
 function getCatalogEntries() {
   return Array.isArray(moduleCatalog) ? moduleCatalog : [];

@@ -207,7 +207,7 @@ function testDefaultActivationState() {
 
   assert.equal(Object.keys(activationState).length, 18);
   assert.equal(grouped.active.length, 17);
-  assert.equal(grouped.inactive.length, 0);
+  assert.equal(grouped.inactive.length, 1);
   assert.equal(activationState.local_seo, false);
   assert.equal(activationState.unified_workflow_layer, true);
 }

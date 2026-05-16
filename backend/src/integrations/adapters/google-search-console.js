@@ -105,7 +105,7 @@ async function collect(context = {}, request = {}) {
   if (!accessToken || !siteUrl) {
     return {
       status: "integration_not_connected",
-      moduleKey: "analytics_integration",
+      moduleKey: "rank_tracking",
       reason: "GSC credentials (accessToken + siteUrl) not found in context or environment.",
       normalizedPayload: {},
     };
