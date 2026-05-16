@@ -21,6 +21,26 @@ function createActionFromInsight(insight) {
     };
   }
 
+  if (insight.type === "quick_win_cluster") {
+    return {
+      type: "push_page2_keywords",
+      title: "Push page 2 keywords to page 1",
+      action: `${insight.keywords?.length || 0} keyword(s) sit on page 2. Strengthen their pages with improved internal linking, a content refresh, or targeted link building — these need the smallest lift for the biggest ranking jump.`,
+      priority: "high",
+      keywords: insight.keywords || [],
+    };
+  }
+
+  if (insight.type === "rising_keyword_opportunity") {
+    return {
+      type: "target_rising_keywords",
+      title: "Target rising-trend keywords before competition peaks",
+      action: "Create or optimise content targeting the rising keywords immediately. Early movers on rising-trend terms capture positions before difficulty and competition increase.",
+      priority: "medium",
+      keywords: insight.keywords || [],
+    };
+  }
+
   if (insight.type === "keyword_summary") {
     return {
       type: "keyword_analysis_follow_up",

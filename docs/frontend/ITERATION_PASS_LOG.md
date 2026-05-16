@@ -1,0 +1,268 @@
+# Iteration Pass Log
+
+## Purpose
+Record each controlled refinement pass after structural remediation is complete.
+
+## Entry Template
+
+### Pass <n>: <name>
+- Goal:
+- Inputs reviewed:
+- Structural changes made:
+- Visual changes made:
+- Intentionally unchanged:
+- Remaining blockers:
+- Validation:
+- Approval status:
+
+### Pass 1: Structural Refinement
+- Goal: normalize screen composition after structural gap remediation, without starting visual polish.
+- Inputs reviewed:
+  - `PHASE_12_ITERATION_PASSES.md`
+  - active feature screens
+  - gated feature screens
+  - shared section and pattern components
+- Structural changes made:
+  - added shared `SectionBlock` wrapper for title + grouped content sections
+  - restructured dashboard into command intake, command evidence, action queue, and gated expansion
+  - restructured keyword, rank, content, review, and settings screens around context/intake, evidence, and action/configuration sections
+  - restructured gated competitor, optimization, creative, and workflow screens so their evidence/flow blocks use the same section wrapper
+- Visual changes made:
+  - no intentional design-language or polish changes
+  - visible layout grouping changed only as a result of structural section normalization
+- Intentionally unchanged:
+  - typography scale
+  - color system
+  - component styling
+  - density tuning
+  - motion / micro-interactions
+- Remaining blockers:
+  - none for Pass 1 scope
+- Validation:
+  - `dart analyze lib test`: passed
+  - `flutter test`: passed
+- Approval status: ready for review
+
+### Pass 2: Hierarchy Refinement
+- Goal: improve scan order and decision clarity on top of the Pass 1 structure.
+- Inputs reviewed:
+  - `PHASE_12_ITERATION_PASSES.md`
+  - shared section wrapper
+  - operational flow component
+  - priority and action components
+- Structural changes made:
+  - none to screen/module architecture
+  - section architecture from Pass 1 was preserved
+- Visual changes made:
+  - added section rail treatment so users can scan intake, evidence, and action areas faster
+  - reduced operational-flow card dominance so workflow context reads as support, not the primary decision object
+  - strengthened priority hero hierarchy with an explicit top-priority label and larger priority headline
+  - strengthened action queue recognizability with an action icon and more meaningful item borders
+- Intentionally unchanged:
+  - color palette
+  - typography token definitions
+  - screen structure
+  - density tuning
+  - motion / polish
+- Remaining blockers:
+  - none for Pass 2 scope
+- Validation:
+  - `dart analyze lib test`: passed
+  - `flutter test`: passed
+- Approval status: ready for review
+
+### Pass 3: Design Language Application
+- Goal: apply a clearer premium operational design language without changing Pass 1 structure or Pass 2 hierarchy.
+- Inputs reviewed:
+  - `PHASE_07_DESIGN_LANGUAGE.md`
+  - `PHASE_12_ITERATION_PASSES.md`
+  - shared theme tokens
+  - shared section, flow, filter, alert, and action components
+- Structural changes made:
+  - none to screen/module architecture
+  - no screen composition order changed
+- Visual changes made:
+  - introduced a restrained signal accent for premium trust cues
+  - sharpened command-header eyebrow treatment
+  - aligned section rails, filters, flow headers, and action affordances to the signal accent
+  - adjusted card tone and border treatment toward glassy analytical panels
+  - removed the remaining Material-icon mapping path from product signal chips in favor of SVG symbols
+- Intentionally unchanged:
+  - active/gated module structure
+  - section ordering
+  - density tuning
+  - motion / micro-interactions
+  - navigation model
+- Remaining blockers:
+  - none for Pass 3 scope
+- Validation:
+  - `dart analyze lib test`: passed
+  - `flutter test`: passed
+- Approval status: ready for review
+
+### Pass 4: Design System Enforcement
+- Goal: enforce reusable design-system rules after the design-language pass.
+- Inputs reviewed:
+  - `PHASE_08_DESIGN_SYSTEM.md`
+  - `PHASE_12_ITERATION_PASSES.md`
+  - shared theme tokens
+  - shared section, primitive, flow, priority, and action components
+- Structural changes made:
+  - none to screen/module architecture
+  - no screen composition order changed
+- Visual changes made:
+  - centralized micro spacing, insets, opacity/state, and surface depth tokens
+  - replaced major shared-component local spacing/radius/opacity literals with system tokens
+  - reinforced shared behavior for chips, alerts, flow stages, priority surfaces, and command/status treatments
+- Intentionally unchanged:
+  - active/gated module structure
+  - section ordering
+  - design-language direction
+  - density tuning
+  - motion / micro-interactions
+  - navigation model
+- Remaining blockers:
+  - none for Pass 4 scope
+- Validation:
+  - `dart analyze lib test`: passed
+  - `flutter test`: passed
+- Approval status: ready for review
+
+### Pass 5: Density / Clarity Tuning
+- Goal: reduce mobile scroll weight while preserving operational clarity.
+- Inputs reviewed:
+  - `PHASE_12_ITERATION_PASSES.md`
+  - active and gated feature screen spacing
+  - shared flow, priority, insight, action, review cluster, and competitor components
+- Structural changes made:
+  - none to screen/module architecture
+  - no section order changed
+- Visual changes made:
+  - reduced repeated inter-section gaps from `AppSpacing.xl` to `AppSpacing.lg` across active and gated screens
+  - compacted operational-flow cards by shortening the explanatory line and tightening stage spacing
+  - reduced priority, insight, action, review-cluster, and competitor block padding/gaps using system tokens
+  - retained all required input, analysis, insight, priority, and action content
+- Intentionally unchanged:
+  - navigation model
+  - module activation model
+  - design-language direction
+  - structural section grouping
+  - motion / micro-interactions
+- Remaining blockers:
+  - none for Pass 5 scope
+- Validation:
+  - `dart analyze lib test`: passed
+  - `flutter test`: passed
+- Approval status: ready for review
+
+### Pass 6: Polish Pass
+- Goal: resolve final edge-integration polish so the UI feels native to the phone canvas instead of boxed inside it.
+- Inputs reviewed:
+  - `PHASE_12_ITERATION_PASSES.md`
+  - `ScreenFrame`
+  - app card theme
+  - bottom navigation shell
+  - user mobile review feedback
+- Structural changes made:
+  - none to screen/module architecture
+  - no section order changed
+- Visual changes made:
+  - reduced global screen gutter from a large fixed inset to the system screen inset
+  - removed default `Card` outer margins so surfaces align with the screen rhythm instead of floating inside another frame
+  - blended the bottom navigation background into the canvas with a vertical gradient
+- Intentionally unchanged:
+  - navigation model
+  - module activation model
+  - operational flow content
+  - design-language direction
+  - density decisions from Pass 5
+- Remaining blockers:
+  - none for Pass 6 scope
+- Validation:
+  - `dart analyze lib test`: passed
+  - `flutter test`: passed
+- Approval status: ready for review
+
+### Pass 6B: Edge Integration Correction
+- Goal: fix the remaining boxed-in phone-canvas issue identified from the supplied mobile screenshots.
+- Inputs reviewed:
+  - `PHASE_12_ITERATION_PASSES.md`
+  - screenshots in `Design Inspiration/UI Screenshots`
+  - `ScreenFrame`
+  - shared card theme
+  - `SectionBlock`
+  - operational flow card
+- Structural changes made:
+  - none to screen/module architecture
+  - no section order changed
+- Visual changes made:
+  - reduced global horizontal screen gutter further
+  - softened default card borders and increased card radius so surfaces feel less like hard inset boxes
+  - removed the `SectionBlock` left rail that was creating a visible inner wall
+  - flattened flow stages from nested rounded cards into rows separated by subtle dividers
+- Intentionally unchanged:
+  - navigation model
+  - module activation model
+  - operational flow content
+  - screen section order
+  - backend/frontend boundaries
+- Remaining blockers:
+  - none for Pass 6B scope
+- Validation:
+  - `dart analyze lib test`: passed
+  - `flutter test`: passed
+- Approval status: ready for review
+
+### Pass 6C: Full-Bleed Edge Correction
+- Goal: remove the remaining contained-column feeling after live mobile review showed the issue still persisted.
+- Inputs reviewed:
+  - live mobile feedback
+  - `ScreenFrame`
+  - app card theme
+  - command header
+  - filter and trust primitives
+- Structural changes made:
+  - none to screen/module architecture
+  - no section order changed
+- Visual changes made:
+  - removed the remaining horizontal `ScreenFrame` gutter
+  - reduced default card border strength and radius so cards read as connected surfaces, not boxed islands
+  - moved necessary text readability padding into header/section primitives instead of applying a global outer frame
+  - padded filter and trust rows internally so screen edges can bleed while content remains readable
+- Intentionally unchanged:
+  - navigation model
+  - module activation model
+  - operational flow content
+  - screen section order
+- Remaining blockers:
+  - none for Pass 6C scope
+- Validation:
+  - `dart analyze lib test`: passed
+  - `flutter test`: passed
+- Approval status: ready for review
+
+### Baseline Reset: Premium-Minimal Parent Pages
+- Goal: establish a new durable parent-page baseline after the older operational dashboard direction proved too heavy.
+- Inputs reviewed:
+  - `Design Inspiration`
+  - user feedback on noise, cloned pages, and weak personality
+  - current shared theme and component layer
+- Structural changes made:
+  - simplified parent module pages to header + commercial feature list
+  - deferred capability depth to future archetype subpages
+- Visual changes made:
+  - shifted shared theme from dark dashboard styling to light premium-minimal styling
+  - softened shell, cards, borders, and navigation
+  - removed generic `Features` heading from module pages
+  - introduced per-screen header personality using symbol + accent tone
+  - introduced feature-specific SVG icons using `iconKey`
+- Intentionally unchanged:
+  - module boundaries
+  - navigation structure
+  - backend capability mapping work
+- Remaining blockers:
+  - archetype subpages are still pending
+- Validation:
+  - `dart analyze lib test`: passed
+  - `flutter test`: passed
+- Approval status: active baseline

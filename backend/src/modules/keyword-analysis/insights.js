@@ -43,13 +43,44 @@ function createSummaryInsight(summary) {
   };
 }
 
+function createQuickWinInsight(opportunities) {
+  const quickWins = opportunities.filter((o) => o.opportunityTier === "quick_win");
+  if (quickWins.length === 0) return null;
+  return {
+    type: "quick_win_cluster",
+    severity: "high",
+    title: "Page 2 keywords are within striking distance",
+    summary: `${quickWins.length} keyword(s) rank on page 2 (positions 11-20) — a targeted content or link push could move these to page 1 rapidly.`,
+    evidenceCount: quickWins.length,
+    severityScore: quickWins.length * 3,
+    keywords: quickWins.map((o) => o.keyword).slice(0, 5),
+  };
+}
+
+function createRisingKeywordInsight(opportunities) {
+  const rising = opportunities.filter((o) => o.trendDirection === "rising" && o.source === "direct_input");
+  if (rising.length === 0) return null;
+  return {
+    type: "rising_keyword_opportunity",
+    severity: "medium",
+    title: "Keywords with growing search volume detected",
+    summary: `${rising.length} keyword(s) show rising search volume trends — early optimisation now captures audience before competition intensifies.`,
+    evidenceCount: rising.length,
+    severityScore: rising.length * 2,
+    keywords: rising.map((o) => o.keyword).slice(0, 5),
+  };
+}
+
 function generateKeywordInsights(analysisResult) {
   const insights = [createCoverageInsight(analysisResult)];
   const highOpportunityInsight = createHighOpportunityInsight(analysisResult.opportunities);
+  if (highOpportunityInsight) insights.push(highOpportunityInsight);
 
-  if (highOpportunityInsight) {
-    insights.push(highOpportunityInsight);
-  }
+  const quickWinInsight = createQuickWinInsight(analysisResult.opportunities);
+  if (quickWinInsight) insights.push(quickWinInsight);
+
+  const risingInsight = createRisingKeywordInsight(analysisResult.opportunities);
+  if (risingInsight) insights.push(risingInsight);
 
   insights.push(createSummaryInsight(analysisResult.summary));
 

@@ -131,6 +131,132 @@ Use these first in a new session:
 - add production deployment hardening such as environment management, logging, and monitoring
 - begin frontend or API consumer integration against the deployed backend routes
 
+---
+
+## SEO OS Expansion — Build Progress
+
+> Reference plan: `SEO-OS-Build-Plan.md`
+> Expansion started: 2026-05-15
+> Goal: Grow from 8 modules to 18, adding 10 new modules, 7 enhancements, 3 core utilities, 5 adapters
+
+### Phase 1 — Foundation ✅ COMPLETE
+> Completed: 2026-05-15 — 13 files created, 3 files updated.
+
+| # | Item | Type | Status | Completed |
+|---|------|------|--------|-----------|
+| 1 | `core/intentClassifier.js` | Core utility | ✅ Done | 2026-05-15 |
+| 2 | `core/seoScorer.js` | Core utility | ✅ Done | 2026-05-15 |
+| 3 | `core/domainAuthorityScorer.js` | Core utility | ✅ Done | 2026-05-15 |
+| 4 | `modules/technical-seo-audit` (5 files) | New module | ✅ Done | 2026-05-15 |
+| 5 | `modules/on-page-seo-scorer` (5 files) | New module | ✅ Done | 2026-05-15 |
+| 6 | Wire: moduleCatalog + activation + serviceRegistry | Config | ✅ Done | 2026-05-15 |
+
+### Phase 2 — Authority Layer ✅ COMPLETE
+> Completed: 2026-05-15 — 10 files created, 3 files updated, 1 module enhanced.
+
+| # | Item | Type | Status | Completed |
+|---|------|------|--------|-----------|
+| 7 | `modules/backlink-intelligence` (5 files) | New module | ✅ Done | 2026-05-15 |
+| 8 | `modules/eeat-signals` (5 files) | New module | ✅ Done | 2026-05-15 |
+| 9 | Enhance `competitor-analysis` (DA gap + topical gap + 6-dimension pressure) | Enhancement | ✅ Done | 2026-05-15 |
+
+### Phase 3 — Intent & Visibility ✅ COMPLETE
+> Completed: 2026-05-15 — 10 files created, 3 files updated, 2 modules enhanced.
+
+| # | Item | Type | Status | Completed |
+|---|------|------|--------|-----------|
+| 10 | `modules/search-intent-classifier` (5 files) | New module | ✅ Done | 2026-05-15 |
+| 11 | `modules/serp-feature-analyzer` (5 files) | New module | ✅ Done | 2026-05-15 |
+| 12 | Enhance `keyword-analysis` (intent + context-aware expansion + trend + quick_win) | Enhancement | ✅ Done | 2026-05-15 |
+| 13 | Enhance `rank-tracking` (CTR efficiency + position-zero + quick_win) | Enhancement | ✅ Done | 2026-05-15 |
+
+### Phase 4 — Content & Architecture ✅ COMPLETE
+> Completed: 2026-05-15 — 10 files created, 3 files updated, 2 modules enhanced.
+
+| # | Item | Type | Status | Completed |
+|---|------|------|--------|-----------|
+| 14 | `modules/topical-authority` (5 files) | New module | ✅ Done | 2026-05-15 |
+| 15 | `modules/site-architecture` (5 files) | New module | ✅ Done | 2026-05-15 |
+| 16 | Enhance `optimization-layer` (readability + semantic richness + density + freshness) | Enhancement | ✅ Done | 2026-05-15 |
+| 17 | Enhance `content-listing-insights` (E-E-A-T signals + competitor depth + structured content) | Enhancement | ✅ Done | 2026-05-15 |
+
+### Phase 5 — Data & Consolidation ✅ COMPLETE
+> Completed: 2026-05-15 — 10 files created, 3 files updated, 2 modules enhanced. Execution order resequenced (technical_seo_audit now runs first).
+
+| # | Item | Type | Status | Completed |
+|---|------|------|--------|-----------|
+| 18 | `modules/analytics-integration` (5 files) | New module | ✅ Done | 2026-05-15 |
+| 19 | `modules/local-seo` opt-in (5 files) | New module | ✅ Done | 2026-05-15 |
+| 20 | Enhance `unified-workflow-layer` (weights + foundation gating + quick win cluster) | Enhancement | ✅ Done | 2026-05-15 |
+| 21 | Enhance `review-analysis` (web sources + recency + responseRate + verifiedBuyer) | Enhancement | ✅ Done | 2026-05-15 |
+
+### Phase 6 — Integration Adapters ✅ COMPLETE
+> Completed: 2026-05-15 — 5 adapter files created, catalog updated, barrel index created.
+
+| # | Item | Type | Status | Completed |
+|---|------|------|--------|-----------|
+| 22 | `integrations/adapters/google-search-console.js` | Adapter | ✅ Done | 2026-05-15 |
+| 23 | `integrations/adapters/google-analytics-4.js` | Adapter | ✅ Done | 2026-05-15 |
+| 24 | `integrations/adapters/pagespeed-insights.js` | Adapter | ✅ Done | 2026-05-15 |
+| 25 | `integrations/adapters/backlink-provider.js` | Adapter | ✅ Done | 2026-05-15 |
+| 26 | `integrations/adapters/serp-provider.js` | Adapter | ✅ Done | 2026-05-15 |
+| 27 | `integrations/adapters/index.js` barrel | Config | ✅ Done | 2026-05-15 |
+| 28 | `integrations/catalog.js` updated (10 new boundaries, 5 `isImplemented: true`) | Config | ✅ Done | 2026-05-15 |
+
+### Expansion Totals
+
+| Metric | Target | Done |
+|--------|--------|------|
+| New modules | 10 | 10 |
+| Module enhancements | 7 | 7 |
+| Core utilities | 3 | 3 |
+| Integration adapters | 5 | 5 |
+| **Total deliverables** | **25** | **25** |
+
+**SEO OS Expansion — ALL PHASES COMPLETE ✅**
+
+---
+
+### Post-Build Audit & Bug Fixes ✅ COMPLETE
+> Completed: 2026-05-15 — Full audit of all 55 deliverables against build plan spec. 4 issues found and resolved.
+
+**Audit scope:** 10 new modules (50 files), 7 module enhancements (21 files), 3 core utilities, 5 integration adapters, 4 registry files — 0 FAIL, 4 WARN resolved.
+
+| # | Issue | Severity | File(s) | Fix Applied |
+|---|-------|----------|---------|-------------|
+| F1 | `resolveCredentials()` in backlink adapter referenced undefined `request` variable (dead function, never called) | Critical | `integrations/adapters/backlink-provider.js` | Deleted dead function entirely |
+| F2 | `fetchCompetitorBacklinks` returned nested `[{ domain, referringDomains[] }]` containers but `backlink-intelligence` module expected flat `[{ domain, domainAuthority }]` referring domain objects — schema mismatch producing wrong link gap analysis | Critical | `integrations/adapters/backlink-provider.js` | Rewrote to flatten + deduplicate all competitor referring domains into a single flat array matching module's expected shape |
+| F3 | `analyzeTrafficOpportunities` filtered on `e.positionDelta` which is never computed — `positionGains` always returned empty array | Critical | `modules/analytics-integration/analysis.js` | Removed dead filter; replaced with `highClickPage2` (page-2 entries with existing clicks — valid momentum proxy from single-period GSC data) |
+| F4 | All 7 issue branches in optimization-layer actions shared the same `type: "optimization_improvement_action"` — made downstream filtering/routing impossible | Non-critical | `modules/optimization-layer/actions.js` | Split into 7 distinct action types: `fix_keyword_overstuffing`, `improve_semantic_richness`, `refresh_stale_content`, `simplify_complex_readability`, `expand_keyword_coverage`, `complete_section_metadata`, `expand_thin_content` |
+
+**Audit results (remaining after fixes):**
+- 55 PASS, 0 WARN, 0 FAIL
+- All module 5-file contracts verified
+- All registry files (moduleCatalog, activation, serviceRegistry, integrationCatalog) verified
+- All adapter credential resolution and API endpoint paths verified
+- GA4 metric index order verified correct per API spec
+- GSC function hoisting verified safe
+- SERP provider deduplication verified correct
+
+---
+
+## Test Layer Audit & Fixes ✅ COMPLETE
+> Completed: 2026-05-15 — Full test layer audit following code audit. 5 issues found and resolved. Full validation suite now covers all 18 modules.
+
+| # | Issue | Severity | File(s) | Fix Applied |
+|---|-------|----------|---------|-------------|
+| T1 | `domain-boundaries.test.js` asserted 8 results from `runDefaultBackendFlow` — now runs 17 | Critical | `src/domain-boundaries.test.js` | Updated assertion: `8` → `17` |
+| T2 | `shared-backend.test.js` had 4 stale assertions and no inputs for the 10 new modules | Critical | `src/shared-backend.test.js` | Updated all 4 counts, added inputs for all 10 new modules in `buildModuleInputs()` |
+| T3 | `server.test.js` had 3 stale assertions (`activeModuleCount`, `modules.length`, results count) | Critical | `src/server.test.js` | Updated: 8→17, 8→18, 8→17 |
+| T4 | No `service.test.js` for any of the 10 new modules | High | 10 new module directories | Created `service.test.js` for all 10 (3 tests each: happy path, adapter fallback, persistence) |
+| T5 | `search-intent-classifier/analysis.js` empty-keywords early return missing `highValueMisaligned` field — insights crashed on `.length` | Critical | `src/modules/search-intent-classifier/analysis.js` | Added `highValueMisaligned: []` to early return |
+
+**Test suite after fixes:**
+- `full-backend-validation.test.js` suite count: 19 → 29
+- All 29 suites PASS
+
+---
+
 ## Session Notes
 - keep work confined to `D:\Neural Rank` unless external deployment or repo actions are explicitly requested
 - frontend MVP exposure must not be confused with backend inactivity

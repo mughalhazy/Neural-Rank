@@ -36,12 +36,14 @@ async function runUnifiedWorkflowLayer(moduleInput = {}, context = {}) {
   const analysisResult = analyzeUnifiedWorkflowLayer(moduleInput, adapterResult);
   const insights = generateUnifiedWorkflowInsights(analysisResult);
   const actions = generateUnifiedWorkflowActions(analysisResult);
+  const priorityPayload = analysisResult.consolidatedPriorities;
 
   await persistRun(context, {
     productTarget: analysisResult.normalizedInput.productTarget,
     inputPayload: analysisResult.normalizedInput,
     analysisPayload: analysisResult,
     insightPayload: insights,
+    priorityPayload,
     actionPayload: actions,
   });
 
@@ -53,7 +55,7 @@ async function runUnifiedWorkflowLayer(moduleInput = {}, context = {}) {
       input: analysisResult.normalizedInput,
       analysis: analysisResult,
       insight: insights,
-      priority: analysisResult.consolidatedPriorities,
+      priority: priorityPayload,
       action: actions,
     },
     integrationStatus: adapterResult?.status || "direct_input",

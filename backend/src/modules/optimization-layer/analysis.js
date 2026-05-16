@@ -1,4 +1,6 @@
 const MODULE_KEY = "optimization_layer";
+const { normalizeProductTarget } = require("../../core/targeting");
+const { readabilityTier, estimateAvgSentenceLength, keywordDensity } = require("../../core/seoScorer");
 
 function normalizeText(value) {
   if (value === null || value === undefined) {
@@ -36,6 +38,8 @@ function normalizeSections(sections) {
         description: normalizeText(section?.metadata?.description),
         title: normalizeText(section?.metadata?.title),
       },
+      relatedTerms: normalizeArray(section?.relatedTerms || section?.lsiTerms || []),
+      lastModified: section?.lastModified ?? section?.last_modified ?? null,
     }))
     .filter((section) => section.title || section.content || section.keywords.length > 0);
 }
@@ -47,20 +51,7 @@ function normalizeInput(moduleInput = {}, adapterResult = {}) {
 
   return {
     moduleKey: MODULE_KEY,
-    productTarget: {
-      targetRef:
-        moduleInput?.targetRef ||
-        moduleInput?.websiteUrl ||
-        moduleInput?.appId ||
-        moduleInput?.appStoreUrl ||
-        moduleInput?.playStoreUrl ||
-        "unknown_target",
-      targetType: moduleInput?.targetType || "product_target",
-      websiteUrl: moduleInput?.websiteUrl || null,
-      appId: moduleInput?.appId || null,
-      appStoreUrl: moduleInput?.appStoreUrl || null,
-      playStoreUrl: moduleInput?.playStoreUrl || null,
-    },
+    productTarget: normalizeProductTarget(moduleInput),
     targetKeywords: normalizeArray(moduleInput.targetKeywords || adapterResult.targetKeywords),
     sections,
   };
@@ -80,13 +71,46 @@ function scoreSection(section, targetKeywords) {
   if (matchedKeywords.length === 0 && targetKeywords.length > 0) {
     issues.push("keyword_coverage_missing");
   }
-
   if (metadataCoverage < 2) {
     issues.push("metadata_incomplete");
   }
-
   if (contentLength < 80) {
     issues.push("content_thin");
+  }
+
+  const avgSentenceLength = estimateAvgSentenceLength(section.content);
+  const readabilityLevel = readabilityTier(avgSentenceLength);
+  if (readabilityLevel === "complex") {
+    issues.push("readability_complex");
+  }
+
+  const primaryKeyword = targetKeywords[0] || "";
+  const density = primaryKeyword ? keywordDensity(section.content, primaryKeyword) : 0;
+  if (density > 3) {
+    issues.push("keyword_overstuffed");
+  } else if (density === 0 && primaryKeyword && contentLength > 80) {
+    issues.push("keyword_density_too_low");
+  }
+
+  const relatedTerms = section.relatedTerms || [];
+  const matchedRelatedTerms = relatedTerms.filter((term) =>
+    contentLower.includes(term.toLowerCase()),
+  );
+  const semanticRichness = relatedTerms.length > 0
+    ? Math.round((matchedRelatedTerms.length / relatedTerms.length) * 100)
+    : null;
+  if (semanticRichness !== null && semanticRichness < 30) {
+    issues.push("low_semantic_richness");
+  }
+
+  const now = Date.now();
+  const twelveMonthsMs = 365 * 24 * 60 * 60 * 1000;
+  const lastModifiedTs = section.lastModified ? new Date(section.lastModified).getTime() : null;
+  const freshnessSignal = lastModifiedTs && !isNaN(lastModifiedTs)
+    ? now - lastModifiedTs > twelveMonthsMs ? "stale_candidate" : "fresh"
+    : "unknown";
+  if (freshnessSignal === "stale_candidate") {
+    issues.push("content_stale");
   }
 
   return {
@@ -96,6 +120,10 @@ function scoreSection(section, targetKeywords) {
     missingKeywordCount: Math.max(targetKeywords.length - matchedKeywords.length, 0),
     metadataCoverage,
     contentLength,
+    readabilityLevel,
+    keywordDensity: density,
+    semanticRichness,
+    freshnessSignal,
     issues,
     optimizationScore:
       matchedKeywords.length * 10 + metadataCoverage * 10 + Math.min(contentLength / 20, 20),

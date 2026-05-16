@@ -1,4 +1,6 @@
 const MODULE_KEY = "rank_tracking";
+const { normalizeProductTarget } = require("../../core/targeting");
+const { expectedCtrByPosition, ctrEfficiencyScore } = require("../../core/seoScorer");
 
 function normalizeText(value) {
   if (value === null || value === undefined) {
@@ -41,6 +43,10 @@ function normalizeRankEntry(entry, index) {
     keyword,
     currentPosition,
     previousPosition,
+    clicks: toNumber(entry.clicks, null),
+    impressions: toNumber(entry.impressions, null),
+    ctr: toNumber(entry.ctr, null),
+    rankingUrl: normalizeText(entry.rankingUrl ?? entry.url ?? ""),
   };
 }
 
@@ -53,23 +59,7 @@ function normalizeRankInput(inputPayload = {}) {
 
   return {
     moduleKey: MODULE_KEY,
-    productTarget: {
-      targetRef:
-        normalizeText(inputPayload.targetRef) ||
-        normalizeText(inputPayload.websiteUrl) ||
-        normalizeText(inputPayload.appUrl) ||
-        normalizeText(inputPayload.appId) ||
-        "unknown_target",
-      targetType:
-        normalizeText(inputPayload.targetType) ||
-        (normalizeText(inputPayload.appUrl) || normalizeText(inputPayload.appId)
-          ? "app_target"
-          : "product_target"),
-      websiteUrl: normalizeText(inputPayload.websiteUrl) || null,
-      appId: normalizeText(inputPayload.appId) || null,
-      appStoreUrl: normalizeText(inputPayload.appUrl) || normalizeText(inputPayload.appStoreUrl) || null,
-      playStoreUrl: normalizeText(inputPayload.playStoreUrl) || null,
-    },
+    productTarget: normalizeProductTarget(inputPayload),
     rankEntries: directRanks.map(normalizeRankEntry).filter(Boolean),
   };
 }
@@ -125,6 +115,14 @@ function summarize(movementDetails) {
 function analyzeRankInput(normalizedInput) {
   const movementDetails = normalizedInput.rankEntries.map((entry) => {
     const movement = classifyMovement(entry.previousPosition, entry.currentPosition);
+    const isPositionZero = entry.currentPosition === 0;
+    const isQuickWin = entry.currentPosition >= 11 && entry.currentPosition <= 20;
+
+    const expectedCtr = expectedCtrByPosition(entry.currentPosition);
+    const ctrEfficiency = entry.ctr !== null
+      ? ctrEfficiencyScore(entry.ctr, entry.currentPosition)
+      : null;
+    const ctrUnderperforming = ctrEfficiency !== null && ctrEfficiency < 0.7;
 
     return {
       keyword: entry.keyword,
@@ -132,12 +130,28 @@ function analyzeRankInput(normalizedInput) {
       previousPosition: entry.previousPosition,
       movementType: movement.movementType,
       delta: movement.delta,
+      clicks: entry.clicks,
+      impressions: entry.impressions,
+      ctr: entry.ctr,
+      rankingUrl: entry.rankingUrl,
+      expectedCtr,
+      ctrEfficiency,
+      ctrUnderperforming,
+      isPositionZero,
+      isQuickWin,
     };
   });
+
+  const quickWinKeywords = movementDetails.filter((e) => e.isQuickWin);
+  const ctrUnderperformers = movementDetails.filter((e) => e.ctrUnderperforming);
+  const positionZeroEntries = movementDetails.filter((e) => e.isPositionZero);
 
   return {
     normalizedInput,
     movementDetails,
+    quickWinKeywords,
+    ctrUnderperformers,
+    positionZeroEntries,
     ...summarize(movementDetails),
   };
 }

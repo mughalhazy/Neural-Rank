@@ -58,6 +58,7 @@ async function runReviewAnalysis(moduleInput = {}, context = {}) {
     inputPayload: analysisResult.normalizedInput,
     analysisPayload: analysisResult,
     insightPayload: insights,
+    priorityPayload,
     actionPayload: actionsPayload,
   });
 

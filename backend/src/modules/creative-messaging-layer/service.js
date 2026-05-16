@@ -40,12 +40,18 @@ async function runCreativeMessagingLayer(moduleInput = {}, context = {}) {
   const analysisResult = analyzeCreativeMessagingLayer(moduleInput, adapterResult);
   const insights = generateCreativeMessagingInsights(analysisResult);
   const actions = generateCreativeMessagingActions(analysisResult);
+  const priorityPayload = actions.map((action) => ({
+    type: action.type,
+    priority: action.priority,
+    assetRef: action.assetRef || null,
+  }));
 
   await persistRun(context, {
     productTarget: analysisResult.normalizedInput.productTarget,
     inputPayload: analysisResult.normalizedInput,
     analysisPayload: analysisResult,
     insightPayload: insights,
+    priorityPayload,
     actionPayload: actions,
   });
 
@@ -57,11 +63,7 @@ async function runCreativeMessagingLayer(moduleInput = {}, context = {}) {
       input: analysisResult.normalizedInput,
       analysis: analysisResult,
       insight: insights,
-      priority: actions.map((action) => ({
-        type: action.type,
-        priority: action.priority,
-        assetRef: action.assetRef || null,
-      })),
+      priority: priorityPayload,
       action: actions,
     },
     integrationStatus: adapterResult?.status || "direct_input",

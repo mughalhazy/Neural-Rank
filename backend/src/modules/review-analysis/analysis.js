@@ -1,4 +1,5 @@
 const MODULE_KEY = "review_analysis";
+const { normalizeProductTarget } = require("../../core/targeting");
 
 const CLUSTER_DEFINITIONS = Object.freeze([
   {
@@ -26,6 +27,11 @@ const CLUSTER_DEFINITIONS = Object.freeze([
     label: "Support",
     keywords: ["support", "help", "response", "customer service", "service"],
   },
+]);
+
+const VALID_REVIEW_SOURCES = new Set([
+  "app_store", "play_store", "google_business", "trustpilot",
+  "g2", "capterra", "yelp", "amazon", "direct_input", "other",
 ]);
 
 const FEATURE_REQUEST_MARKERS = Object.freeze([
@@ -84,6 +90,13 @@ function normalizeReviewInput(reviewInput, index) {
     return null;
   }
 
+  const rawSource = normalizeText(reviewInput.source).toLowerCase();
+  const normalizedSource = VALID_REVIEW_SOURCES.has(rawSource) ? rawSource : "direct_input";
+
+  const rawDate = reviewInput.date ?? reviewInput.reviewDate ?? reviewInput.created_at ?? null;
+  const reviewDate = rawDate ? new Date(rawDate) : null;
+  const reviewDateValid = reviewDate && !isNaN(reviewDate.getTime());
+
   return {
     reviewId:
       normalizeText(reviewInput.reviewId) ||
@@ -91,7 +104,10 @@ function normalizeReviewInput(reviewInput, index) {
       `review_${index + 1}`,
     text,
     rating: toNumber(reviewInput.rating, null),
-    source: normalizeText(reviewInput.source) || "direct_input",
+    source: normalizedSource,
+    verifiedBuyer: Boolean(reviewInput.verifiedBuyer ?? reviewInput.verified_buyer ?? reviewInput.verified),
+    responseReceived: Boolean(reviewInput.responseReceived ?? reviewInput.response_received ?? reviewInput.replied),
+    reviewDate: reviewDateValid ? reviewDate.toISOString() : null,
   };
 }
 
@@ -99,26 +115,6 @@ function normalizeReviews(reviewInputs = []) {
   return (Array.isArray(reviewInputs) ? reviewInputs : [])
     .map((reviewInput, index) => normalizeReviewInput(reviewInput, index))
     .filter(Boolean);
-}
-
-function resolveProductTarget(moduleInput = {}) {
-  return {
-    targetRef:
-      normalizeText(moduleInput.targetRef) ||
-      normalizeText(moduleInput.websiteUrl) ||
-      normalizeText(moduleInput.appUrl) ||
-      normalizeText(moduleInput.appId) ||
-      "unknown_target",
-    targetType:
-      normalizeText(moduleInput.targetType) ||
-      (normalizeText(moduleInput.appUrl) || normalizeText(moduleInput.appId)
-        ? "app_target"
-        : "product_target"),
-    websiteUrl: normalizeText(moduleInput.websiteUrl) || null,
-    appId: normalizeText(moduleInput.appId) || null,
-    appStoreUrl: normalizeText(moduleInput.appUrl) || normalizeText(moduleInput.appStoreUrl) || null,
-    playStoreUrl: normalizeText(moduleInput.playStoreUrl) || null,
-  };
 }
 
 function calculateSeverityScore(review) {
@@ -211,6 +207,22 @@ function buildFeatureRequests(reviews) {
     }));
 }
 
+function buildRecencyBuckets(reviews) {
+  const now = Date.now();
+  const d30 = 30 * 24 * 60 * 60 * 1000;
+  const d90 = 90 * 24 * 60 * 60 * 1000;
+
+  let recent = 0, midTerm = 0, older = 0, undated = 0;
+  for (const review of reviews) {
+    if (!review.reviewDate) { undated++; continue; }
+    const age = now - new Date(review.reviewDate).getTime();
+    if (age <= d30) recent++;
+    else if (age <= d90) midTerm++;
+    else older++;
+  }
+  return { last30Days: recent, last30To90Days: midTerm, olderThan90Days: older, undated };
+}
+
 function buildSummary(reviews, complaintClusters, featureRequests) {
   const ratedReviews = reviews.filter((review) => review.rating !== null);
   const averageRating =
@@ -218,12 +230,33 @@ function buildSummary(reviews, complaintClusters, featureRequests) {
       ? ratedReviews.reduce((total, review) => total + review.rating, 0) / ratedReviews.length
       : null;
 
+  const verifiedCount = reviews.filter((r) => r.verifiedBuyer).length;
+  const verifiedBuyerRatio = reviews.length > 0
+    ? Math.round((verifiedCount / reviews.length) * 100) / 100
+    : 0;
+
+  const respondedCount = reviews.filter((r) => r.responseReceived).length;
+  const responseRate = reviews.length > 0
+    ? Math.round((respondedCount / reviews.length) * 100) / 100
+    : 0;
+
+  const sourceCounts = reviews.reduce((acc, r) => {
+    acc[r.source] = (acc[r.source] || 0) + 1;
+    return acc;
+  }, {});
+
+  const recencyBuckets = buildRecencyBuckets(reviews);
+
   return {
     reviewCount: reviews.length,
     averageRating,
     complaintClusterCount: complaintClusters.length,
     featureRequestCount: featureRequests.length,
     highestSeverityClusterKey: complaintClusters[0]?.clusterKey || null,
+    verifiedBuyerRatio,
+    responseRate,
+    sourceCounts,
+    recencyBuckets,
   };
 }
 
@@ -249,7 +282,7 @@ function normalizeReviewAnalysisInput(moduleInput = {}, adapterResult = {}) {
 
   return {
     moduleKey: MODULE_KEY,
-    productTarget: resolveProductTarget(moduleInput),
+    productTarget: normalizeProductTarget(moduleInput),
     reviews,
   };
 }

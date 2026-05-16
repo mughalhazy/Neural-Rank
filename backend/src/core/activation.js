@@ -9,6 +9,15 @@ const DEFAULT_ACTIVE_MODULES = new Set([
   "optimization_layer",
   "creative_messaging_layer",
   "unified_workflow_layer",
+  "technical_seo_audit",
+  "on_page_seo_scorer",
+  "backlink_intelligence",
+  "eeat_signals",
+  "search_intent_classifier",
+  "serp_feature_analyzer",
+  "topical_authority",
+  "site_architecture",
+  "analytics_integration",
 ]);
 
 const BUILT_BUT_INACTIVE_MODULES = new Set([]);

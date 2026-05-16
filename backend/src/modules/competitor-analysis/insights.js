@@ -27,6 +27,32 @@ function buildCoverageInsight(summary) {
   };
 }
 
+function buildDaGapInsight(finding) {
+  return {
+    type: "domain_authority_gap",
+    competitorRef: finding.competitorRef,
+    severity: finding.daSeverity === "critical" ? "high" : finding.daSeverity === "significant" ? "medium" : "low",
+    message: `${finding.competitorRef} has a domain authority gap of ${finding.daGap} points — classified as ${finding.daSeverity}. Authority gaps directly limit ranking potential on competitive keywords.`,
+    evidence: {
+      daGap: finding.daGap,
+      daSeverity: finding.daSeverity,
+      serpOverlap: finding.serpOverlapScore,
+    },
+  };
+}
+
+function buildTopicalGapInsight(finding) {
+  return {
+    type: "topical_coverage_gap",
+    competitorRef: finding.competitorRef,
+    severity: finding.topicalGap >= 20 ? "high" : "medium",
+    message: `${finding.competitorRef} covers ${finding.topicalGap} more topics than the target — broader topical authority increases their domain-wide ranking signal.`,
+    evidence: {
+      topicalGap: finding.topicalGap,
+    },
+  };
+}
+
 function generateCompetitorInsights(analysisResult) {
   const pressuredFindings = analysisResult.gapFindings
     .filter((finding) => finding.gapDetected)
@@ -40,6 +66,16 @@ function generateCompetitorInsights(analysisResult) {
 
   if (pressuredFindings[1]) {
     insights.push(buildPressureInsight(pressuredFindings[1]));
+  }
+
+  const highDaGap = pressuredFindings.find((f) => f.daGap > 15 && f.daSeverity);
+  if (highDaGap) {
+    insights.push(buildDaGapInsight(highDaGap));
+  }
+
+  const highTopicalGap = pressuredFindings.find((f) => f.topicalGap > 10);
+  if (highTopicalGap) {
+    insights.push(buildTopicalGapInsight(highTopicalGap));
   }
 
   insights.push(buildCoverageInsight(analysisResult.summary));

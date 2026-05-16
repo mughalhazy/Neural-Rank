@@ -50,10 +50,42 @@ function createSummaryInsight(summary) {
   };
 }
 
+function createEeatContentInsight(contentAnalysis) {
+  const { eeAtSignals } = contentAnalysis;
+  if (!eeAtSignals) return null;
+  const hasSignals = eeAtSignals.hasFirstHandContent || eeAtSignals.hasCitations;
+  if (hasSignals) return null;
+  return {
+    type: "weak_eeat_content_signals",
+    surface: "website_content",
+    severity: "medium",
+    title: "Content lacks E-E-A-T signals",
+    summary: "No first-hand experience markers or citation signals detected in the content body — adding author voice, real examples, and source references strengthens E-E-A-T scoring.",
+    evidenceCount: 2,
+    severityScore: 2,
+  };
+}
+
+function createCompetitorDepthInsight(competitorDepthComparison) {
+  if (!competitorDepthComparison || !competitorDepthComparison.isBelowAverage) return null;
+  return {
+    type: "below_competitor_content_depth",
+    surface: "website_content",
+    severity: competitorDepthComparison.gap > 500 ? "high" : "medium",
+    title: "Content depth is below competitor average",
+    summary: `Target content is ${competitorDepthComparison.gap} words shorter than the competitor average of ${competitorDepthComparison.avgCompetitorWordCount} words — thinner content rarely outranks more comprehensive competitor pages.`,
+    evidenceCount: 1,
+    severityScore: competitorDepthComparison.gap > 500 ? 3 : 2,
+    evidence: competitorDepthComparison,
+  };
+}
+
 function generateContentListingInsights(analysisResult) {
   return [
     createGapInsight(analysisResult.contentAnalysis),
     createGapInsight(analysisResult.listingAnalysis),
+    createEeatContentInsight(analysisResult.contentAnalysis),
+    createCompetitorDepthInsight(analysisResult.competitorDepthComparison),
     createSummaryInsight(analysisResult.summary),
   ].filter(Boolean);
 }

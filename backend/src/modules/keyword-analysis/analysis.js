@@ -1,4 +1,6 @@
 const MODULE_KEY = "keyword_analysis";
+const { normalizeProductTarget } = require("../../core/targeting");
+const { classifyIntent } = require("../../core/intentClassifier");
 
 function normalizeText(value) {
   if (value === null || value === undefined) {
@@ -47,6 +49,10 @@ function normalizeKeywordEntry(keywordInput) {
     position: toNumber(keywordInput.position ?? keywordInput.rank, null),
     difficulty: toNumber(keywordInput.difficulty, null),
     volume: toNumber(keywordInput.volume, null),
+    volumePrevious: toNumber(keywordInput.volumePrevious ?? keywordInput.volume_previous, null),
+    serpFeaturePresent: Array.isArray(keywordInput.serpFeatures)
+      ? keywordInput.serpFeatures.length > 0
+      : Boolean(keywordInput.serpFeaturePresent),
   };
 }
 
@@ -63,23 +69,7 @@ function normalizeKeywordInput(inputPayload = {}) {
 
   return {
     moduleKey: MODULE_KEY,
-    productTarget: {
-      targetRef:
-        normalizeText(inputPayload.targetRef) ||
-        normalizeText(inputPayload.websiteUrl) ||
-        normalizeText(inputPayload.appUrl) ||
-        normalizeText(inputPayload.appId) ||
-        "unknown_target",
-      targetType:
-        normalizeText(inputPayload.targetType) ||
-        (normalizeText(inputPayload.appUrl) || normalizeText(inputPayload.appId)
-          ? "app_target"
-          : "product_target"),
-      websiteUrl: normalizeText(inputPayload.websiteUrl) || null,
-      appId: normalizeText(inputPayload.appId) || null,
-      appStoreUrl: normalizeText(inputPayload.appUrl) || normalizeText(inputPayload.appStoreUrl) || null,
-      playStoreUrl: normalizeText(inputPayload.playStoreUrl) || null,
-    },
+    productTarget: normalizeProductTarget(inputPayload),
     keywords: normalizedKeywords,
   };
 }
@@ -88,8 +78,36 @@ function extractKeywordTokens(keyword) {
   return keyword.split(/\s+/).filter(Boolean);
 }
 
+function buildSeedExpansions(keywords) {
+  const highVolumeKeywords = [...keywords]
+    .filter((k) => k.volume !== null)
+    .sort((a, b) => (b.volume || 0) - (a.volume || 0))
+    .slice(0, 3);
+
+  const seedTokens = new Set();
+  for (const kw of highVolumeKeywords) {
+    for (const token of extractKeywordTokens(kw.keyword)) {
+      if (token.length > 3) seedTokens.add(token);
+    }
+  }
+
+  const expansions = ["guide", "tips", "tool", "software", "platform", "strategy", "best practices"];
+  return [...seedTokens].slice(0, 3).flatMap((token) =>
+    expansions.slice(0, 2).map((exp) => `${token} ${exp}`),
+  );
+}
+
+function computeTrendDirection(volumePrevious, volume) {
+  if (volumePrevious === null || volume === null) return "stable";
+  const delta = volume - volumePrevious;
+  if (delta > volumePrevious * 0.1) return "rising";
+  if (delta < -(volumePrevious * 0.1)) return "declining";
+  return "stable";
+}
+
 function buildKeywordSuggestions(keywords) {
   const suggestions = new Map();
+  const contextExpansions = buildSeedExpansions(keywords);
 
   for (const keywordEntry of keywords) {
     const tokens = extractKeywordTokens(keywordEntry.keyword);
@@ -118,31 +136,58 @@ function buildKeywordSuggestions(keywords) {
             ? 2
             : 1;
 
+    const trendDirection = computeTrendDirection(keywordEntry.volumePrevious, keywordEntry.volume);
+    const trendBonus = trendDirection === "rising" ? 1 : 0;
+
+    const isQuickWin = keywordEntry.position !== null &&
+      keywordEntry.position >= 11 && keywordEntry.position <= 20;
+
+    const intentResult = classifyIntent(keywordEntry.keyword);
+
     suggestions.set(keywordEntry.keyword, {
       keyword: keywordEntry.keyword,
       source: "direct_input",
-      opportunityScore: rankFactor + difficultyFactor + volumeFactor,
+      opportunityScore: rankFactor + difficultyFactor + volumeFactor + trendBonus,
+      opportunityTier: isQuickWin ? "quick_win" : null,
+      trendDirection,
+      intentSignal: intentResult.primaryIntent,
+      intentConfidence: intentResult.confidence,
+      serpFeaturePresent: keywordEntry.serpFeaturePresent,
       basedOn: keywordEntry,
     });
 
     if (tokens.length === 1) {
-      for (const expansion of ["insights", "analysis", "tool"]) {
-        const expandedKeyword = `${keywordEntry.keyword} ${expansion}`;
-        suggestions.set(expandedKeyword, {
-          keyword: expandedKeyword,
-          source: "expansion",
-          opportunityScore: rankFactor + difficultyFactor + Math.max(volumeFactor - 1, 1),
-          basedOn: keywordEntry,
-        });
+      for (const expansion of contextExpansions.slice(0, 2)) {
+        const expandedKeyword = `${keywordEntry.keyword} ${expansion.split(" ").pop()}`;
+        if (!suggestions.has(expandedKeyword)) {
+          suggestions.set(expandedKeyword, {
+            keyword: expandedKeyword,
+            source: "expansion",
+            opportunityScore: rankFactor + difficultyFactor + Math.max(volumeFactor - 1, 1),
+            opportunityTier: null,
+            trendDirection: "stable",
+            intentSignal: intentResult.primaryIntent,
+            intentConfidence: 0,
+            serpFeaturePresent: false,
+            basedOn: keywordEntry,
+          });
+        }
       }
     } else {
       const longTailKeyword = `${keywordEntry.keyword} strategy`;
-      suggestions.set(longTailKeyword, {
-        keyword: longTailKeyword,
-        source: "long_tail",
-        opportunityScore: rankFactor + difficultyFactor,
-        basedOn: keywordEntry,
-      });
+      if (!suggestions.has(longTailKeyword)) {
+        suggestions.set(longTailKeyword, {
+          keyword: longTailKeyword,
+          source: "long_tail",
+          opportunityScore: rankFactor + difficultyFactor,
+          opportunityTier: null,
+          trendDirection: "stable",
+          intentSignal: "informational",
+          intentConfidence: 0,
+          serpFeaturePresent: false,
+          basedOn: keywordEntry,
+        });
+      }
     }
   }
 
@@ -164,6 +209,11 @@ function classifyOpportunities(suggestions) {
           ? "medium"
           : "low",
     opportunityScore: suggestion.opportunityScore,
+    opportunityTier: suggestion.opportunityTier,
+    trendDirection: suggestion.trendDirection,
+    intentSignal: suggestion.intentSignal,
+    intentConfidence: suggestion.intentConfidence,
+    serpFeaturePresent: suggestion.serpFeaturePresent,
     basedOn: suggestion.basedOn,
   }));
 }
@@ -173,6 +223,8 @@ function summarize(keywordEntries, opportunities) {
     keywordCount: keywordEntries.length,
     highOpportunityCount: opportunities.filter((item) => item.opportunityBand === "high").length,
     mediumOpportunityCount: opportunities.filter((item) => item.opportunityBand === "medium").length,
+    quickWinCount: opportunities.filter((item) => item.opportunityTier === "quick_win").length,
+    risingCount: opportunities.filter((item) => item.trendDirection === "rising").length,
   };
 }
 

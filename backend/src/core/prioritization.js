@@ -4,6 +4,15 @@ const PRIORITY_SCORES = {
   low: 100,
 };
 
+function normalizeOptionalNumericValue(value) {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
+
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : null;
+}
+
 function normalizePriority(priority) {
   if (priority === "high" || priority === "medium" || priority === "low") {
     return priority;
@@ -47,6 +56,22 @@ function comparePriorityEntries(left, right) {
     return scoreDelta;
   }
 
+  const leftBusinessValue = normalizeOptionalNumericValue(left?.businessValue);
+  const rightBusinessValue = normalizeOptionalNumericValue(right?.businessValue);
+  if (leftBusinessValue !== null || rightBusinessValue !== null) {
+    if (leftBusinessValue === null) {
+      return 1;
+    }
+
+    if (rightBusinessValue === null) {
+      return -1;
+    }
+
+    if (rightBusinessValue !== leftBusinessValue) {
+      return rightBusinessValue - leftBusinessValue;
+    }
+  }
+
   const leftModule = left?.moduleKey || "";
   const rightModule = right?.moduleKey || "";
   if (leftModule !== rightModule) {
@@ -71,6 +96,7 @@ function dedupePriorityEntries(entries = []) {
     const normalizedEntry = {
       ...entry,
       priority: normalizePriority(entry?.priority),
+      businessValue: normalizeOptionalNumericValue(entry?.businessValue),
       reference: getReferenceValue(entry),
       type: getTypeValue(entry),
     };

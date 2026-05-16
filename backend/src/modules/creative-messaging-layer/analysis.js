@@ -1,4 +1,5 @@
 const MODULE_KEY = "creative_messaging_layer";
+const { normalizeProductTarget } = require("../../core/targeting");
 
 function normalizeText(value) {
   if (value === null || value === undefined) {
@@ -45,20 +46,7 @@ function normalizeInput(moduleInput = {}, adapterResult = {}) {
 
   return {
     moduleKey: MODULE_KEY,
-    productTarget: {
-      targetRef:
-        moduleInput?.targetRef ||
-        moduleInput?.websiteUrl ||
-        moduleInput?.appId ||
-        moduleInput?.appStoreUrl ||
-        moduleInput?.playStoreUrl ||
-        "unknown_target",
-      targetType: moduleInput?.targetType || "product_target",
-      websiteUrl: moduleInput?.websiteUrl || null,
-      appId: moduleInput?.appId || null,
-      appStoreUrl: moduleInput?.appStoreUrl || null,
-      playStoreUrl: moduleInput?.playStoreUrl || null,
-    },
+    productTarget: normalizeProductTarget(moduleInput),
     targetThemes: normalizeArray(moduleInput.targetThemes || adapterResult.targetThemes),
     assets,
   };

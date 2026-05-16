@@ -1,4 +1,28 @@
 const MODULE_KEY = "content_listing_insights";
+const { normalizeProductTarget } = require("../../core/targeting");
+const { readabilityTier, estimateAvgSentenceLength } = require("../../core/seoScorer");
+
+const EEAT_EXPERIENCE_MARKERS = [
+  "i found", "in my experience", "i tested", "we tested", "i tried", "our team",
+  "our research", "i recommend", "based on my", "from my experience", "we discovered",
+];
+
+const EEAT_CITATION_MARKERS = [
+  "according to", "study shows", "research shows", "data shows", "published in",
+  "cited by", "source:", "references:", "per ", "experts say",
+];
+
+const STRUCTURED_CONTENT_PATTERNS = [
+  /\n[-*]\s/,
+  /\n\d+\.\s/,
+  /\|.*\|/,
+  /<table/i,
+  /#{1,3}\s/,
+];
+
+function detectStructuredContent(text) {
+  return STRUCTURED_CONTENT_PATTERNS.some((pattern) => pattern.test(text));
+}
 
 function normalizeText(value) {
   if (value === null || value === undefined) {
@@ -84,32 +108,15 @@ function buildListingContent(inputPayload = {}) {
   };
 }
 
-function resolveProductTarget(inputPayload = {}) {
-  return {
-    targetRef:
-      normalizeText(inputPayload.targetRef) ||
-      normalizeText(inputPayload.websiteUrl) ||
-      normalizeText(inputPayload.appUrl) ||
-      normalizeText(inputPayload.appId) ||
-      "unknown_target",
-    targetType:
-      normalizeText(inputPayload.targetType) ||
-      (normalizeText(inputPayload.appUrl) || normalizeText(inputPayload.appId)
-        ? "app_target"
-        : "product_target"),
-    websiteUrl: normalizeText(inputPayload.websiteUrl) || null,
-    appId: normalizeText(inputPayload.appId) || null,
-    appStoreUrl: normalizeText(inputPayload.appUrl) || normalizeText(inputPayload.appStoreUrl) || null,
-    playStoreUrl: normalizeText(inputPayload.playStoreUrl) || null,
-  };
-}
-
 function normalizeContentInput(inputPayload = {}) {
   return {
     moduleKey: MODULE_KEY,
-    productTarget: resolveProductTarget(inputPayload),
+    productTarget: normalizeProductTarget(inputPayload),
     content: buildWebsiteContent(inputPayload),
     listing: buildListingContent(inputPayload),
+    competitorWordCounts: Array.isArray(inputPayload.competitorWordCounts)
+      ? inputPayload.competitorWordCounts.map(Number).filter((n) => Number.isFinite(n))
+      : [],
   };
 }
 
@@ -157,11 +164,31 @@ function analyzeWebsiteContent(content) {
     observations.push("Website content body is too thin to carry strong listing insight value.");
   }
 
+  const bodyText = content.body || "";
+  const avgSentenceLength = estimateAvgSentenceLength(bodyText);
+  const contentReadabilityTier = readabilityTier(avgSentenceLength);
+
+  const lowerBody = bodyText.toLowerCase();
+  const eeAtExperienceSignals = EEAT_EXPERIENCE_MARKERS.filter((m) => lowerBody.includes(m)).length;
+  const eeAtCitationSignals = EEAT_CITATION_MARKERS.filter((m) => lowerBody.includes(m)).length;
+  const hasStructuredContent = detectStructuredContent(bodyText);
+
+  const wordCount = bodyText.split(/\s+/).filter(Boolean).length;
+
   return {
     surface: "website_content",
     present: Boolean(content.title || content.summary || content.body),
     observations,
     keywordCoverage,
+    readabilityTier: contentReadabilityTier,
+    eeAtSignals: {
+      experienceMarkers: eeAtExperienceSignals,
+      citationMarkers: eeAtCitationSignals,
+      hasFirstHandContent: eeAtExperienceSignals > 0,
+      hasCitations: eeAtCitationSignals > 0,
+    },
+    hasStructuredContent,
+    wordCount,
   };
 }
 
@@ -189,11 +216,19 @@ function analyzeListingContent(listing) {
     observations.push("App listing description is too thin to support strong store positioning.");
   }
 
+  const descText = listing.description || "";
+  const listingWordCount = descText.split(/\s+/).filter(Boolean).length;
+  const listingReadabilityTier = readabilityTier(estimateAvgSentenceLength(descText));
+  const hasStructuredListing = detectStructuredContent(descText);
+
   return {
     surface: "app_listing",
     present: Boolean(listing.title || listing.shortDescription || listing.description),
     observations,
     keywordCoverage,
+    readabilityTier: listingReadabilityTier,
+    hasStructuredContent: hasStructuredListing,
+    wordCount: listingWordCount,
   };
 }
 
@@ -206,14 +241,29 @@ function summarize(contentAnalysis, listingAnalysis) {
   };
 }
 
+function analyzeCompetitorDepth(targetWordCount, competitorWordCounts) {
+  if (competitorWordCounts.length === 0) return null;
+  const avgCompetitorWordCount = Math.round(
+    competitorWordCounts.reduce((s, c) => s + c, 0) / competitorWordCounts.length,
+  );
+  const isBelowAverage = targetWordCount < avgCompetitorWordCount;
+  const gap = Math.max(0, avgCompetitorWordCount - targetWordCount);
+  return { avgCompetitorWordCount, targetWordCount, isBelowAverage, gap };
+}
+
 function analyzeContentListingInput(normalizedInput) {
   const contentAnalysis = analyzeWebsiteContent(normalizedInput.content);
   const listingAnalysis = analyzeListingContent(normalizedInput.listing);
+  const competitorDepthComparison = analyzeCompetitorDepth(
+    contentAnalysis.wordCount,
+    normalizedInput.competitorWordCounts,
+  );
 
   return {
     normalizedInput,
     contentAnalysis,
     listingAnalysis,
+    competitorDepthComparison,
     summary: summarize(contentAnalysis, listingAnalysis),
   };
 }

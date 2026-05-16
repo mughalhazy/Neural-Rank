@@ -31,12 +31,18 @@ async function runCompetitorAnalysis(moduleInput = {}, context = {}) {
   const analysisResult = analyzeCompetitorLandscape(moduleInput, adapterResult);
   const insights = generateCompetitorInsights(analysisResult);
   const actions = generateCompetitorActions(analysisResult);
+  const priorityPayload = actions.map((action) => ({
+    type: action.type,
+    priority: action.priority,
+    competitorRef: action.competitorRef || null,
+  }));
 
   await persistRun(context, {
     productTarget: analysisResult.normalizedInput.productTarget,
     inputPayload: analysisResult.normalizedInput,
     analysisPayload: analysisResult,
     insightPayload: insights,
+    priorityPayload,
     actionPayload: actions,
   });
 
@@ -48,11 +54,7 @@ async function runCompetitorAnalysis(moduleInput = {}, context = {}) {
       input: analysisResult.normalizedInput,
       analysis: analysisResult,
       insight: insights,
-      priority: actions.map((action) => ({
-        type: action.type,
-        priority: action.priority,
-        competitorRef: action.competitorRef || null,
-      })),
+      priority: priorityPayload,
       action: actions,
     },
     integrationStatus: adapterResult?.status || "direct_input",

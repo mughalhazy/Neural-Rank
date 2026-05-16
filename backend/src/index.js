@@ -14,7 +14,9 @@ const {
   orderActionEntries,
   orderPriorityEntries,
 } = require("./core/prioritization");
+const { normalizeProductTarget } = require("./core/targeting");
 const { buildModuleContext } = require("./core/runtimeContext");
+const { getDomainBoundaryMap, getDomainServices } = require("./domains");
 const { getIntegrationRegistry, getModuleAdapter } = require("./integrations/registry");
 const {
   runDefaultBackendFlow,
@@ -34,6 +36,8 @@ module.exports = {
   BUILT_BUT_INACTIVE_MODULES,
   buildModuleContext,
   canRunModule,
+  getDomainBoundaryMap,
+  getDomainServices,
   getDefaultActivationState,
   getIntegrationRegistry,
   getModuleAdapter,
@@ -42,6 +46,7 @@ module.exports = {
   getServiceRegistry,
   listInactiveModules,
   listModulesByActivation,
+  normalizeProductTarget,
   normalizePriority,
   orderActionEntries,
   orderPriorityEntries,

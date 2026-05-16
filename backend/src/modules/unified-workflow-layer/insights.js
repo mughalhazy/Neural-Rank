@@ -20,7 +20,37 @@ function buildWorkflowInsight(summary) {
   };
 }
 
+function buildFoundationInsight(foundationIssue) {
+  if (!foundationIssue) return null;
+  return {
+    type: "technical_foundation_blocking",
+    severity: "high",
+    moduleKey: "technical_seo_audit",
+    message: `Technical SEO health score is ${foundationIssue.technicalHealthScore}/100 — fix the technical foundation before other optimisation work will achieve full impact. This is the highest-priority action across all modules.`,
+    evidence: { healthScore: foundationIssue.technicalHealthScore },
+  };
+}
+
+function buildQuickWinInsight(quickWinCluster) {
+  if (!quickWinCluster) return null;
+  return {
+    type: "cross_module_quick_win_cluster",
+    severity: "high",
+    moduleKey: "unified_workflow_layer",
+    message: `${quickWinCluster.keywordCount} page-2 keyword(s) identified across ${quickWinCluster.sources.length} module(s) — these are ready to push to page 1 with minimal effort and represent the fastest ranking wins available.`,
+    evidence: { keywordCount: quickWinCluster.keywordCount, sources: quickWinCluster.sources },
+  };
+}
+
 function generateUnifiedWorkflowInsights(analysisResult) {
+  const insights = [];
+
+  const foundationInsight = buildFoundationInsight(analysisResult.foundationIssue);
+  if (foundationInsight) insights.push(foundationInsight);
+
+  const quickWinInsight = buildQuickWinInsight(analysisResult.quickWinCluster);
+  if (quickWinInsight) insights.push(quickWinInsight);
+
   const prioritizedSummaries = analysisResult.moduleSummaries
     .filter((summary) => summary.actionCount > 0 || summary.priorityCount > 0)
     .sort((left, right) => {
@@ -30,7 +60,7 @@ function generateUnifiedWorkflowInsights(analysisResult) {
     })
     .slice(0, 3);
 
-  const insights = prioritizedSummaries.map(buildCrossModuleInsight);
+  insights.push(...prioritizedSummaries.map(buildCrossModuleInsight));
   insights.push(buildWorkflowInsight(analysisResult.summary));
   return insights;
 }

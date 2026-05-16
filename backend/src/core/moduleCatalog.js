@@ -48,6 +48,66 @@ const MODULE_CATALOG = Object.freeze([
     initialState: "backend_active",
     isWorkflowModule: true,
   },
+  {
+    moduleKey: "technical_seo_audit",
+    displayName: "Technical SEO Audit",
+    defaultActive: true,
+    initialState: "backend_active",
+  },
+  {
+    moduleKey: "on_page_seo_scorer",
+    displayName: "On-Page SEO Scorer",
+    defaultActive: true,
+    initialState: "backend_active",
+  },
+  {
+    moduleKey: "backlink_intelligence",
+    displayName: "Backlink Intelligence",
+    defaultActive: true,
+    initialState: "backend_active",
+  },
+  {
+    moduleKey: "eeat_signals",
+    displayName: "E-E-A-T Signals",
+    defaultActive: true,
+    initialState: "backend_active",
+  },
+  {
+    moduleKey: "search_intent_classifier",
+    displayName: "Search Intent Classifier",
+    defaultActive: true,
+    initialState: "backend_active",
+  },
+  {
+    moduleKey: "serp_feature_analyzer",
+    displayName: "SERP Feature Analyzer",
+    defaultActive: true,
+    initialState: "backend_active",
+  },
+  {
+    moduleKey: "topical_authority",
+    displayName: "Topical Authority",
+    defaultActive: true,
+    initialState: "backend_active",
+  },
+  {
+    moduleKey: "site_architecture",
+    displayName: "Site Architecture",
+    defaultActive: true,
+    initialState: "backend_active",
+  },
+  {
+    moduleKey: "analytics_integration",
+    displayName: "Analytics Integration",
+    defaultActive: true,
+    initialState: "backend_active",
+  },
+  {
+    moduleKey: "local_seo",
+    displayName: "Local SEO",
+    defaultActive: false,
+    initialState: "backend_active",
+  },
 ]);
 
 function getModuleDefinition(moduleKey) {

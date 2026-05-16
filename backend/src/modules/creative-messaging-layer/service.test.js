@@ -90,8 +90,9 @@ async function testQueryBackedPersistencePath() {
   assert.equal(queries.length, 2);
   assert.match(queries[0].sql, /insert into app_public\.product_targets/i);
   assert.match(queries[1].sql, /insert into app_public\.creative_messaging_layer_records/i);
-  assert.equal(queries[0].params[0], "https://example.com");
-  assert.equal(queries[1].params[1], "creative_messaging_layer");
+  assert.equal(queries[0].params[0], "website");
+  assert.equal(queries[0].params[1], "https://example.com");
+  assert.equal(queries[1].params[1], "internal_only");
   assert.ok(result.flow.action.length >= 1);
 }
 

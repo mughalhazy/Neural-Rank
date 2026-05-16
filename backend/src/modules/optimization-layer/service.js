@@ -31,12 +31,18 @@ async function runOptimizationLayer(moduleInput = {}, context = {}) {
   const analysisResult = analyzeOptimizationLayer(moduleInput, adapterResult);
   const insights = generateOptimizationInsights(analysisResult);
   const actions = generateOptimizationActions(analysisResult);
+  const priorityPayload = actions.map((action) => ({
+    type: action.type,
+    priority: action.priority,
+    sectionRef: action.sectionRef || null,
+  }));
 
   await persistRun(context, {
     productTarget: analysisResult.normalizedInput.productTarget,
     inputPayload: analysisResult.normalizedInput,
     analysisPayload: analysisResult,
     insightPayload: insights,
+    priorityPayload,
     actionPayload: actions,
   });
 
@@ -48,11 +54,7 @@ async function runOptimizationLayer(moduleInput = {}, context = {}) {
       input: analysisResult.normalizedInput,
       analysis: analysisResult,
       insight: insights,
-      priority: actions.map((action) => ({
-        type: action.type,
-        priority: action.priority,
-        sectionRef: action.sectionRef || null,
-      })),
+      priority: priorityPayload,
       action: actions,
     },
     integrationStatus: adapterResult?.status || "direct_input",
