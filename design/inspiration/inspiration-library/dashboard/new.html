@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard / New Inspiration</title>
+    <link rel="stylesheet" href="../library.css" />
+    <style>
+      .card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .preview {
+        aspect-ratio: 10 / 16;
+        background: #edf1f7;
+      }
+
+      .crop {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        background: #edf1f7;
+      }
+
+      .crop img {
+        width: 100%;
+        height: 160%;
+        object-fit: cover;
+        object-position: center 26%;
+        display: block;
+        transform: translateY(8%);
+      }
+
+      @media (max-width: 1100px) {
+        .card-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand">Neural Rank / Inspiration Library</div>
+        <div class="topnav">
+          <a href="../index.html">Library index</a>
+          <a href="./approved.html">Approved</a>
+          <a href="./rejected.html">Rejected</a>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="eyebrow">Dashboard</div>
+        <h1>Dashboard inspiration / new</h1>
+        <p>Plain static image grid. No live feeds. No renderer layer. This page shows only local image files inside fixed containers.</p>
+      </div>
+
+      <div class="card-grid">
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-01.jpg" alt="Dashboard 01" /></div></div>
+          <div class="content"><h3>Task Management Mobile App</h3><p>Overview-first mobile dashboard candidate.</p></div>
+        </article>
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-02.jpg" alt="Dashboard 02" /></div></div>
+          <div class="content"><h3>Task Management Mobile App</h3><p>Summary-led mobile SaaS candidate.</p></div>
+        </article>
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-03.jpg" alt="Dashboard 03" /></div></div>
+          <div class="content"><h3>Analytics Dashboard - Mobile</h3><p>Reduced-depth analytics dashboard candidate.</p></div>
+        </article>
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-04.png" alt="Dashboard 04" /></div></div>
+          <div class="content"><h3>Analytics Dashboard Mobile</h3><p>Reorderable summary card candidate.</p></div>
+        </article>
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-05.jpg" alt="Dashboard 05" /></div></div>
+          <div class="content"><h3>Task Management Mobile App</h3><p>High-level work overview candidate.</p></div>
+        </article>
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-06.jpg" alt="Dashboard 06" /></div></div>
+          <div class="content"><h3>AfterClick SaaS Mobile Analytics Dashboard</h3><p>Modern KPI hierarchy candidate.</p></div>
+        </article>
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-07.jpg" alt="Dashboard 07" /></div></div>
+          <div class="content"><h3>Mobile Analytics App UI Design</h3><p>Chart-led summary dashboard candidate.</p></div>
+        </article>
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-08.jpg" alt="Dashboard 08" /></div></div>
+          <div class="content"><h3>Productivity Mobile App</h3><p>Operational summary screen candidate.</p></div>
+        </article>
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-09.jpg" alt="Dashboard 09" /></div></div>
+          <div class="content"><h3>UI/UX Design for Mobile Task Management App</h3><p>Dashboard-like workload summary candidate.</p></div>
+        </article>
+        <article class="source-card">
+          <div class="preview"><div class="crop"><img src="../captures/dashboard/new-10.jpg" alt="Dashboard 10" /></div></div>
+          <div class="content"><h3>Task Management UI/UX Mobile App</h3><p>Compact overview and status grouping candidate.</p></div>
+        </article>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,16 +1,46 @@
-node_modules/
-.npm-cache/
-.npm-global/
-.codex-stderr.log
+# Claude Code local config (contains machine-specific settings and secrets)
+.claude/
 
+# Node
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Environment
 .env
 .env.*
 !.env.example
 
+# npm local cache/global (machine-specific, not project code)
+.npm-cache/
+.npm-global/
+.npmrc.local
+
+# Codex CLI artifacts
+.codex-stderr.log
+codex.cmd
+codex.ps1
+
+# Build archives (source of truth is the directory, not the zip)
+*.zip
+
+# Flutter build outputs
+frontend/build/
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+SEOSync_Flutter_App/build/
+SEOSync_Flutter_App/.dart_tool/
+SEOSync_Flutter_App/.flutter-plugins
+SEOSync_Flutter_App/.flutter-plugins-dependencies
+
+# Flutter logs
+flutter_*.log
+flutter-build-*.log
+
+# OS
 .DS_Store
 Thumbs.db
+Thumbs.db:encryptable

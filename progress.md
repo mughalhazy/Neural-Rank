@@ -133,9 +133,51 @@ Use these first in a new session:
 
 ---
 
+## Supabase Project Setup — ✅ COMPLETE
+> Completed: 2026-05-16
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Supabase project created via Management API (free tier) | ✅ Done |
+| 2 | All 9 migrations applied (8 schema + 1 activation fix) | ✅ Done |
+| 3 | Schema verified: 33 tables in `app_public` | ✅ Done |
+| 4 | Module catalog verified: 18 modules, 17 active, 1 inactive (local_seo) | ✅ Done |
+| 5 | Fix migration committed and pushed | ✅ Done |
+
+**Project details:**
+- Project name: `neural-rank`
+- Project ref: `bvujfwwwwzlpsxbshxyn`
+- Region: `us-east-1`
+- Plan: free tier
+- DB host: `db.bvujfwwwwzlpsxbshxyn.supabase.co`
+- Dashboard: `https://supabase.com/dashboard/project/bvujfwwwwzlpsxbshxyn`
+- Organization: Syntera Cloud (`eslplsangorrdavhhbsc`)
+
+---
+
+## Post-Expansion Git & Deploy — ✅ COMPLETE
+> Completed: 2026-05-16
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Git commit — all SEO OS expansion changes (238 files, +25780/-929) | ✅ Done |
+| 2 | Push to GitHub — triggers Render auto-redeploy | ✅ Done |
+| 3 | Supabase migration created — `20260516120000_seo_os_expansion_modules.sql` | ✅ Done |
+
+**Migration contents:**
+- Altered `backend_module_catalog.initial_state` check constraint to include `backend_active`
+- Created 10 new record tables (one per new module) matching the 5-column jsonb + audit pattern
+- Created `updated_at` triggers for all 10 tables
+- Inserted all 10 modules into `backend_module_catalog` and `backend_module_activation_defaults`
+- `local_seo` registered with `is_active = false` (opt-in only)
+
+**Render redeploy:** triggered automatically by the GitHub push. Allow ~2 min for free-tier spin-up before health check.
+
+---
+
 ## SEO OS Expansion — Build Progress
 
-> Reference plan: `SEO-OS-Build-Plan.md`
+> Reference plan: `docs/product/SEO-OS-Build-Plan.md`
 > Expansion started: 2026-05-15
 > Goal: Grow from 8 modules to 18, adding 10 new modules, 7 enhancements, 3 core utilities, 5 adapters
 

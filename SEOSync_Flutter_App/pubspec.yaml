@@ -1,0 +1,42 @@
+name: seosync
+version: 1.0.0+1
+description: Unified SEO Platform — Insight to Action
+
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.3
+  bloc: ^8.1.2
+  equatable: ^2.0.5
+  go_router: ^13.0.1
+  supabase_flutter: ^2.0.0
+  dio: ^5.4.0
+  hive_flutter: ^1.1.0
+  hive: ^2.2.3
+  flutter_svg: ^2.0.9
+  shimmer: ^3.0.0
+  flutter_animate: ^4.3.0
+  intl: ^0.19.0
+  url_launcher: ^6.2.2
+  share_plus: ^7.2.1
+  path_provider: ^2.1.1
+  fl_chart: ^0.66.0
+  flutter_local_notifications: ^16.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.8
+  hive_generator: ^2.0.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/images/
