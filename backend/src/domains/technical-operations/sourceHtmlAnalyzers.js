@@ -531,11 +531,21 @@ function analyzeBrokenLinksAssets(context = {}) {
 }
 
 function buildRenderedDomPlaceholder() {
+  // Rendered DOM analysis requires a headless browser (e.g. Playwright).
+  // To enable: set RENDERER_ENDPOINT=http://localhost:3001 and run a
+  // compatible renderer service that accepts POST /render with { url }
+  // and returns { html, statusCode }. The renderer contract is defined
+  // in domains/technical-operations/contract.js (rendererContract).
+  const rendererEndpoint = process.env.RENDERER_ENDPOINT || null;
   return {
     analyzerKey: "rendered_dom",
-    status: "not_implemented",
+    status: rendererEndpoint ? "renderer_configured_not_called" : "renderer_not_configured",
     source: "rendered_dom",
     requiresRenderer: true,
+    rendererEndpoint: rendererEndpoint || null,
+    configurationInstructions: rendererEndpoint
+      ? null
+      : "Set RENDERER_ENDPOINT env var to a running renderer service URL to enable rendered DOM analysis.",
     findings: [],
   };
 }

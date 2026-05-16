@@ -33,7 +33,7 @@ async function testHtmlPayloadAuditReturnsStructuredFindings() {
   assert.equal(result.sourceHtml.inputType, "html_payload");
   assert.ok(Array.isArray(result.sourceHtml.findings));
   assert.ok(result.sourceHtml.findings.length >= 6);
-  assert.equal(result.renderedDom.status, "not_implemented");
+  assert.ok(result.renderedDom.status.startsWith("renderer_"));
   assert.equal(result.renderedDom.requiresRenderer, true);
 
   const requiredFindingKeys = new Set([
@@ -70,7 +70,7 @@ async function testUrlOnlyAuditDoesNotPretendRenderedDomExists() {
   });
 
   assert.equal(result.sourceHtml.inputType, "url_only");
-  assert.equal(result.renderedDom.status, "not_implemented");
+  assert.ok(result.renderedDom.status.startsWith("renderer_"));
   assert.ok(
     result.sourceHtml.findings.some(
       (finding) => finding.findingKey === "source_html_unavailable",

@@ -132,14 +132,17 @@
 - unavailable-provider path is explicit and tested:
   - [backend/src/search-intelligence.test.js](/D:/Neural%20Rank/backend/src/search-intelligence.test.js)
 
-## Next Build Priorities
-- P0: apply and verify migrations against the real Supabase/Postgres environment
-- P0: replace placeholder actor header auth with actual auth/session enforcement if Supabase Auth is already available
-- P1: add dedicated API routes for measurement, technical operations, search intelligence, and business intelligence services
-- P1: add a compliant SERP provider integration through the existing provider interface
-- P1: add persistent rate limiting and tenant/workspace enforcement
-- P2: add rendered DOM analysis behind an explicit renderer contract
-- P2: add lint/typecheck scripts and make them part of CI
+## Next Build Priorities — Updated 2026-05-16
+
+| Item | Priority | Status |
+|---|---|---|
+| Apply and verify migrations against real Supabase/Postgres | P0 | ✅ Done — Supabase project created, all 9 migrations applied |
+| Replace placeholder actor header auth with Supabase Auth enforcement | P0 | ✅ Done — `api/auth.js` verifies Bearer JWT via Supabase `/auth/v1/user`; falls back to actor header when `SUPABASE_URL` not set (tests/dev) |
+| Add dedicated API routes for measurement, technical-ops, search-intelligence, business-intelligence | P1 | ✅ Done — 9 new routes added to `server.js` |
+| Add persistent rate limiting and tenant/workspace enforcement | P1 | ✅ Done — `core/rateLimiter.js` sliding-window rate limiter; 120 req/min global, 30 mutations/min per actor; workspace ID propagated through context |
+| Add a compliant SERP provider integration through the existing provider interface | P1 | ⚠️ Pending — adapter is production-ready (`SERP_PROVIDER` + `SERP_API_KEY` env vars); requires API credentials from SerpApi or DataForSEO |
+| Add rendered DOM analysis behind an explicit renderer contract | P2 | ⚠️ Partially done — `buildRenderedDomPlaceholder()` now returns `renderer_not_configured` status with configuration instructions; set `RENDERER_ENDPOINT` env var to activate |
+| Add lint/typecheck scripts and make them part of CI | P2 | ✅ Done — `npm run check` (syntax checks 192 files); `npm run ci` runs check + full test suite |
 
 ## Evidence of Validation
 - aggregate harness passes:
