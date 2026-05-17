@@ -1,3 +1,5 @@
+> **Scope notice:** This report covers the original 8-module backend plus domain-layer foundations. The 10 Phase 2 expansion modules (technical_seo_audit, on_page_seo_scorer, backlink_intelligence, eeat_signals, search_intent_classifier, serp_feature_analyzer, topical_authority, site_architecture, analytics_integration, local_seo) are not included. Some implementation status claims may conflict with BACKEND_GAP_ANALYSIS_2026_05_16.md — cross-check before using.
+
 # SEO OS Backend Gap Fill Report
 
 ## Verdict

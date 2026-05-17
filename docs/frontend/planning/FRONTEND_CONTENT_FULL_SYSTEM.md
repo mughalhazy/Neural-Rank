@@ -875,3 +875,221 @@ The full frontend content system is applied when:
 - raw data surfaces are converted into interpreted decision surfaces
 - the content remains system-native with no reverse engineering or external influence
 - UI structure remains unchanged while content structure becomes enforceable
+
+---
+## Pattern Combination Rules
+
+### Standard Insight Block
+Use:
+- insight pattern
+- explanation pattern
+- priority pattern
+- action pattern
+
+Order:
+```text
+Title
+Explanation
+Evidence
+Impact
+Action
+Optional next step
+```
+
+### Action Queue Item
+Use:
+- action pattern
+- explanation pattern
+- priority pattern
+
+Order:
+```text
+Action
+Reason
+Impact / effort
+```
+
+### Alert
+Use:
+- insight pattern
+- priority pattern
+- action pattern
+
+Order:
+```text
+Trigger
+Why it matters
+Action
+```
+
+### Table Row
+Use:
+- signal
+- explanation pattern
+- priority pattern
+- action pattern
+
+Order:
+```text
+Label
+Value / movement
+Interpretation flag
+Action implication
+```
+
+---
+## Allowed Insight Formats
+
+### Compact Insight
+Used for:
+- mobile cards
+- dashboard highlights
+- small supporting findings
+
+Structure:
+- title
+- one-sentence explanation
+- 2-3 evidence chips
+- impact label
+- action
+
+### Full Insight
+Used for:
+- analysis feed
+- review cluster
+- content issue
+- competitor comparison
+
+Structure:
+- title
+- explanation
+- evidence group
+- impact
+- action
+- optional next step
+
+### Row Insight
+Used for:
+- keyword tables
+- rank tables
+- competitor rows
+
+Structure:
+- row label
+- signal value
+- movement/trend
+- interpreted flag
+- impact
+- action implication
+
+### Alert Insight
+Used for:
+- warnings
+- urgent issues
+- stale data
+- trust risks
+
+Structure:
+- trigger
+- explanation
+- impact
+- action
+
+### Action Insight
+Used for:
+- action queue
+- workflow task
+- priority hero
+
+Structure:
+- action title
+- reasoning explanation
+- evidence or source signal
+- impact
+- estimated effort or next step
+
+---
+## Module-Specific Insight Examples
+
+### Review Analysis
+Insight must include:
+- cluster theme
+- recurrence or volume
+- trust impact
+- action path
+
+Example:
+- Title: "Sync complaints are recurring in recent reviews"
+- Explanation: "The issue is narrow enough to repair trust through targeted messaging and product follow-up."
+- Evidence: `29% mention sync`, `14-day recurrence`
+- Impact: `Urgent`
+- Action: "Repair sync messaging in release notes and onboarding."
+
+### Content / Listing Insights
+Insight must include:
+- content surface
+- mismatch or missing coverage
+- conversion or relevance impact
+- rewrite action
+
+Example:
+- Title: "Description opening misses exam-prep intent"
+- Explanation: "High-volume study terms are less likely to convert because the first message does not match the query promise."
+- Evidence: `Vol 11k`, `Rank #9`, `copy gap`
+- Impact: `High impact`
+- Action: "Rewrite the first 180 characters around exam-prep outcomes."
+
+### Keyword Analysis
+Insight must include:
+- keyword or cluster
+- movement or opportunity
+- reason it matters
+- targeting action
+
+Example:
+- Title: "Offline flashcards is a defendable keyword cluster"
+- Explanation: "The term is already near the top, so the next move is defense rather than expansion."
+- Evidence: `Rank #2`, `Vol 7k`, `+1`
+- Impact: `Defend`
+- Action: "Protect the cluster with matching listing copy and screenshot language."
+
+### Rank Tracking
+Insight must include:
+- tracked movement
+- trend meaning
+- risk or opportunity
+- response action
+
+Example:
+- Title: "Top-3 coverage is expanding in mid-tail terms"
+- Explanation: "The gains are strong enough to convert into durable coverage before chasing new head terms."
+- Evidence: `12 top-3 keywords`, `+4`
+- Impact: `Expand`
+- Action: "Push winning mid-tail terms into content and metadata updates."
+
+### Competitor Analysis
+Insight must include:
+- competitor gap or advantage
+- source of pressure
+- strategic implication
+- response action
+
+Example:
+- Title: "Competitor A is winning through clearer exam-prep messaging"
+- Explanation: "The advantage is messaging-led, so the response should focus on creative clarity before keyword expansion."
+- Evidence: `+14 SOV`, `messaging lead`
+- Impact: `High impact`
+- Action: "Compare screenshot promise and rewrite the weakest headline."
+
+### Settings / Configuration
+Insight must include:
+- source or setting state
+- trust implication
+- configuration action
+
+Example:
+- Title: "Keyword provider is still using a mock adapter"
+- Explanation: "Insights should not be treated as final until the live source is connected."
+- Evidence: `Mock adapter`, `workspace confidence: medium`
+- Impact: `Monitor`
+- Action: "Connect the live keyword provider before production decisions."

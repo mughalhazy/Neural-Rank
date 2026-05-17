@@ -42,7 +42,6 @@ Actively consulted specs. These are the source of truth for how the backend is d
 | [BACKEND_INTEGRATION_BOUNDARIES.md](docs/backend/reference/BACKEND_INTEGRATION_BOUNDARIES.md) | `LIVE` | 18 integration boundary catalogue — 5 implemented adapters (GSC, GA4, PageSpeed, backlink-provider, serp-provider), boundary contracts, fallback rules |
 | [BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md](docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md) | `LIVE` | Audit of all 24 API routes — envelope format, input validation, actor identity, rate-limit headers, safe logging compliance |
 | [BACKEND_DOMAIN_BOUNDARIES.md](docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md) | `LIVE` | All 18 modules mapped to 8 bounded contexts — site-intelligence, search-intelligence, content-operations, technical-operations, execution, measurement, governance, business-intelligence; includes domain layer rationale and compatibility mapping. Supersedes BACKEND_DOMAIN_BOUNDARY_MAP.md and BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md *(created 2026-05-17)* |
-| [BACKEND_DOMAIN_BOUNDARY_MAP.md](docs/backend/reference/BACKEND_DOMAIN_BOUNDARY_MAP.md) | `ARCHIVE` | Original Phase 1 domain boundary map for the first 8 modules only — superseded by BACKEND_DOMAIN_BOUNDARIES.md which covers all 18 |
 
 ---
 
@@ -70,11 +69,9 @@ Records of completed build work. Useful for traceability and onboarding. Not act
 | [BACKEND_SEARCH_INTELLIGENCE_IMPLEMENTATION_REPORT.md](docs/backend/implementation/BACKEND_SEARCH_INTELLIGENCE_IMPLEMENTATION_REPORT.md) | `ARCHIVE` | Implementation summary of search-intelligence domain — 7-intent taxonomy, heuristic classifier, provider interface, opportunity scoring |
 | [BACKEND_BUSINESS_INTELLIGENCE_IMPLEMENTATION_REPORT.md](docs/backend/implementation/BACKEND_BUSINESS_INTELLIGENCE_IMPLEMENTATION_REPORT.md) | `ARCHIVE` | Implementation summary of business-intelligence domain — business profiles, priority score extension, business value scoring |
 | [BACKEND_RECOMMENDATION_SCORING_IMPLEMENTATION_REPORT.md](docs/backend/implementation/BACKEND_RECOMMENDATION_SCORING_IMPLEMENTATION_REPORT.md) | `ARCHIVE` | Implementation of recommendation scoring engine — 9 scoring dimensions, weighted overall score, priority derivation |
-| [BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md](docs/backend/implementation/BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md) | `ARCHIVE` | Original implementation record for the 8-domain bounded context layer — superseded by BACKEND_DOMAIN_BOUNDARIES.md |
 | [BACKEND_QC_PHASE2.md](docs/backend/implementation/BACKEND_QC_PHASE2.md) | `LIVE` | QC audit (60/60 PASS) for all 10 Phase 2 expansion modules — checks 5-file contract, activation state, flow, tests, persistence pattern, schema alignment |
 | [BACKEND_TEST_HARNESS_REPORT.md](docs/backend/implementation/BACKEND_TEST_HARNESS_REPORT.md) | `LIVE` | Test harness coverage map — CI command, test files for all P0 flows, pass/fail matrix; useful reference when adding new tests |
 | [BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md](docs/backend/implementation/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md) | `LIVE` | Unified schema/repository alignment audit for all 18 modules — Phase 1 (field renames fixed) + Phase 2 (10 new modules all aligned); combined 18/18 status table. Supersedes both originals *(created 2026-05-17)* |
-| [BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_PHASE2.md](docs/backend/implementation/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_PHASE2.md) | `ARCHIVE` | Original Phase 2 alignment audit for 10 expansion modules — superseded by BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md |
 
 ---
 
@@ -85,8 +82,8 @@ Point-in-time analysis documents. Read these to understand current production re
 | File | Status | Description |
 |------|--------|-------------|
 | [BACKEND_GAP_ANALYSIS_2026_05_16.md](docs/backend/analysis/BACKEND_GAP_ANALYSIS_2026_05_16.md) | `LIVE` | Comprehensive gap scan dated 2026-05-16 — compares all 32 docs vs codebase reality, health score per doc, identifies stale claims and missing coverage |
-| [SEO_OS_BACKEND_GAP_FILL_REPORT.md](docs/backend/analysis/SEO_OS_BACKEND_GAP_FILL_REPORT.md) | `LIVE` | Production readiness summary — what is implemented, partial, missing, or risky across all subsystems; verdict: backend ready for internal testing |
-| [SEO_OS_DELTA_ANALYSIS_REPORT.md](docs/backend/analysis/SEO_OS_DELTA_ANALYSIS_REPORT.md) | `LIVE` | Delta analysis vs full SEO OS target capability model — maturity percentage, P0/P1/P2 gap list, critical findings |
+| [SEO_OS_BACKEND_GAP_FILL_REPORT.md](docs/backend/analysis/SEO_OS_BACKEND_GAP_FILL_REPORT.md) | `LIVE` | Production readiness summary for original 8-module backend + domain layer — scope notice added; Phase 2 (10 new modules) not included; cross-check against BACKEND_GAP_ANALYSIS before using |
+| [SEO_OS_DELTA_ANALYSIS_REPORT.md](docs/backend/analysis/SEO_OS_DELTA_ANALYSIS_REPORT.md) | `LIVE` | Delta analysis vs full SEO OS target capability model — scope notice added; maturity % based on pre-Phase-2 8-module state; recalculate figures against 18-module backend before using for planning |
 
 ---
 
@@ -103,6 +100,9 @@ Freeze records, QC reports, and gap scans from the original 8-module Phase 1 bui
 | [BACKEND_BUILD_SEQUENCE.md](docs/backend/archive/BACKEND_BUILD_SEQUENCE.md) | `ARCHIVE` | Original Phase 1 build sequence for 8 modules — documentation-first order, architecture setup, implementation sequence; not updated for Phase 2 |
 | [BACKEND_IMPLEMENTATION_GAP_SCAN.md](docs/backend/archive/BACKEND_IMPLEMENTATION_GAP_SCAN.md) | `ARCHIVE` | Phase 1 only gap scan for original 8 modules — all declared fixed; superseded by BACKEND_GAP_ANALYSIS_2026_05_16.md which covers all 18 |
 | [BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_REPORT.md](docs/backend/archive/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_REPORT.md) | `ARCHIVE` | Phase 1 schema/repository alignment fix for original 8 modules — documents 5 field-name mismatches resolved 2026-05-06; superseded by BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md |
+| [BACKEND_DOMAIN_BOUNDARY_MAP.md](docs/backend/archive/BACKEND_DOMAIN_BOUNDARY_MAP.md) | `ARCHIVE` | Original Phase 1 domain boundary map for 8 modules — moved from reference/; fully superseded by BACKEND_DOMAIN_BOUNDARIES.md *(archived 2026-05-17)* |
+| [BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md](docs/backend/archive/BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md) | `ARCHIVE` | Original implementation record for the 8-domain bounded context layer — moved from implementation/; fully superseded by BACKEND_DOMAIN_BOUNDARIES.md *(archived 2026-05-17)* |
+| [BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_PHASE2.md](docs/backend/archive/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_PHASE2.md) | `ARCHIVE` | Original Phase 2 alignment audit for 10 expansion modules — moved from implementation/; fully superseded by BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md *(archived 2026-05-17)* |
 
 ---
 
@@ -115,10 +115,7 @@ The frozen, active design system and content rules. These govern all UI developm
 | [PHASE_07_DESIGN_LANGUAGE.md](docs/frontend/reference/PHASE_07_DESIGN_LANGUAGE.md) | `LIVE` | Frozen design language spec — typography, colour palette, spacing scale, elevation, motion principles; promoted from phases/ as it remains active |
 | [PHASE_08_DESIGN_SYSTEM.md](docs/frontend/reference/PHASE_08_DESIGN_SYSTEM.md) | `LIVE` | Frozen design system spec — component tokens, grid system, breakpoints, theming rules; promoted from phases/ as it remains active |
 | [CURRENT_UI_BASELINE.md](docs/frontend/reference/CURRENT_UI_BASELINE.md) | `LIVE` | Current UI component inventory and screen count — baseline state snapshot for iterative design reference |
-| [FRONTEND_CONTENT_SYSTEM.md](docs/frontend/reference/FRONTEND_CONTENT_SYSTEM.md) | `LIVE` | Core content system specification — how content is structured, categorised, and rendered across all screens |
-| [FRONTEND_INSIGHT_STRUCTURE.md](docs/frontend/reference/FRONTEND_INSIGHT_STRUCTURE.md) | `LIVE` | Insight card structure spec — how SEO insights are presented, prioritised, and actioned in the UI |
 | [FRONTEND_MICROCOPY_RULES.md](docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md) | `LIVE` | Microcopy rules — labels, empty states, error messages, CTA text standards across all screens |
-| [FRONTEND_CONTENT_PATTERNS_BASE.md](docs/frontend/reference/FRONTEND_CONTENT_PATTERNS_BASE.md) | `LIVE` | Base content pattern rules — tone, voice, pattern primitives shared across all screens |
 | [FRONTEND_BACKEND_CONTENT_MAPPING.md](docs/frontend/reference/FRONTEND_BACKEND_CONTENT_MAPPING.md) | `LIVE` | Maps each backend module's output fields to the specific UI elements that display them |
 | [FRONTEND_MODULE_FEATURE_MAPPING.md](docs/frontend/reference/FRONTEND_MODULE_FEATURE_MAPPING.md) | `LIVE` | Maps all 18 backend modules to their corresponding frontend feature screens and capabilities |
 
@@ -134,7 +131,7 @@ Live planning and capability mapping documents used to guide frontend build deci
 | [FRONTEND_SCREEN_ARCHETYPES.md](docs/frontend/planning/FRONTEND_SCREEN_ARCHETYPES.md) | `LIVE` | Screen archetype definitions — the 6 reusable screen patterns used across the app, with composition rules |
 | [FRONTEND_BACKEND_CAPABILITY_AUDIT.md](docs/frontend/planning/FRONTEND_BACKEND_CAPABILITY_AUDIT.md) | `LIVE` | Audit of which backend capabilities are currently surfaced in the frontend vs still pending implementation |
 | [FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md](docs/frontend/planning/FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md) | `LIVE` | Maps backend capabilities to frontend feature workflows end-to-end — from API response to user-facing feature |
-| [FRONTEND_CONTENT_FULL_SYSTEM.md](docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md) | `LIVE` | Full-scope content system — extends the base content system with all screen-specific content patterns |
+| [FRONTEND_CONTENT_FULL_SYSTEM.md](docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md) | `LIVE` | Authoritative full content system — all screen-specific patterns, pattern combination rules, allowed insight formats, and module-specific insight examples; absorbs CONTENT_SYSTEM, CONTENT_PATTERNS_BASE, and INSIGHT_STRUCTURE *(updated 2026-05-17, 1095 lines)* |
 | [FRONTEND_PHASE_INDEX.md](docs/frontend/planning/FRONTEND_PHASE_INDEX.md) | `LIVE` | Index of all 13 frontend design phases with status, deliverable summary, and completion date |
 
 ---
@@ -153,12 +150,24 @@ Historical design phase outputs from PHASE_01 through PHASE_13. Kept for traceab
 | [PHASE_04_INSPIRATION_PATTERN_EXTRACTION.md](docs/frontend/phases/PHASE_04_INSPIRATION_PATTERN_EXTRACTION.md) | `ARCHIVE` | Phase 4 supplemental — design patterns extracted from the inspiration library |
 | [PHASE_04_INSPIRATION_VISUAL_AUDIT.md](docs/frontend/phases/PHASE_04_INSPIRATION_VISUAL_AUDIT.md) | `ARCHIVE` | Phase 4 supplemental — visual audit of inspiration images with pattern annotations |
 | [PHASE_05_PATTERN_EXTRACTION_CHECKLIST.md](docs/frontend/phases/PHASE_05_PATTERN_EXTRACTION_CHECKLIST.md) | `ARCHIVE` | Phase 5 deliverable — checklist of all extracted design patterns with adoption status |
-| [PHASE_06_PATTERN_LIBRARY.md](docs/frontend/phases/PHASE_06_PATTERN_LIBRARY.md) | `ARCHIVE` | Phase 6 deliverable — complete reusable pattern library with usage rules |
-| [PHASE_09_SVG_ICON_LAYER.md](docs/frontend/phases/PHASE_09_SVG_ICON_LAYER.md) | `ARCHIVE` | Phase 9 deliverable — SVG icon system, naming conventions, full icon set |
-| [PHASE_10_COMPONENT_SYSTEM.md](docs/frontend/phases/PHASE_10_COMPONENT_SYSTEM.md) | `ARCHIVE` | Phase 10 deliverable — full component system spec with all UI components and their variants |
-| [PHASE_11_ARCHETYPE_ASSEMBLY.md](docs/frontend/phases/PHASE_11_ARCHETYPE_ASSEMBLY.md) | `ARCHIVE` | Phase 11 deliverable — assembly guide for composing screens from archetypes and components |
 | [PHASE_12_ITERATION_PASSES.md](docs/frontend/phases/PHASE_12_ITERATION_PASSES.md) | `ARCHIVE` | Phase 12 deliverable — structured iteration pass methodology and pass definitions |
 | [PHASE_13_IMPLEMENTATION_SEQUENCE.md](docs/frontend/phases/PHASE_13_IMPLEMENTATION_SEQUENCE.md) | `ARCHIVE` | Phase 13 deliverable — ordered implementation sequence for the full frontend build |
+
+---
+
+## docs/frontend/archive/ — Archived Frontend Docs
+
+Superseded or stub-only docs moved here during 2026-05-17 deduplication pass. Not updated.
+
+| File | Status | Description |
+|------|--------|-------------|
+| [FRONTEND_CONTENT_SYSTEM.md](docs/frontend/archive/FRONTEND_CONTENT_SYSTEM.md) | `ARCHIVE` | Base content system spec — fully subsumed by FRONTEND_CONTENT_FULL_SYSTEM.md which contains all its content plus module-specific patterns *(archived 2026-05-17)* |
+| [FRONTEND_CONTENT_PATTERNS_BASE.md](docs/frontend/archive/FRONTEND_CONTENT_PATTERNS_BASE.md) | `ARCHIVE` | Base pattern rules — unique "Pattern Combination Rules" section migrated to FRONTEND_CONTENT_FULL_SYSTEM.md; remainder subsumed *(archived 2026-05-17)* |
+| [FRONTEND_INSIGHT_STRUCTURE.md](docs/frontend/archive/FRONTEND_INSIGHT_STRUCTURE.md) | `ARCHIVE` | Insight structure spec — unique sections (Allowed Insight Formats, module-specific examples) migrated to FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
+| [PHASE_06_PATTERN_LIBRARY.md](docs/frontend/archive/PHASE_06_PATTERN_LIBRARY.md) | `ARCHIVE` | Phase 6 stub — thin spec (42 lines); actual pattern library is in code under frontend/lib/shared/widgets/ *(archived 2026-05-17)* |
+| [PHASE_09_SVG_ICON_LAYER.md](docs/frontend/archive/PHASE_09_SVG_ICON_LAYER.md) | `ARCHIVE` | Phase 9 stub — requirements spec only (28 lines); icon layer implemented in code; content covered by PHASE_10 *(archived 2026-05-17)* |
+| [PHASE_10_COMPONENT_SYSTEM.md](docs/frontend/archive/PHASE_10_COMPONENT_SYSTEM.md) | `ARCHIVE` | Phase 10 stub — requirements spec only (31 lines); component system implemented in code; governance covered by PHASE_05 *(archived 2026-05-17)* |
+| [PHASE_11_ARCHETYPE_ASSEMBLY.md](docs/frontend/archive/PHASE_11_ARCHETYPE_ASSEMBLY.md) | `ARCHIVE` | Phase 11 stub — spec and closure notes only (45 lines); assembly covered by PHASE_01 + PHASE_04; closure notes are in ITERATION_PASS_LOG *(archived 2026-05-17)* |
 
 ---
 
@@ -185,7 +194,6 @@ Active product planning, specification, and architecture docs.
 | [SEO-OS-Build-Plan.md](docs/product/SEO-OS-Build-Plan.md) | `LIVE` | **Authoritative full-product expansion build plan** — all phases, 25 tasks, deliverables, priorities; supersedes MASTER_BUILD_SPEC for planning purposes |
 | [SYSTEMATIC_UI_ARCHITECTURE.md](docs/product/SYSTEMATIC_UI_ARCHITECTURE.md) | `LIVE` | UI architecture governance — screen hierarchy, navigation model, state management rules, layout system |
 | [MASTER_BUILD_SPEC.md](docs/product/MASTER_BUILD_SPEC.md) | `LIVE` | Original product build specification — updated 2026-05-17 to acknowledge 18-module state; SEO-OS-Build-Plan is now the planning authority |
-| [MVP_TO_FULL_SUITE_ROLLOUT.md](docs/product/MVP_TO_FULL_SUITE_ROLLOUT.md) | `ARCHIVE` | Original 7-phase MVP-to-full-suite rollout plan — superseded by SEO-OS-Build-Plan Part 7 (6-phase, 25-task rollout) |
 
 ---
 
@@ -194,6 +202,7 @@ Active product planning, specification, and architecture docs.
 | File | Status | Description |
 |------|--------|-------------|
 | [MARKET_RESEARCH_PLAYSTORE.md](docs/product/archive/MARKET_RESEARCH_PLAYSTORE.md) | `ARCHIVE` | Historical Play Store competitor market validation — written pre-backend build as initial market context; retained as a historical decision record |
+| [MVP_TO_FULL_SUITE_ROLLOUT.md](docs/product/archive/MVP_TO_FULL_SUITE_ROLLOUT.md) | `ARCHIVE` | Original 7-phase MVP-to-full-suite rollout plan — superseded by SEO-OS-Build-Plan Part 7; moved from product/ to archive/ *(archived 2026-05-17)* |
 
 ---
 
@@ -201,7 +210,7 @@ Active product planning, specification, and architecture docs.
 
 | File | Status | Description |
 |------|--------|-------------|
-| [frontend/README.md](frontend/README.md) | `LIVE` | Flutter app (simple scaffold) README — setup instructions, run commands, basic folder structure |
+| [frontend/README.md](frontend/README.md) | `LIVE` | Flutter scaffold cross-reference — points to SEOSync_Flutter_App/README.md (production app) and docs/frontend/ (all frontend docs) |
 | [SEOSync_Flutter_App/README.md](SEOSync_Flutter_App/README.md) | `LIVE` | SEOSync BLoC Flutter app README — setup, BLoC architecture overview, state management guide; this is the more mature Flutter codebase |
 
 ---

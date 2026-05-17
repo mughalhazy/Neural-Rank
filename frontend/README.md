@@ -1,17 +1,9 @@
-# frontend
+# Neural Rank — Flutter Frontend
 
-A new Flutter project.
+This is the simple Flutter scaffold (original prototype).
 
-## Getting Started
+For the production-ready Flutter app with BLoC architecture, see:
+**[SEOSync_Flutter_App/](../SEOSync_Flutter_App/README.md)**
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+For frontend documentation, design system, and planning docs, see:
+**[docs/frontend/](../docs/frontend/)**

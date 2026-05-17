@@ -1,3 +1,5 @@
+> **Scope notice:** This analysis was written before the Phase 2 expansion (2026-05-15). Maturity percentages (11% overall, capability area figures) are based on the original 8-module backend. The current backend has 18 active modules. Figures should be recalculated against the 18-module state before using for planning decisions.
+
 # SEO OS Delta Analysis Report
 
 Scope:
