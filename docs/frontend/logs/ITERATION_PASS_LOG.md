@@ -74,7 +74,7 @@ Record each controlled refinement pass after structural remediation is complete.
 ### Pass 3: Design Language Application
 - Goal: apply a clearer premium operational design language without changing Pass 1 structure or Pass 2 hierarchy.
 - Inputs reviewed:
-  - `PHASE_07_DESIGN_LANGUAGE.md`
+  - `FRONTEND_DESIGN_LANGUAGE.md`
   - `PHASE_12_ITERATION_PASSES.md`
   - shared theme tokens
   - shared section, flow, filter, alert, and action components
@@ -103,7 +103,7 @@ Record each controlled refinement pass after structural remediation is complete.
 ### Pass 4: Design System Enforcement
 - Goal: enforce reusable design-system rules after the design-language pass.
 - Inputs reviewed:
-  - `PHASE_08_DESIGN_SYSTEM.md`
+  - `FRONTEND_DESIGN_SYSTEM.md`
   - `PHASE_12_ITERATION_PASSES.md`
   - shared theme tokens
   - shared section, primitive, flow, priority, and action components

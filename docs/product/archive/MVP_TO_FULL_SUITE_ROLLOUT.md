@@ -1,5 +1,5 @@
 
-> **Superseded — 2026-05-17:** This 7-phase rollout plan was written for the original 8-module product definition. It has been superseded by the 6-phase implementation sequence in [SEO-OS-Build-Plan.md](SEO-OS-Build-Plan.md) Part 7, which covers all 18 modules, 7 module enhancements, integration adapters, and database schema additions. This document is retained as a historical decision record.
+> **Superseded — 2026-05-17:** This 7-phase rollout plan was written for the original 8-module product definition. It has been superseded by the 6-phase implementation sequence in [PRODUCT_SEO_OS_BUILD_PLAN.md](../PRODUCT_SEO_OS_BUILD_PLAN.md) Part 7, which covers all 18 modules, 7 module enhancements, integration adapters, and database schema additions. This document is retained as a historical decision record.
 
 GOAL:
 Incrementally build full SEO platform with explicit MVP boundary and full-suite expansion.

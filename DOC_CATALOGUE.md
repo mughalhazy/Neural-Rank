@@ -1,7 +1,7 @@
 # DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-17 (content backfill pass — all 18 modules in all LIVE docs) | **Total documents:** 78
+**Last updated:** 2026-05-17 (naming normalisation — 3 files renamed to global standard) | **Total documents:** 78
 
 ---
 
@@ -112,8 +112,8 @@ The frozen, active design system and content rules. These govern all UI developm
 
 | File | Status | Description |
 |------|--------|-------------|
-| [PHASE_07_DESIGN_LANGUAGE.md](docs/frontend/reference/PHASE_07_DESIGN_LANGUAGE.md) | `LIVE` | Frozen design language spec — typography, colour palette, spacing scale, elevation, motion principles; promoted from phases/ as it remains active |
-| [PHASE_08_DESIGN_SYSTEM.md](docs/frontend/reference/PHASE_08_DESIGN_SYSTEM.md) | `LIVE` | Frozen design system spec — component tokens, grid system, breakpoints, theming rules; promoted from phases/ as it remains active |
+| [FRONTEND_DESIGN_LANGUAGE.md](docs/frontend/reference/FRONTEND_DESIGN_LANGUAGE.md) | `LIVE` | Frozen design language spec — typography, colour palette, spacing scale, elevation, motion principles; renamed from PHASE_07_DESIGN_LANGUAGE.md to reflect active reference status |
+| [FRONTEND_DESIGN_SYSTEM.md](docs/frontend/reference/FRONTEND_DESIGN_SYSTEM.md) | `LIVE` | Frozen design system spec — component tokens, grid system, breakpoints, theming rules; renamed from PHASE_08_DESIGN_SYSTEM.md to reflect active reference status |
 | [CURRENT_UI_BASELINE.md](docs/frontend/reference/CURRENT_UI_BASELINE.md) | `LIVE` | Current UI component inventory and screen count — baseline state snapshot for iterative design reference |
 | [FRONTEND_MICROCOPY_RULES.md](docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md) | `LIVE` | Microcopy rules — labels, empty states, error messages, CTA text standards across all screens |
 | [FRONTEND_BACKEND_CONTENT_MAPPING.md](docs/frontend/reference/FRONTEND_BACKEND_CONTENT_MAPPING.md) | `LIVE` | Maps each backend module's output fields to the specific UI elements that display them |
@@ -191,9 +191,9 @@ Active product planning, specification, and architecture docs.
 
 | File | Status | Description |
 |------|--------|-------------|
-| [SEO-OS-Build-Plan.md](docs/product/SEO-OS-Build-Plan.md) | `LIVE` | **Authoritative full-product expansion build plan** — all phases, 25 tasks, deliverables, priorities; supersedes MASTER_BUILD_SPEC for planning purposes |
+| [PRODUCT_SEO_OS_BUILD_PLAN.md](docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md) | `LIVE` | **Authoritative full-product expansion build plan** — all phases, 25 tasks, deliverables, priorities; supersedes MASTER_BUILD_SPEC for planning purposes |
 | [SYSTEMATIC_UI_ARCHITECTURE.md](docs/product/SYSTEMATIC_UI_ARCHITECTURE.md) | `LIVE` | UI architecture governance — screen hierarchy, navigation model, state management rules, layout system |
-| [MASTER_BUILD_SPEC.md](docs/product/MASTER_BUILD_SPEC.md) | `LIVE` | Original product build specification — updated 2026-05-17 to acknowledge 18-module state; SEO-OS-Build-Plan is now the planning authority |
+| [MASTER_BUILD_SPEC.md](docs/product/MASTER_BUILD_SPEC.md) | `LIVE` | Original product build specification — updated 2026-05-17 to acknowledge 18-module state; PRODUCT_SEO_OS_BUILD_PLAN is now the planning authority |
 | [PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md) | `LIVE` | **Production readiness gap register** — 5 P0s, 14 P1s, 10 P2s identified by 4-agent audit + manual verification 2026-05-17; each item has exact file/line evidence and fix instructions; update in place as gaps are resolved |
 
 ---
@@ -203,7 +203,7 @@ Active product planning, specification, and architecture docs.
 | File | Status | Description |
 |------|--------|-------------|
 | [MARKET_RESEARCH_PLAYSTORE.md](docs/product/archive/MARKET_RESEARCH_PLAYSTORE.md) | `ARCHIVE` | Historical Play Store competitor market validation — written pre-backend build as initial market context; retained as a historical decision record |
-| [MVP_TO_FULL_SUITE_ROLLOUT.md](docs/product/archive/MVP_TO_FULL_SUITE_ROLLOUT.md) | `ARCHIVE` | Original 7-phase MVP-to-full-suite rollout plan — superseded by SEO-OS-Build-Plan Part 7; moved from product/ to archive/ *(archived 2026-05-17)* |
+| [MVP_TO_FULL_SUITE_ROLLOUT.md](docs/product/archive/MVP_TO_FULL_SUITE_ROLLOUT.md) | `ARCHIVE` | Original 7-phase MVP-to-full-suite rollout plan — superseded by PRODUCT_SEO_OS_BUILD_PLAN Part 7; moved from product/ to archive/ *(archived 2026-05-17)* |
 
 ---
 

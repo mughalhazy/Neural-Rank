@@ -178,7 +178,7 @@ Use these first in a new session:
 
 ## SEO OS Expansion — Build Progress
 
-> Reference plan: `docs/product/SEO-OS-Build-Plan.md`
+> Reference plan: `docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md`
 > Expansion started: 2026-05-15
 > Goal: Grow from 8 modules to 18, adding 10 new modules, 7 enhancements, 3 core utilities, 5 adapters
 

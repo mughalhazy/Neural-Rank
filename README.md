@@ -118,7 +118,7 @@ Neural Rank/
 | `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` | API route audit |
 | `docs/backend/implementation/BACKEND_QC_PHASE2.md` | Phase 2 QC — 10 expansion modules |
 | `docs/backend/analysis/SEO_OS_BACKEND_GAP_FILL_REPORT.md` | Production readiness gaps |
-| `docs/product/SEO-OS-Build-Plan.md` | Full expansion build plan (authoritative) |
+| `docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md` | Full expansion build plan (authoritative) |
 | `progress.md` | Session milestone log and resume anchors |
 
 ---
