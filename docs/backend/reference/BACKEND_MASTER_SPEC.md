@@ -1,5 +1,7 @@
 # Backend Master Spec
 
+> Last updated 2026-05-17 — reflects 18-module state
+>
 > Version note: V1 (8 modules) frozen 2026-04-22. Expanded to 18 modules 2026-05-15.
 
 Anchor: `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER BUILD SPEC.md](</D:/Neural Rank/MASTER BUILD SPEC.md>)

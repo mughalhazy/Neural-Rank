@@ -1,4 +1,5 @@
 
+> **Historical record — 2026-05-17:** This document records the Google Play Store market research that validated the original product direction. It predates the current 18-module backend implementation. Retained as a decision record.
 
 GOAL:
 Use Google Play ecosystem as signal base to understand broader SEO tool gaps.

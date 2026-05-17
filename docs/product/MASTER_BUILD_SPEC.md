@@ -1,5 +1,7 @@
 MASTER_PRODUCT_BUILD_SPEC.md
 
+> **Status — 2026-05-17:** This spec was written for the original 8-module product definition. The backend now implements 18 modules (17 default-active + local_seo opt-in). For the current full technical specification, see [SEO-OS-Build-Plan.md](SEO-OS-Build-Plan.md). The core principles, behavior contract, and UI system authority in this document remain valid.
+
 GOAL:
 Define the master product build specification for a unified SEO platform that starts with Google Play delivery in Flutter, but is architected from day 1 for later expansion into:
 - web app
@@ -129,6 +131,8 @@ Purpose:
 
 ---
 
+> **Note:** The above reflects the original 8-module MVP scope. The production backend implements 18 modules. See SEO-OS-Build-Plan.md for the complete module catalogue.
+
 ROLLOUT STRATEGY:
 
 BUILD STRATEGY:
@@ -156,10 +160,10 @@ These are the initially activated capabilities.
 ---
 
 FULL-SUITE MODULES BUILT BUT INACTIVE INITIALLY:
-- Competitor Analysis
-- Optimization Layer
-- Creative / Messaging Layer
-- Unified Workflow Layer beyond MVP activation
+- Competitor Analysis (now default-active in production)
+- Optimization Layer (now default-active in production)
+- Creative / Messaging Layer (now default-active in production)
+- Unified Workflow Layer beyond MVP activation (now default-active in production)
 
 Inactive means:
 - module exists in architecture
@@ -363,10 +367,10 @@ Initial active UI includes:
 ---
 
 BUILT BUT INACTIVE UI SURFACES:
-- competitor analysis surfaces
-- optimization layer surfaces
-- creative / messaging surfaces
-- unified workflow expansion surfaces
+- competitor analysis surfaces (now default-active in production)
+- optimization layer surfaces (now default-active in production)
+- creative / messaging surfaces (now default-active in production)
+- unified workflow expansion surfaces (now default-active in production)
 
 These must be architected and coded in a way that supports later activation.
 

@@ -16,9 +16,20 @@ Neural Rank/
 │   ├── mockups/          HTML archetype mockups
 │   └── screenshots/      UI screenshots
 ├── docs/
-│   ├── backend/          Backend architecture, QC, and module docs (32 files)
-│   ├── frontend/         Frontend design system and implementation docs
-│   └── product/          Product planning, build specs, and roadmap docs
+│   ├── backend/
+│   │   ├── reference/    Live backend specs (master spec, module boundaries, APIs)
+│   │   ├── decisions/    One-time architectural decisions (dual classifier, service routes)
+│   │   ├── implementation/ Completed work records (domain services, QC, schema alignment)
+│   │   ├── analysis/     Gap scans and audit reports
+│   │   └── archive/      Phase 1 freeze records (historical, superseded)
+│   ├── frontend/
+│   │   ├── reference/    Live design system rules (UI baseline, content system, design language)
+│   │   ├── planning/     Active planning docs (master plan, screen archetypes, capability maps)
+│   │   ├── phases/       Completed phase deliverables PHASE_01–PHASE_13 (historical)
+│   │   └── logs/         Iteration logs, implementation history, gap register
+│   └── product/
+│       ├── archive/      Historical decision records (market research)
+│       └── *.md          Active product docs (build plan, UI architecture, build spec)
 ├── scripts/              CI and build scripts
 ├── supabase/             Database migrations (9 applied)
 ├── package.json          Root scripts — start, check, test, ci
@@ -101,12 +112,13 @@ Neural Rank/
 
 | Doc | Purpose |
 |---|---|
-| `docs/backend/BACKEND_MASTER_SPEC.md` | Full backend specification |
-| `docs/backend/BACKEND_MODULE_BOUNDARIES.md` | Per-module boundaries (all 18) |
-| `docs/backend/BACKEND_QC_PHASE2.md` | Phase 2 QC — 10 expansion modules |
-| `docs/backend/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` | API route audit |
-| `docs/backend/SEO_OS_BACKEND_GAP_FILL_REPORT.md` | Production readiness gaps |
-| `docs/product/SEO-OS-Build-Plan.md` | Full expansion build plan |
+| `docs/backend/reference/BACKEND_MASTER_SPEC.md` | Full backend specification |
+| `docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md` | Per-module boundaries (all 18) |
+| `docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md` | All 18 modules mapped to 8 bounded contexts |
+| `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` | API route audit |
+| `docs/backend/implementation/BACKEND_QC_PHASE2.md` | Phase 2 QC — 10 expansion modules |
+| `docs/backend/analysis/SEO_OS_BACKEND_GAP_FILL_REPORT.md` | Production readiness gaps |
+| `docs/product/SEO-OS-Build-Plan.md` | Full expansion build plan (authoritative) |
 | `progress.md` | Session milestone log and resume anchors |
 
 ---
