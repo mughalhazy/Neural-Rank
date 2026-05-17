@@ -2,9 +2,9 @@
 
 Anchors:
 
-- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER BUILD SPEC.md](</D:/Neural Rank/MASTER BUILD SPEC.md>)
-- [docs/backend/BACKEND_MASTER_SPEC.md](</D:/Neural Rank/docs/backend/BACKEND_MASTER_SPEC.md>)
-- [docs/backend/BACKEND_MODULE_BOUNDARIES.md](</D:/Neural Rank/docs/backend/BACKEND_MODULE_BOUNDARIES.md>)
+- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER_BUILD_SPEC.md](../../product/MASTER_BUILD_SPEC.md)
+- [BACKEND_MASTER_SPEC.md](BACKEND_MASTER_SPEC.md)
+- [BACKEND_MODULE_BOUNDARIES.md](BACKEND_MODULE_BOUNDARIES.md)
 
 This document defines backend service structure and orchestration boundaries for the current 18-module state. It covers the module service layer, both orchestrators, and the parallel domain service layer.
 

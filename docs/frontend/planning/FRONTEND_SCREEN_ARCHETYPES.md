@@ -2,10 +2,9 @@
 
 Anchors:
 
-- `MASTER_PRODUCT_BUILD_SPEC.md` interpreted from [MASTER BUILD SPEC.md](</D:/Neural Rank/MASTER BUILD SPEC.md>)
-- [MASTER_BEHAVIOUR_DOC.md](</D:/Neural Rank/MASTER_BEHAVIOUR_DOC.md>)
-- [MARKET_RESEARCH_PLAYSTORE.md](</D:/Neural Rank/MARKET_RESEARCH_PLAYSTORE.md>)
-- [BACKEND_MODULE_BOUNDARIES.md](</D:/Neural Rank/docs/backend/BACKEND_MODULE_BOUNDARIES.md>)
+- `MASTER_PRODUCT_BUILD_SPEC.md` interpreted from [MASTER_BUILD_SPEC.md](../../product/MASTER_BUILD_SPEC.md)
+- [MARKET_RESEARCH_PLAYSTORE.md](../../product/archive/MARKET_RESEARCH_PLAYSTORE.md)
+- [BACKEND_MODULE_BOUNDARIES.md](../../backend/reference/BACKEND_MODULE_BOUNDARIES.md)
 - `backend` code under `D:\Neural Rank\backend\src`
 
 This document defines the reusable structural and behavioural screen archetypes for the full product. Archetypes are not screens. They are reusable templates that multiple modules can compose.

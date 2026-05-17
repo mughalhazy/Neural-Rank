@@ -19,23 +19,13 @@ Every screen must define:
 This is structure only. It does not redesign the UI.
 
 ## Source Anchors
-Requested anchors:
-- `MASTER_PRODUCT_BUILD_SPEC.md`
-- `MASTER_BEHAVIOUR_DOC.md`
-- `docs/frontend/FRONTEND_CONTENT_SYSTEM.md`
-- `docs/frontend/FRONTEND_INSIGHT_STRUCTURE.md`
-- `docs/frontend/FRONTEND_BACKEND_CONTENT_MAPPING.md`
-- `docs/frontend/FRONTEND_MICROCOPY_RULES.md`
-- `docs/frontend/FRONTEND_SCREEN_ARCHETYPES.md`
-- `docs/frontend/FRONTEND_PATTERN_LIBRARY.md`
-
-Available anchor fallbacks in the current repo:
-- `MASTER BUILD SPEC.md` is used as the product spec fallback for `MASTER_PRODUCT_BUILD_SPEC.md`
-- `PHASE_01_ARCHETYPES_AND_MAPPING.md` is used as the archetype fallback for `FRONTEND_SCREEN_ARCHETYPES.md`
-- `PHASE_06_PATTERN_LIBRARY.md` is used as the pattern fallback for `FRONTEND_PATTERN_LIBRARY.md`
-
-Backend-content mapping anchor:
-- `docs/frontend/FRONTEND_BACKEND_CONTENT_MAPPING.md` now defines how backend outputs become frontend content layers.
+## Source Anchors
+- `docs/product/MASTER_BUILD_SPEC.md`
+- `docs/frontend/reference/FRONTEND_BACKEND_CONTENT_MAPPING.md`
+- `docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md`
+- `docs/frontend/planning/FRONTEND_SCREEN_ARCHETYPES.md`
+- `docs/frontend/phases/PHASE_01_ARCHETYPES_AND_MAPPING.md`
+- `docs/frontend/archive/PHASE_06_PATTERN_LIBRARY.md`
 
 ## Global Product Content Rule
 No screen may present:

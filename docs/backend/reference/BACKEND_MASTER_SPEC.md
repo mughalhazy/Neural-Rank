@@ -4,7 +4,7 @@
 >
 > Version note: V1 (8 modules) frozen 2026-04-22. Expanded to 18 modules 2026-05-15.
 
-Anchor: `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER BUILD SPEC.md](</D:/Neural Rank/MASTER BUILD SPEC.md>)
+Anchor: `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER_BUILD_SPEC.md](../../product/MASTER_BUILD_SPEC.md)
 
 This document translates the master product build specification into a backend-only master spec. It does not add product scope, module scope, activation rules, or technology beyond the anchor.
 

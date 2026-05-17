@@ -12,13 +12,13 @@
 
 ### 1. Backend documentation set created
 Anchors:
-- [docs/backend/BACKEND_MASTER_SPEC.md](docs/backend/BACKEND_MASTER_SPEC.md)
-- [docs/backend/BACKEND_MODULE_BOUNDARIES.md](docs/backend/BACKEND_MODULE_BOUNDARIES.md)
-- [docs/backend/BACKEND_ACTIVATION_AND_GATING.md](docs/backend/BACKEND_ACTIVATION_AND_GATING.md)
-- [docs/backend/BACKEND_DATA_AND_PERSISTENCE.md](docs/backend/BACKEND_DATA_AND_PERSISTENCE.md)
-- [docs/backend/BACKEND_SERVICES_AND_ORCHESTRATION.md](docs/backend/BACKEND_SERVICES_AND_ORCHESTRATION.md)
-- [docs/backend/BACKEND_INTEGRATION_BOUNDARIES.md](docs/backend/BACKEND_INTEGRATION_BOUNDARIES.md)
-- [docs/backend/BACKEND_BUILD_SEQUENCE.md](docs/backend/BACKEND_BUILD_SEQUENCE.md)
+- [docs/backend/reference/BACKEND_MASTER_SPEC.md](docs/backend/reference/BACKEND_MASTER_SPEC.md)
+- [docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md](docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md)
+- [docs/backend/reference/BACKEND_ACTIVATION_AND_GATING.md](docs/backend/reference/BACKEND_ACTIVATION_AND_GATING.md)
+- [docs/backend/reference/BACKEND_DATA_AND_PERSISTENCE.md](docs/backend/reference/BACKEND_DATA_AND_PERSISTENCE.md)
+- [docs/backend/reference/BACKEND_SERVICES_AND_ORCHESTRATION.md](docs/backend/reference/BACKEND_SERVICES_AND_ORCHESTRATION.md)
+- [docs/backend/reference/BACKEND_INTEGRATION_BOUNDARIES.md](docs/backend/reference/BACKEND_INTEGRATION_BOUNDARIES.md)
+- [docs/backend/archive/BACKEND_BUILD_SEQUENCE.md](docs/backend/archive/BACKEND_BUILD_SEQUENCE.md)
 
 Outcome:
 - backend implementation was anchored before coding
@@ -76,10 +76,10 @@ Outcome:
 
 ### 5. Final backend QC and freeze completed
 Anchors:
-- [docs/backend/BACKEND_QC_REPORT.md](docs/backend/BACKEND_QC_REPORT.md)
-- [docs/backend/BACKEND_QC_FINAL.md](docs/backend/BACKEND_QC_FINAL.md)
-- [docs/backend/BACKEND_V1_HARDENED.md](docs/backend/BACKEND_V1_HARDENED.md)
-- [docs/backend/BACKEND_V1_FROZEN.md](docs/backend/BACKEND_V1_FROZEN.md)
+- [docs/backend/archive/BACKEND_QC_REPORT.md](docs/backend/archive/BACKEND_QC_REPORT.md)
+- [docs/backend/archive/BACKEND_QC_FINAL.md](docs/backend/archive/BACKEND_QC_FINAL.md)
+- [docs/backend/archive/BACKEND_V1_HARDENED.md](docs/backend/archive/BACKEND_V1_HARDENED.md)
+- [docs/backend/archive/BACKEND_V1_FROZEN.md](docs/backend/archive/BACKEND_V1_FROZEN.md)
 
 Outcome:
 - final backend QC score recorded as `10/10`
@@ -112,9 +112,9 @@ Outcome:
 Use these first in a new session:
 - [progress.md](progress.md)
 - [README.md](README.md)
-- [docs/backend/BACKEND_V1_FROZEN.md](docs/backend/BACKEND_V1_FROZEN.md)
-- [docs/backend/BACKEND_QC_FINAL.md](docs/backend/BACKEND_QC_FINAL.md)
-- [docs/backend/BACKEND_QC_REPORT.md](docs/backend/BACKEND_QC_REPORT.md)
+- [docs/backend/archive/BACKEND_V1_FROZEN.md](docs/backend/archive/BACKEND_V1_FROZEN.md)
+- [docs/backend/archive/BACKEND_QC_FINAL.md](docs/backend/archive/BACKEND_QC_FINAL.md)
+- [docs/backend/archive/BACKEND_QC_REPORT.md](docs/backend/archive/BACKEND_QC_REPORT.md)
 - [backend/src/server.js](backend/src/server.js)
 - [render.yaml](render.yaml)
 

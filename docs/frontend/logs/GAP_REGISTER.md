@@ -2,11 +2,10 @@
 
 ## Purpose
 Record the implementation gaps found by overlaying:
-- `SYSTEMATIC_UI_ARCHITECTURE.md`
-- `MASTER BUILD SPEC.md`
-- `MASTER_BEHAVIOUR_DOC.md`
-- `MARKET_RESEARCH_PLAYSTORE.md`
-- `docs/frontend/*.md`
+- `docs/product/SYSTEMATIC_UI_ARCHITECTURE.md`
+- `docs/product/MASTER_BUILD_SPEC.md`
+- `docs/product/archive/MARKET_RESEARCH_PLAYSTORE.md`
+- `docs/frontend/**/*.md`
 
 against the current frontend code in `frontend/lib`.
 
@@ -14,11 +13,11 @@ This register is the authority for pre-polish remediation. No refinement or poli
 
 ## Audit Scope
 - Frontend docs:
-  - `docs/frontend/FRONTEND_MASTER_PLAN.md`
-  - `docs/frontend/PHASE_01_ARCHETYPES_AND_MAPPING.md`
-  - `docs/frontend/PHASE_02_BEHAVIOUR_AND_MARKET_OVERLAY.md`
-  - `docs/frontend/PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md`
-  - `docs/frontend/PHASE_04_IMPLEMENTATION_BLUEPRINT.md`
+  - `docs/frontend/planning/FRONTEND_MASTER_PLAN.md`
+  - `docs/frontend/phases/PHASE_01_ARCHETYPES_AND_MAPPING.md`
+  - `docs/frontend/phases/PHASE_02_BEHAVIOUR_AND_MARKET_OVERLAY.md`
+  - `docs/frontend/phases/PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md`
+  - `docs/frontend/phases/PHASE_04_IMPLEMENTATION_BLUEPRINT.md`
 - Frontend code:
   - `frontend/lib/app`
   - `frontend/lib/core`

@@ -4,12 +4,11 @@
 Record the UI implementation path so future sessions can resume without drift.
 
 ## Source Anchors
-- `SYSTEMATIC_UI_ARCHITECTURE.md`
-- `MASTER BUILD SPEC.md`
-- `MASTER_BEHAVIOUR_DOC.md`
-- `MARKET_RESEARCH_PLAYSTORE.md`
-- `Design Inspiration`
-- `docs/frontend/FRONTEND_PHASE_INDEX.md`
+- `docs/product/SYSTEMATIC_UI_ARCHITECTURE.md`
+- `docs/product/MASTER_BUILD_SPEC.md`
+- `docs/product/archive/MARKET_RESEARCH_PLAYSTORE.md`
+- `design/inspiration/`
+- `docs/frontend/planning/FRONTEND_PHASE_INDEX.md`
 
 ## Phase Implementation Summary
 

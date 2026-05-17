@@ -13,8 +13,7 @@ Microcopy must support the content system and insight structure by making every 
 Microcopy must not sound like marketing copy. It must help the user understand what is happening, why it matters, and what to do next.
 
 ## Source Anchors
-- `docs/frontend/FRONTEND_CONTENT_SYSTEM.md`
-- `docs/frontend/FRONTEND_INSIGHT_STRUCTURE.md`
+- `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`
 
 ## Core Structure
 Use this structure for all meaningful UI text:

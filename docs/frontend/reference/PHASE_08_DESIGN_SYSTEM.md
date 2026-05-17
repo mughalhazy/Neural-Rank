@@ -4,8 +4,8 @@
 Convert the premium-minimal design language into enforceable reusable implementation rules.
 
 ## Anchor
-- `docs/frontend/PHASE_04_INSPIRATION_VISUAL_AUDIT.md`
-- `docs/frontend/PHASE_07_DESIGN_LANGUAGE.md`
+- `docs/frontend/phases/PHASE_04_INSPIRATION_VISUAL_AUDIT.md`
+- `docs/frontend/reference/PHASE_07_DESIGN_LANGUAGE.md`
 
 ## Rule Categories
 - typography

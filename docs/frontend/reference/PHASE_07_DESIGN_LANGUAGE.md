@@ -6,7 +6,7 @@ Define a premium minimal visual language for the product based on direct inspira
 This phase replaces the earlier dark command-center drift.
 
 ## Anchor
-- `docs/frontend/PHASE_04_INSPIRATION_VISUAL_AUDIT.md`
+- `docs/frontend/phases/PHASE_04_INSPIRATION_VISUAL_AUDIT.md`
 
 ## Design Language Axes
 - visual tone

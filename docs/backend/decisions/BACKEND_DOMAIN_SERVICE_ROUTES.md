@@ -2,8 +2,8 @@
 
 Anchors:
 
-- [docs/backend/BACKEND_MASTER_SPEC.md](</D:/Neural Rank/docs/backend/BACKEND_MASTER_SPEC.md>)
-- [docs/backend/BACKEND_MODULE_BOUNDARIES.md](</D:/Neural Rank/docs/backend/BACKEND_MODULE_BOUNDARIES.md>)
+- [BACKEND_MASTER_SPEC.md](../reference/BACKEND_MASTER_SPEC.md)
+- [BACKEND_MODULE_BOUNDARIES.md](../reference/BACKEND_MODULE_BOUNDARIES.md)
 - `backend/src/server.js`
 - `backend/src/domains/`
 

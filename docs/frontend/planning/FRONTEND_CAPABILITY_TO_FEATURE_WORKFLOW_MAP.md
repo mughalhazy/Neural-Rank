@@ -6,10 +6,10 @@ This document turns audited backend capabilities into deterministic frontend fea
 It must be updated after each module capability audit and before any UI implementation for that module.
 
 ## Anchors
-- `docs/frontend/FRONTEND_BACKEND_CAPABILITY_AUDIT.md`
-- `docs/frontend/FRONTEND_MODULE_FEATURE_MAPPING.md`
-- `docs/frontend/PHASE_01_ARCHETYPES_AND_MAPPING.md`
-- `docs/frontend/FRONTEND_CONTENT_SYSTEM.md`
+- `docs/frontend/planning/FRONTEND_BACKEND_CAPABILITY_AUDIT.md`
+- `docs/frontend/reference/FRONTEND_MODULE_FEATURE_MAPPING.md`
+- `docs/frontend/phases/PHASE_01_ARCHETYPES_AND_MAPPING.md`
+- `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`
 
 ## Mapping Rule
 The mapping sequence is:

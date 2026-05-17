@@ -2,8 +2,8 @@
 
 Anchors:
 
-- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER BUILD SPEC.md](</D:/Neural Rank/MASTER BUILD SPEC.md>)
-- [docs/backend/BACKEND_MASTER_SPEC.md](</D:/Neural Rank/docs/backend/BACKEND_MASTER_SPEC.md>)
+- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER_BUILD_SPEC.md](../../product/MASTER_BUILD_SPEC.md)
+- [BACKEND_MASTER_SPEC.md](BACKEND_MASTER_SPEC.md)
 
 This document defines clean backend integration boundaries so external providers and future data sources can be added later without structural rewrite.
 

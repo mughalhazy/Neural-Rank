@@ -6,13 +6,12 @@ This document is the deterministic source of truth for backend capability extrac
 The frontend must not invent module capabilities. Each capability must be extracted from backend code, then projected into the existing UI framework, content system, and archetype subpages.
 
 ## Anchors
-- `MASTER BUILD SPEC.md`
-- `MASTER_BEHAVIOUR_DOC.md`
-- `docs/backend/BACKEND_MASTER_SPEC.md`
-- `docs/backend/BACKEND_MODULE_BOUNDARIES.md`
-- `docs/frontend/PHASE_01_ARCHETYPES_AND_MAPPING.md`
-- `docs/frontend/FRONTEND_MODULE_FEATURE_MAPPING.md`
-- `docs/frontend/FRONTEND_CONTENT_SYSTEM.md`
+- `docs/product/MASTER_BUILD_SPEC.md`
+- `docs/backend/reference/BACKEND_MASTER_SPEC.md`
+- `docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md`
+- `docs/frontend/phases/PHASE_01_ARCHETYPES_AND_MAPPING.md`
+- `docs/frontend/reference/FRONTEND_MODULE_FEATURE_MAPPING.md`
+- `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`
 
 ## Deterministic Audit Protocol
 For each module:

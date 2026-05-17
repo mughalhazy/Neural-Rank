@@ -1,15 +1,12 @@
 # Frontend Content Implementation Log
 
 ## Anchors
-- `MASTER_PRODUCT_BUILD_SPEC.md`
-- `MASTER_BEHAVIOUR_DOC.md`
-- `docs/frontend/FRONTEND_CONTENT_SYSTEM.md`
-- `docs/frontend/FRONTEND_INSIGHT_STRUCTURE.md`
-- `docs/frontend/FRONTEND_BACKEND_CONTENT_MAPPING.md`
-- `docs/frontend/FRONTEND_MICROCOPY_RULES.md`
-- `docs/frontend/FRONTEND_SCREEN_ARCHETYPES.md`
-- `docs/frontend/FRONTEND_PATTERN_LIBRARY.md`
-- `docs/backend/BACKEND_MASTER_SPEC.md`
+- `docs/product/MASTER_BUILD_SPEC.md`
+- `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`
+- `docs/frontend/reference/FRONTEND_BACKEND_CONTENT_MAPPING.md`
+- `docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md`
+- `docs/frontend/planning/FRONTEND_SCREEN_ARCHETYPES.md`
+- `docs/backend/reference/BACKEND_MASTER_SPEC.md`
 
 ## Implementation Rule
 Every visible module screen must convert demo backend-style signals into:

@@ -17,13 +17,10 @@ Frontend content must present:
 - what to do next
 
 ## Source Anchors
-- `docs/backend/BACKEND_MASTER_SPEC.md`
-- `MASTER BUILD SPEC.md`
-- `MASTER_BEHAVIOUR_DOC.md`
-- `docs/frontend/FRONTEND_CONTENT_SYSTEM.md`
-- `docs/frontend/FRONTEND_INSIGHT_STRUCTURE.md`
-- `docs/frontend/FRONTEND_MICROCOPY_RULES.md`
-- `docs/frontend/FRONTEND_CONTENT_FULL_SYSTEM.md`
+- `docs/backend/reference/BACKEND_MASTER_SPEC.md`
+- `docs/product/MASTER_BUILD_SPEC.md`
+- `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`
+- `docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md`
 
 ## Mapping Rule
 Every backend module output must be translated into four frontend content layers:

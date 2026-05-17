@@ -2,8 +2,8 @@
 
 Anchors:
 
-- [docs/backend/BACKEND_MASTER_SPEC.md](</D:/Neural Rank/docs/backend/BACKEND_MASTER_SPEC.md>)
-- [docs/backend/BACKEND_MODULE_BOUNDARIES.md](</D:/Neural Rank/docs/backend/BACKEND_MODULE_BOUNDARIES.md>)
+- [BACKEND_MASTER_SPEC.md](BACKEND_MASTER_SPEC.md)
+- [BACKEND_MODULE_BOUNDARIES.md](BACKEND_MODULE_BOUNDARIES.md)
 
 This document catalogs the nine core utility modules in `backend/src/core/`. These files are shared infrastructure consumed by modules, domains, orchestration, and persistence layers. They do not contain business logic specific to any one module.
 
