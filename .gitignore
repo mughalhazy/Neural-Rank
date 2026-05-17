@@ -16,6 +16,7 @@ pnpm-debug.log*
 # npm local cache/global (machine-specific, not project code)
 .npm-cache/
 .npm-global/
+.npmrc
 .npmrc.local
 
 # Codex CLI artifacts

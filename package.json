@@ -7,8 +7,5 @@
     "test:backend": "node backend/src/full-backend-validation.test.js",
     "test:backend:ci": "node backend/src/full-backend-validation.test.js",
     "ci": "npm run check && npm run test:backend:ci"
-  },
-  "dependencies": {
-    "@openai/codex": "^0.122.0"
   }
 }
