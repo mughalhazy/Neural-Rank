@@ -121,7 +121,7 @@ Use these first in a new session:
 ## Current Operational Facts
 - backend is deployed as a Render free-tier web service
 - `/health` is live and returning `status: ok`
-- all 8 backend modules are active in runtime
+- all 18 backend modules registered; 17 default-active, 1 opt-in (local_seo)
 - GitHub repo is current with deployed code
 
 ## Suggested Next Work Areas
@@ -150,6 +150,7 @@ Use these first in a new session:
 - Region: `us-east-1`
 - Plan: free tier
 - DB host: `db.bvujfwwwwzlpsxbshxyn.supabase.co`
+- DB password: [REDACTED — rotate immediately, store in Render dashboard only, never commit]
 - Dashboard: `https://supabase.com/dashboard/project/bvujfwwwwzlpsxbshxyn`
 - Organization: Syntera Cloud (`eslplsangorrdavhhbsc`)
 

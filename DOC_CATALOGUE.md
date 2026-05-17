@@ -1,7 +1,7 @@
 # DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-17 (linkage normalisation pass) | **Total documents:** 77
+**Last updated:** 2026-05-17 (production readiness audit + gap register added) | **Total documents:** 78
 
 ---
 
@@ -194,6 +194,7 @@ Active product planning, specification, and architecture docs.
 | [SEO-OS-Build-Plan.md](docs/product/SEO-OS-Build-Plan.md) | `LIVE` | **Authoritative full-product expansion build plan** — all phases, 25 tasks, deliverables, priorities; supersedes MASTER_BUILD_SPEC for planning purposes |
 | [SYSTEMATIC_UI_ARCHITECTURE.md](docs/product/SYSTEMATIC_UI_ARCHITECTURE.md) | `LIVE` | UI architecture governance — screen hierarchy, navigation model, state management rules, layout system |
 | [MASTER_BUILD_SPEC.md](docs/product/MASTER_BUILD_SPEC.md) | `LIVE` | Original product build specification — updated 2026-05-17 to acknowledge 18-module state; SEO-OS-Build-Plan is now the planning authority |
+| [PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md) | `LIVE` | **Production readiness gap register** — 5 P0s, 14 P1s, 10 P2s identified by 4-agent audit + manual verification 2026-05-17; each item has exact file/line evidence and fix instructions; update in place as gaps are resolved |
 
 ---
 
