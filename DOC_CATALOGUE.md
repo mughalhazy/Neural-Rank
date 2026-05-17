@@ -1,7 +1,7 @@
 # DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-17 (production readiness audit + gap register added) | **Total documents:** 78
+**Last updated:** 2026-05-17 (content backfill pass — all 18 modules in all LIVE docs) | **Total documents:** 78
 
 ---
 
@@ -117,7 +117,7 @@ The frozen, active design system and content rules. These govern all UI developm
 | [CURRENT_UI_BASELINE.md](docs/frontend/reference/CURRENT_UI_BASELINE.md) | `LIVE` | Current UI component inventory and screen count — baseline state snapshot for iterative design reference |
 | [FRONTEND_MICROCOPY_RULES.md](docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md) | `LIVE` | Microcopy rules — labels, empty states, error messages, CTA text standards across all screens |
 | [FRONTEND_BACKEND_CONTENT_MAPPING.md](docs/frontend/reference/FRONTEND_BACKEND_CONTENT_MAPPING.md) | `LIVE` | Maps each backend module's output fields to the specific UI elements that display them |
-| [FRONTEND_MODULE_FEATURE_MAPPING.md](docs/frontend/reference/FRONTEND_MODULE_FEATURE_MAPPING.md) | `LIVE` | Maps all 18 backend modules to their corresponding frontend feature screens and capabilities |
+| [FRONTEND_MODULE_FEATURE_MAPPING.md](docs/frontend/reference/FRONTEND_MODULE_FEATURE_MAPPING.md) | `LIVE` | Maps all 18 backend modules to frontend feature surfaces — full commercial job, screen blocks, and demo data for all 18; Phase 2 expansion modules (9–18) documented with planned feature surfaces *(backfilled 2026-05-17)* |
 
 ---
 
@@ -127,9 +127,9 @@ Live planning and capability mapping documents used to guide frontend build deci
 
 | File | Status | Description |
 |------|--------|-------------|
-| [FRONTEND_MASTER_PLAN.md](docs/frontend/planning/FRONTEND_MASTER_PLAN.md) | `LIVE` | Master frontend plan — full screen list, implementation phases, feature priorities, inter-screen dependencies |
+| [FRONTEND_MASTER_PLAN.md](docs/frontend/planning/FRONTEND_MASTER_PLAN.md) | `LIVE` | Master frontend plan — full screen list, implementation phases, feature priorities; product surface now lists all 18 modules across MVP / gated / Phase 2 expansion / opt-in tiers *(backfilled 2026-05-17)* |
 | [FRONTEND_SCREEN_ARCHETYPES.md](docs/frontend/planning/FRONTEND_SCREEN_ARCHETYPES.md) | `LIVE` | Screen archetype definitions — the 6 reusable screen patterns used across the app, with composition rules |
-| [FRONTEND_BACKEND_CAPABILITY_AUDIT.md](docs/frontend/planning/FRONTEND_BACKEND_CAPABILITY_AUDIT.md) | `LIVE` | Audit of which backend capabilities are currently surfaced in the frontend vs still pending implementation |
+| [FRONTEND_BACKEND_CAPABILITY_AUDIT.md](docs/frontend/planning/FRONTEND_BACKEND_CAPABILITY_AUDIT.md) | `LIVE` | Audit of which backend capabilities are surfaced in the frontend vs pending; Phase 1 (7 original modules) and Phase 2 (10 expansion modules) both listed as pending *(backfilled 2026-05-17)* |
 | [FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md](docs/frontend/planning/FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md) | `LIVE` | Maps backend capabilities to frontend feature workflows end-to-end — from API response to user-facing feature |
 | [FRONTEND_CONTENT_FULL_SYSTEM.md](docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md) | `LIVE` | Authoritative full content system — all screen-specific patterns, pattern combination rules, allowed insight formats, and module-specific insight examples; absorbs CONTENT_SYSTEM, CONTENT_PATTERNS_BASE, and INSIGHT_STRUCTURE *(updated 2026-05-17, 1095 lines)* |
 | [FRONTEND_PHASE_INDEX.md](docs/frontend/planning/FRONTEND_PHASE_INDEX.md) | `LIVE` | Index of all 13 frontend design phases with status, deliverable summary, and completion date |

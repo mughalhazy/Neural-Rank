@@ -383,6 +383,373 @@ Apply feature-value previews to:
 ### Batch 5: Dashboard and Workflow Consolidation
 Rebuild dashboard content around cross-module commercial decisions and next-best-action flow.
 
+---
+
+## Phase 2 Expansion Modules — Frontend Phase 2
+
+The following 10 modules are fully implemented in the backend (`backend_active`) as of 2026-05-15. They have no frontend screens yet. Each entry below defines the intended feature surface for when Phase 2 frontend work begins. All 10 follow the same gated-module rule: show feature-value previews with commercial intent, not empty scaffolds.
+
+---
+
+## Module 9: Technical SEO Audit
+
+### Backend Capability
+- Core Web Vitals scoring (LCP, CLS, INP)
+- crawl health analysis (broken URLs, status codes)
+- robots.txt and sitemap configuration auditing
+- structured data / schema validation
+
+### Backend Action Types
+- `fix_crawl_issue`
+- `improve_core_web_vitals`
+- `fix_robots_sitemap`
+- `add_schema_markup`
+
+### Commercial Job
+Surface the technical issues that are actively blocking crawl coverage and ranking performance — before any content or keyword work begins.
+
+### Frontend Feature Surfaces
+- Technical Health Score Board
+- Core Web Vitals Risk Map
+- Crawl Issue Priority Queue
+- Robots / Sitemap Status Panel
+
+### Required Screen Blocks
+- CWV pass/fail summary (LCP/CLS/INP)
+- top crawl issue with affected URL count
+- sitemap/robots status
+- highest-priority technical remediation action
+
+### Commercial Value
+The user can identify which technical issue is suppressing rankings and what to fix first — without needing to interpret raw audit data.
+
+### Demo Data Requirement
+Use CWV scores, crawl error count, broken URL samples, robots disallow paths, schema warnings, and top priority action.
+
+---
+
+## Module 10: On-Page SEO Scorer
+
+### Backend Capability
+- per-page on-page signal scoring
+- title tag and meta description analysis
+- heading hierarchy evaluation
+- keyword density and coverage scoring
+
+### Backend Action Types
+- `fix_missing_title`
+- `fix_duplicate_meta`
+- `fix_thin_content`
+- `add_keyword_coverage`
+
+### Commercial Job
+Score individual pages so the user knows exactly which page needs fixing and why — without reading every page manually.
+
+### Frontend Feature Surfaces
+- Page Score Leaderboard
+- Meta Tag Audit Board
+- Thin Content Detector
+- On-Page Fix Queue
+
+### Required Screen Blocks
+- lowest-scoring page with primary issue
+- missing keyword count
+- meta description status
+- highest-priority on-page fix action
+
+### Commercial Value
+The user can rank pages by SEO health and act on the weakest ones first rather than treating all pages equally.
+
+### Demo Data Requirement
+Use pages, score, missing title/meta flags, heading issues, keyword count per page, and priority fix action.
+
+---
+
+## Module 11: Backlink Intelligence
+
+### Backend Capability
+- domain authority and link quality scoring
+- toxic / unnatural link risk detection
+- anchor text distribution analysis
+- link acquisition opportunity identification
+
+### Backend Action Types
+- `acquire_link_target`
+- `disavow_toxic_link`
+- `diversify_anchor_text`
+
+### Commercial Job
+Show the state of the link profile and what one link action to take first — not a raw data dump of every backlink.
+
+### Frontend Feature Surfaces
+- Link Profile Health Board
+- Toxic Link Risk Detector
+- Anchor Distribution Map
+- Link Acquisition Opportunity Queue
+
+### Required Screen Blocks
+- authority score summary
+- toxic link count and risk level
+- anchor diversity signal
+- top link acquisition target with rationale
+
+### Commercial Value
+The user can decide whether their link profile is helping or hurting rankings and act on the most impactful link opportunity.
+
+### Demo Data Requirement
+Use DA score, referring domain count, toxic link count, anchor type distribution, top acquisition target domain, and priority action.
+
+---
+
+## Module 12: E-E-A-T Signals
+
+### Backend Capability
+- author and expertise signal evaluation
+- trust marker assessment (About, Contact, credentials)
+- site-level authority scoring
+- editorial citation gap detection
+
+### Backend Action Types
+- `add_author_bio`
+- `improve_about_contact`
+- `acquire_editorial_citation`
+- `add_trust_schema`
+
+### Commercial Job
+Show which trust and authority signals are weakest and which fix will have the most immediate impact on organic visibility.
+
+### Frontend Feature Surfaces
+- Trust Signal Board
+- Author Authority Map
+- E-E-A-T Gap Detector
+- Trust Improvement Queue
+
+### Required Screen Blocks
+- E-E-A-T score summary
+- biggest single trust gap
+- sample missing signal
+- primary trust-building action
+
+### Commercial Value
+The user understands exactly which E-E-A-T dimension is underweight and what specific content or structural change addresses it.
+
+### Demo Data Requirement
+Use signal categories (experience, expertise, authority, trust), per-category scores, missing signal examples, and top trust action.
+
+---
+
+## Module 13: Search Intent Classifier
+
+### Backend Capability
+- 4-intent keyword classification (informational, navigational, transactional, commercial)
+- content-format alignment recommendations per intent
+
+### Backend Action Types
+- `align_content_format_to_intent`
+- `create_intent_aligned_content`
+
+### Commercial Job
+Match keyword targeting to what searchers actually want — expose where the current content format mismatches the dominant intent.
+
+### Frontend Feature Surfaces
+- Intent Distribution Map
+- Misaligned Keyword Detector
+- Content Format Recommendation Board
+- Intent-Aligned Action Queue
+
+### Required Screen Blocks
+- intent distribution across tracked keywords
+- highest-volume misaligned keyword
+- recommended content format
+- content alignment action
+
+### Commercial Value
+The user can stop targeting keywords with the wrong content format and see exactly what format change each keyword set needs.
+
+### Demo Data Requirement
+Use keywords, intent category, confidence, current page format, recommended format, and priority alignment action.
+
+---
+
+## Module 14: SERP Feature Analyzer
+
+### Backend Capability
+- SERP feature presence detection across target keywords
+- feature ownership gap identification
+- structured data and content opportunity mapping
+
+### Backend Action Types
+- `implement_schema_type`
+- `restructure_for_featured_snippet`
+- `build_local_signals`
+
+### Commercial Job
+Show which SERP real estate the target does not own and what it takes to win it — featured snippets, knowledge panels, PAA boxes, and more.
+
+### Frontend Feature Surfaces
+- SERP Ownership Map
+- Feature Capture Priority Board
+- Schema Gap Detector
+- Structured Data Action Queue
+
+### Required Screen Blocks
+- features triggered for target keywords
+- features not owned by target URL
+- highest-value unowned feature
+- capture action with schema or content recommendation
+
+### Commercial Value
+The user can prioritize structured data and content work that will win visible SERP space rather than improving invisible ranking positions.
+
+### Demo Data Requirement
+Use feature type, keyword trigger count, ownership status (owned/unowned), schema recommendation, and priority capture action.
+
+---
+
+## Module 15: Topical Authority
+
+### Backend Capability
+- topic cluster coverage depth and breadth analysis
+- topical gap detection against target topics
+- thin topical coverage identification
+
+### Backend Action Types
+- `create_gap_fill_content`
+- `consolidate_thin_coverage`
+- `build_internal_cluster_links`
+
+### Commercial Job
+Show which topics the site covers shallowly or not at all — and what content to create first to build authority in each cluster.
+
+### Frontend Feature Surfaces
+- Topical Coverage Map
+- Gap Priority Board
+- Cluster Depth Analyzer
+- Content Plan Queue
+
+### Required Screen Blocks
+- topic coverage score
+- biggest gap cluster with missing subtopics
+- content creation priority
+- internal linking opportunity
+
+### Commercial Value
+The user can see which topic areas need deeper coverage to compete on authority — and get a prioritized content plan, not a generic gap list.
+
+### Demo Data Requirement
+Use topics, coverage %, gap count, uncovered subtopics, cluster depth score, and top content creation action.
+
+---
+
+## Module 16: Site Architecture
+
+### Backend Capability
+- crawl depth and hierarchy analysis
+- internal link gap and orphaned page detection
+- URL structure evaluation
+
+### Backend Action Types
+- `flatten_crawl_hierarchy`
+- `link_orphaned_page`
+- `improve_url_structure`
+- `create_hub_page`
+
+### Commercial Job
+Fix the structural problems that prevent crawlers and users from reaching all content — not visible in rankings but directly responsible for missed organic coverage.
+
+### Frontend Feature Surfaces
+- Architecture Health Board
+- Deep Page Risk Map
+- Orphaned Page Detector
+- Internal Link Fix Queue
+
+### Required Screen Blocks
+- average crawl depth
+- orphaned page count
+- deepest problematic page
+- highest-priority architecture fix
+
+### Commercial Value
+The user can identify which structural issues are hiding content from search engines and act on the fix that will unlock the most crawl coverage.
+
+### Demo Data Requirement
+Use crawl depth distribution, orphaned page samples, link gap count, URL structure issues, and top fix action.
+
+---
+
+## Module 17: Analytics Integration
+
+### Backend Capability
+- Google Search Console search analytics ingestion
+- GA4 page metrics ingestion
+- cross-signal performance correlation (impressions, clicks, CTR, position, sessions)
+
+### Backend Action Types
+- `recover_traffic_decline`
+- `improve_low_ctr_query`
+- `fix_page_performance_gap`
+
+### Commercial Job
+Turn raw analytics data into decisions — show what traffic signal needs acting on, not just what the chart looks like.
+
+### Frontend Feature Surfaces
+- Traffic Health Board
+- CTR Opportunity Map
+- Performance Correlation View
+- Analytics Action Queue
+
+### Required Screen Blocks
+- top organic session trend (up/down)
+- highest-impression / lowest-CTR query
+- performance gap with recommended fix
+- traffic recovery or CTR improvement action
+
+### Commercial Value
+The user can act on analytics signals rather than just observe them — each data point maps to a specific SEO action.
+
+### Demo Data Requirement
+Use top queries, impressions, clicks, CTR, position, trend direction, correlated SEO signal, and recommended action.
+
+---
+
+## Module 18: Local SEO (opt-in)
+
+**Note:** This module is opt-in only (`defaultActive: false`). It must be explicitly activated via `activationOverrides: { local_seo: true }` with `options: { allowInactiveActivation: true }`. The frontend should gate this module behind an explicit activation flow, not show it as standard.
+
+### Backend Capability
+- NAP (Name / Address / Phone) citation consistency analysis
+- Google Business Profile completeness scoring
+- geo-specific rank factor evaluation
+
+### Backend Action Types
+- `fix_nap_inconsistency`
+- `optimize_gmb_profile`
+- `implement_local_schema`
+- `build_local_links`
+
+### Commercial Job
+For businesses with physical locations or service areas — show exactly what local signals are limiting local search visibility and what to fix first.
+
+### Frontend Feature Surfaces
+- Local Citation Health Board
+- GMB Completeness Scorer
+- Local Rank Signal Map
+- Local Fix Queue
+
+### Required Screen Blocks
+- NAP consistency score across citation sources
+- GMB completeness percentage
+- top local signal gap
+- highest-priority local fix action
+
+### Commercial Value
+The user can stop losing local search visibility to competitors who have cleaner citations and more complete GMB profiles.
+
+### Demo Data Requirement
+Use citation sources, consistency score, GMB completeness %, geo-rank signal samples, and top local action.
+
+---
+
 ## Acceptance Checklist
 - Each module has a named commercial feature surface.
 - Each module maps backend action types to frontend actions.
@@ -391,3 +758,4 @@ Rebuild dashboard content around cross-module commercial decisions and next-best
 - MVP modules do not look like generic dashboards.
 - Gated modules do not look like empty placeholders.
 - Unified workflow shows one prioritized action path across modules.
+- Phase 2 expansion modules have defined feature surfaces ready for implementation.

@@ -501,7 +501,7 @@ The parent Review Analysis screen should be simple:
 - samples belong in detail subpages
 - feature requests should be framed as roadmap demand, not generic feedback
 
-## Pending Modules
+## Pending Modules — Phase 1 (original 8)
 - Content / Listing Insights
 - Keyword Analysis
 - Rank Tracking
@@ -509,3 +509,17 @@ The parent Review Analysis screen should be simple:
 - Optimization Layer
 - Creative / Messaging Layer
 - Unified Workflow Layer
+
+## Pending Modules — Phase 2 expansion (10 new backend modules)
+These modules are fully implemented in the backend (`backend_active`). Capability audit must be completed before any Phase 2 frontend screens are built.
+
+- Technical SEO Audit (`technical_seo_audit`) — crawl health, CWV scoring, robots/sitemap, structured data
+- On-Page SEO Scorer (`on_page_seo_scorer`) — per-page on-page signal scoring, title/meta/heading/keyword analysis
+- Backlink Intelligence (`backlink_intelligence`) — authority scoring, toxicity risk, anchor distribution, link acquisition
+- E-E-A-T Signals (`eeat_signals`) — author/expertise signals, trust markers, site-level authority
+- Search Intent Classifier (`search_intent_classifier`) — 4-intent taxonomy, content-format alignment recommendations
+- SERP Feature Analyzer (`serp_feature_analyzer`) — feature presence, ownership gaps, schema/content recommendations
+- Topical Authority (`topical_authority`) — topic cluster coverage, gap detection, content plan prioritization
+- Site Architecture (`site_architecture`) — crawl depth, internal link gaps, URL structure, orphaned pages
+- Analytics Integration (`analytics_integration`) — GSC + GA4 ingestion, cross-signal correlation, CTR/traffic actions
+- Local SEO (`local_seo`) — NAP consistency, GMB completeness, geo-rank factors (opt-in only)

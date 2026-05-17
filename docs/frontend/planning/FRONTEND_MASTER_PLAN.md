@@ -9,11 +9,23 @@ Build a Flutter-first UI system for Neural Rank that follows `docs/product/SYSTE
   - Content / Listing Insights
   - Keyword Analysis
   - Rank Tracking
-- Built but gated modules:
+- Built but gated modules (Phase 1 expansion, backend_active):
   - Competitor Analysis
   - Optimization Layer
   - Creative / Messaging Layer
   - Unified Workflow Layer
+- Backend-ready, frontend Phase 2 (backend_active, no frontend screens yet):
+  - Technical SEO Audit
+  - On-Page SEO Scorer
+  - Backlink Intelligence
+  - E-E-A-T Signals
+  - Search Intent Classifier
+  - SERP Feature Analyzer
+  - Topical Authority
+  - Site Architecture
+  - Analytics Integration
+- Backend-ready, opt-in only (frontend Phase 2, requires explicit activation):
+  - Local SEO
 
 ## Frontend Principles
 - Build by system layer, not polished screen first.
