@@ -31,7 +31,7 @@ These must be fixed before any real users are onboarded.
 3. Update `render.yaml` to use `sync: false` for all secret env vars — values live in Render dashboard only, not in the file
 4. Verify `.gitignore` does not accidentally expose any `.env` file
 
-**Status:** Open
+**Status:** PARTIALLY RESOLVED (2026-05-18) — `render.yaml` updated to `sync: false` for all 6 env vars; plaintext values removed from version control. **Remaining action required by owner:** rotate `SUPABASE_ANON_KEY` at Supabase dashboard → Settings → API, and verify all 6 values are set in Render dashboard before pushing.
 
 ---
 
@@ -228,7 +228,7 @@ process.on('unhandledRejection', (reason) => {
 });
 ```
 
-**Status:** Open
+**Status:** RESOLVED (2026-05-18) — `unhandledRejection` and `uncaughtException` handlers added to `backend/src/server.js`; structured JSON log output on rejection, process exits with code 1 on uncaught exception.
 
 ---
 

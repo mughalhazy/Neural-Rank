@@ -16,7 +16,7 @@ const { createTechnicalOperationsService } = require("./domains/technical-operat
 const { createSearchIntelligenceService } = require("./domains/search-intelligence/service");
 const { createBusinessIntelligenceService } = require("./domains/business-intelligence/service");
 const { normalizeError } = require("./api/errors");
-const { resolveRequestIdentity, requireIdentity, requireWorkspace } = require("./api/auth");
+const { resolveRequestIdentity, requireIdentity } = require("./api/auth");
 const {
   validateFlowRunBody,
   validateModuleRunBody,
@@ -705,6 +705,14 @@ module.exports = {
   requestHandler: createRequestHandler(),
   startServer,
 };
+
+process.on('unhandledRejection', (reason) => {
+  console.log(JSON.stringify({ kind: 'unhandled_rejection', reason: String(reason) }));
+});
+process.on('uncaughtException', (error) => {
+  console.log(JSON.stringify({ kind: 'uncaught_exception', reason: String(error) }));
+  process.exit(1);
+});
 
 if (require.main === module) {
   startServer()

@@ -1,7 +1,7 @@
 # DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-18 (folder restructure — 4 folders renamed: SEOSync_Flutter_App→app, frontend→ui, inspiration-library→library, html-mockups-archetypes-v2→archetypes; all references updated) | **Total documents:** 78
+**Last updated:** 2026-05-18 (8-step hardening pass — CHANGELOG.md, CONTRIBUTING.md, SECURITY.md added; ESLint wired; render.yaml credentials removed) | **Total documents:** 81
 
 ---
 
@@ -24,6 +24,9 @@ Future audits: scan this file first. If a doc's status or description is wrong, 
 |------|--------|-------------|
 | [README.md](README.md) | `LIVE` | Project overview — 18-module table, 24-route API surface, Supabase details, env var reference, project tree |
 | [progress.md](progress.md) | `LIVE` | Session milestone log and resume anchors — running record of every build session |
+| [CHANGELOG.md](CHANGELOG.md) | `LOG` | All notable changes — keepachangelog.com format; append on every significant milestone |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | `LIVE` | Branch naming, commit style, pre-push checklist, doc update rules, backend module contract |
+| [SECURITY.md](SECURITY.md) | `LIVE` | Responsible disclosure policy — contact, scope, SLA; in-scope: backend API, auth, schema, governance |
 
 ---
 

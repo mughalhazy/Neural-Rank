@@ -8,7 +8,7 @@
 - backend modules: 18 total — 17 default-active, 1 opt-in (`local_seo`)
 - backend QC: Phase 1 `10/10` · Phase 2 `60/60 PASS` · tests `29/29`
 - backend freeze status: Phase 1 (8 modules) FROZEN — Phase 2 (10 modules) DEPLOYED
-- doc health status: CLEAN — 5 passes completed 2026-05-17 · 78 docs
+- doc health status: CLEAN — 5 passes completed 2026-05-17 · 81 docs (3 added 2026-05-18)
 - workspace structure: restructured 2026-05-18 — 4 folder renames applied
 
 ## Core Milestones Achieved
@@ -164,6 +164,37 @@ Outcome:
 - Root `.gitignore` Flutter build exclusion paths updated to match renamed folders (`1c27a3c`)
 - C: leak audit performed: npm cache/prefix on D:, no node_modules (pure built-in scripts), Flutter build artifacts gitignored at all levels, Android `.gradle` excluded — project is sealed at project level; system-level Dart pub cache and Gradle daemon cache reside on C: (system tool behaviour, not project-level leakage)
 
+### 11. Production hardening — 8-item quality lift
+> Completed: 2026-05-18
+
+Anchors:
+- [CHANGELOG.md](CHANGELOG.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [SECURITY.md](SECURITY.md)
+- [.env.example](.env.example)
+- [.eslintrc.json](.eslintrc.json)
+- [render.yaml](render.yaml)
+- [backend/src/server.js](backend/src/server.js)
+
+| Item | Change | Files |
+|------|--------|-------|
+| `.env.example` | Documents all 6 env vars with placeholder values; copy to `.env` for local dev | `.env.example` |
+| `SECURITY.md` | Responsible disclosure policy — email contact, 48hr ack, 14-day resolution, in/out scope | `SECURITY.md` |
+| `CONTRIBUTING.md` | Branch naming, commit style, pre-push checklist, doc update rules, module contract | `CONTRIBUTING.md` |
+| `CHANGELOG.md` | keepachangelog.com format; backfilled from git log across all milestones | `CHANGELOG.md` |
+| unhandledRejection handlers | `process.on('unhandledRejection', ...)` + `process.on('uncaughtException', ...)` — structured JSON log, exit(1) on uncaught | `backend/src/server.js` |
+| ESLint | `eslint@8` devDep; `.eslintrc.json` (`no-unused-vars`, `no-undef`); `npm run lint` + `npm run ci` updated; 13 dead variables removed across 12 backend files | `package.json`, `.eslintrc.json`, 12 module files |
+| render.yaml credentials | All 6 env vars changed to `sync: false`; plaintext `SUPABASE_URL` and `SUPABASE_ANON_KEY` values removed from tracked file (P0-1 partially resolved) | `render.yaml` |
+| UptimeRobot monitor | Pending owner action — see Suggested Next Work Areas | — |
+
+Outcome:
+- 3 new governance docs (CONTRIBUTING.md, SECURITY.md, CHANGELOG.md) + `.env.example` + `.eslintrc.json`
+- ESLint clean: 0 errors across all 18 backend modules
+- Tests: 29/29 still passing after lint fixes
+- Credential exposure P0-1 partially resolved — render.yaml clean; owner must rotate Supabase keys and verify Render dashboard values before pushing
+- P1-9 (unhandledRejection) fully resolved
+- doc count: 78 → 81
+
 ## Current Resume Anchors
 Use these first in a new session:
 - [progress.md](progress.md)
@@ -177,23 +208,25 @@ Use these first in a new session:
 
 ## Current Operational Facts
 - backend: 18 modules live on Render free tier — 17 default-active, 1 opt-in (`local_seo`)
-- tests: 29/29 passing (`npm run ci`)
+- tests: 29/29 passing (`npm run ci` = syntax check + lint + full suite)
+- lint: ESLint clean — 0 errors (`eslint@8`, `no-unused-vars`, `no-undef`)
 - API: 24 routes — health, modules, run, execution lifecycle, measurement, technical-ops, search-intelligence, business-intelligence
 - database: Supabase `neural-rank` — 9 migrations applied, 33 tables in `app_public`; no DB connection wired at startup (P0-2)
 - Flutter apps: `app/` (BLoC architecture — canonical production app) + `ui/` (UI prototype — pending consolidation into `app/`)
-- docs: 78 `.md` files — structurally clean, fully linked, all 18 modules covered in all LIVE docs
-- production gaps: 5 P0 + 14 P1 + 10 P2 — see [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
+- docs: 81 `.md` files — structurally clean, fully linked, all 18 modules covered in all LIVE docs
+- production gaps: 5 P0 (1 partially resolved) + 13 P1 (1 resolved) + 10 P2 — see [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
 - workspace: fully restructured — `app/`, `ui/`, `design/library/`, `design/mockups/archetypes/`
 - npm cache and global prefix: on D: — project does not leak to C:
 
 ## Suggested Next Work Areas
 Ordered by PRODUCTION_READINESS_GAPS.md priority:
-1. **P0-1** — Rotate Supabase credentials; move `SUPABASE_URL` and `SUPABASE_ANON_KEY` out of `render.yaml` into Render dashboard (`sync: false`)
-2. **P0-2** — Wire database: add `pg` client, create `backend/src/db.js`, pass `query` into `baseContext` at startup — currently all data is lost on every Render restart
-3. **P0-3** — Add `workspace_id` column migration; filter all execution queries by workspace — currently all workspaces share data
-4. **P0-4 / P0-5** — Flutter consolidation: port `ui/` screens + components into `app/`; implement `ApiRepository` with real Dio HTTP calls against the 24 live backend routes
-5. **P1-1** — Set `SERP_PROVIDER` and `SERP_API_KEY` in Render dashboard — SERP adapter is wired but env vars are missing
-6. Full P1 list in [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
+1. **P0-1 owner action** — Rotate `SUPABASE_ANON_KEY` at Supabase dashboard → Settings → API; verify all 6 env vars are set in Render dashboard before pushing (render.yaml already fixed)
+2. **Step 8** — Add UptimeRobot free monitor: `https://neural-rank-backend.onrender.com/health`, HTTP monitor, 5-min interval — prevents Render spindown (free tier, owner account required)
+3. **P0-2** — Wire database: add `pg` client, create `backend/src/db.js`, pass `query` into `baseContext` at startup — currently all data is lost on every Render restart
+4. **P0-3** — Add `workspace_id` column migration; filter all execution queries by workspace — currently all workspaces share data
+5. **P0-4 / P0-5** — Flutter consolidation: port `ui/` screens + components into `app/`; implement `ApiRepository` with real Dio HTTP calls against the 24 live backend routes
+6. **P1-1** — Set `SERP_PROVIDER` and `SERP_API_KEY` in Render dashboard — SERP adapter is wired but env vars are missing
+7. Full P1 list in [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
 
 ---
 

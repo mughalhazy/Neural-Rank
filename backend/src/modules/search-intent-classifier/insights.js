@@ -59,7 +59,7 @@ function generateSearchIntentInsights(analysisResult) {
     .filter(([, count]) => count > 0);
 
   if (dominant.length > 0) {
-    const [topIntent, topCount] = dominant[0];
+    const [topIntent] = dominant[0];
     insights.push(buildInsight(
       "intent_distribution_overview",
       `Intent breakdown across ${totalKeywords} keyword(s): ${dominant.map(([k, v]) => `${k} (${v})`).join(", ")}. Dominant intent is "${topIntent}" — content strategy should reflect this.`,

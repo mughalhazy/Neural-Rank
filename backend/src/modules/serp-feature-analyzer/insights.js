@@ -20,7 +20,6 @@ function generateSerpFeatureInsights(analysisResult) {
     highValueGaps,
     totalFeatureGaps,
     totalEstimatedCtrLift,
-    topOpportunity,
     featureOwnershipRatioAvg,
   } = analysisResult;
 

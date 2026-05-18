@@ -20,7 +20,6 @@ function generateBacklinkInsights(analysisResult) {
     authorityDistribution,
     toxicityAnalysis,
     anchorDistribution,
-    diversityScore,
     linkVelocity,
     competitorLinkGap,
     overallAuthorityScore,

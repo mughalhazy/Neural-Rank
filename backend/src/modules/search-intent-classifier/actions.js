@@ -4,13 +4,6 @@ function toPriority(score) {
   return "low";
 }
 
-const FORMAT_GUIDANCE = {
-  informational: "Reformat as a comprehensive guide, how-to article, or FAQ page with clear headings and structured answers.",
-  navigational: "Ensure the page is a clear, direct landing page for the brand or feature with fast navigation to the destination.",
-  transactional: "Rebuild as a conversion-focused page with a prominent CTA, pricing information, social proof, and friction-free sign-up or purchase flow.",
-  commercial: "Reformat as a comparison page, review article, or listicle that objectively evaluates options and guides the user toward a decision.",
-};
-
 function createActionFromInsight(insight) {
   switch (insight.type) {
     case "high_value_intent_mismatch": {

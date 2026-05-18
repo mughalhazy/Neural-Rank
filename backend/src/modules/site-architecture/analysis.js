@@ -122,7 +122,6 @@ function analyzeTopicSilos(pages, internalLinkGraph) {
     }
   }
 
-  const linkSet = new Set(internalLinkGraph.map((l) => `${l.sourceUrl}→${l.targetUrl}`));
   let crossLinkedClusters = 0;
   const clusters = [];
 

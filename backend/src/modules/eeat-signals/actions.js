@@ -1,9 +1,3 @@
-function toPriority(score) {
-  if (score >= 10) return "high";
-  if (score >= 4) return "medium";
-  return "low";
-}
-
 function createActionFromInsight(insight) {
   switch (insight.type) {
     case "trust_signals_weak":

@@ -4,7 +4,7 @@ function toPriority(score) {
   return "low";
 }
 
-function createActionFromInsight(insight, analysisResult) {
+function createActionFromInsight(insight, _analysisResult) {
   switch (insight.type) {
     case "critical_pages_detected": {
       const urls = (insight.evidence.urls || []).slice(0, 5);

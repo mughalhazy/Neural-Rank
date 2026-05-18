@@ -157,7 +157,7 @@ function analyzeSemanticDepth(existingContent) {
 function analyzeTopicalAuthority(normalizedInput) {
   const { targetTopics, competitorTopics, existingContent } = normalizedInput;
 
-  const { covered, uncovered, coverageRatio, contentByTopic } = buildCoverageMap(targetTopics, existingContent);
+  const { covered, uncovered, coverageRatio } = buildCoverageMap(targetTopics, existingContent);
   const clusterAnalysis = analyzeClusterCompleteness(covered);
   const competitorGapAnalysis = analyzeCompetitorTopicGaps(targetTopics, competitorTopics);
   const semanticDepth = analyzeSemanticDepth(existingContent);

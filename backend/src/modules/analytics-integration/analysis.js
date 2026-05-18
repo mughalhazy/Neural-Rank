@@ -1,5 +1,5 @@
 const { normalizeProductTarget } = require("../../core/targeting");
-const { expectedCtrByPosition, ctrEfficiencyScore, ctrOpportunityLift } = require("../../core/seoScorer");
+const { ctrEfficiencyScore, ctrOpportunityLift } = require("../../core/seoScorer");
 
 const MODULE_KEY = "analytics_integration";
 

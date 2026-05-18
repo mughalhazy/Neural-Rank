@@ -64,7 +64,7 @@ function normalizeFeatureInput(inputPayload = {}) {
   };
 }
 
-function scoreEligibility(feature, entry) {
+function scoreEligibility(feature, _entry) {
   const reqs = ELIGIBILITY_REQUIREMENTS[feature] || [];
   return reqs.length > 0 ? Math.round((1 / reqs.length) * 50) : 30;
 }

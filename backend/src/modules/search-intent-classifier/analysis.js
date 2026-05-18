@@ -1,5 +1,5 @@
 const { normalizeProductTarget } = require("../../core/targeting");
-const { batchClassifyIntents, CONTENT_FORMAT_MAP } = require("../../core/intentClassifier");
+const { batchClassifyIntents } = require("../../core/intentClassifier");
 
 const MODULE_KEY = "search_intent_classifier";
 

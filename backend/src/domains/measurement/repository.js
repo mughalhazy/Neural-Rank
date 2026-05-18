@@ -1,4 +1,3 @@
-const { randomUUID } = require("node:crypto");
 const {
   resolveCanonicalRef,
   resolveQueryFunction,

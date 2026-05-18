@@ -13,3 +13,11 @@ services:
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
+      - key: SERP_PROVIDER
+        sync: false
+      - key: SERP_API_KEY
+        sync: false
+      - key: RENDERER_ENDPOINT
+        sync: false
+      - key: DATABASE_URL
+        sync: false
