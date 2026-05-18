@@ -31,7 +31,7 @@ These must be fixed before any real users are onboarded.
 3. Update `render.yaml` to use `sync: false` for all secret env vars — values live in Render dashboard only, not in the file
 4. Verify `.gitignore` does not accidentally expose any `.env` file
 
-**Status:** PARTIALLY RESOLVED (2026-05-18) — `render.yaml` updated to `sync: false` for all 6 env vars; plaintext values removed from version control. **Remaining action required by owner:** rotate `SUPABASE_ANON_KEY` at Supabase dashboard → Settings → API, and verify all 6 values are set in Render dashboard before pushing.
+**Status:** CODE RESOLVED (2026-05-18) — `render.yaml` updated to `sync: false`; full git history scrubbed of JWT and DB password via `git filter-branch` + `git gc --prune=now`; force-pushed to GitHub. **Owner action still required before next deploy:** (1) rotate `SUPABASE_ANON_KEY` at Supabase dashboard → Settings → API; (2) set all 6 env vars in Render dashboard (values are no longer in the repo).
 
 ---
 
