@@ -1,7 +1,7 @@
 # DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-18 (8-step hardening pass — CHANGELOG.md, CONTRIBUTING.md, SECURITY.md added; ESLint wired; render.yaml credentials removed) | **Total documents:** 81
+**Last updated:** 2026-05-18 (REBUILD_PLAN.md added — 30-item enterprise grading audit with Tier 1/2/3 gap closure plan) | **Total documents:** 82
 
 ---
 
@@ -27,6 +27,7 @@ Future audits: scan this file first. If a doc's status or description is wrong, 
 | [CHANGELOG.md](CHANGELOG.md) | `LOG` | All notable changes — keepachangelog.com format; append on every significant milestone |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | `LIVE` | Branch naming, commit style, pre-push checklist, doc update rules, backend module contract |
 | [SECURITY.md](SECURITY.md) | `LIVE` | Responsible disclosure policy — contact, scope, SLA; in-scope: backend API, auth, schema, governance |
+| [REBUILD_PLAN.md](REBUILD_PLAN.md) | `LIVE` | Enterprise rebuild plan — 30-item gap register across Tier 1 (blockers), Tier 2 (adoption), Tier 3 (elite); current grade B- (76/100), target A+ (100/100) |
 
 ---
 
