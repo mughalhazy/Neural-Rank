@@ -64,8 +64,8 @@ Attach user intent, state logic, and market expectations to each archetype befor
 - Every data-heavy surface has an explicit insight and action layer
 
 ## Current Frontend Closure Notes
-- Reusable state model added in `frontend/lib/core/models/view_state.dart`
-- Shared state host added in `frontend/lib/shared/components/pattern_blocks.dart`
+- Reusable state model added in `ui/lib/core/models/view_state.dart`
+- Shared state host added in `ui/lib/shared/components/pattern_blocks.dart`
 - Active screens now render through consistent state-aware composition:
   - dashboard
   - keyword

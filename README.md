@@ -8,13 +8,15 @@ Neural Rank is a unified SEO intelligence platform — a 18-module backend SEO O
 
 ```
 Neural Rank/
+├── app/                  Flutter mobile app (BLoC architecture — canonical production app)
 ├── backend/              Node.js SEO OS backend (18 modules)
-├── frontend/             Flutter mobile app
-├── SEOSync_Flutter_App/  Flutter app (BLoC architecture — pending consolidation)
 ├── design/               All design assets
-│   ├── inspiration/      Reference images and inspiration library
-│   ├── mockups/          HTML archetype mockups
+│   ├── inspiration/      Raw reference images
+│   ├── library/          HTML design review library (captures, inspection tool)
+│   ├── mockups/
+│   │   └── archetypes/   HTML archetype mockups
 │   └── screenshots/      UI screenshots
+├── ui/                   Flutter UI prototype (design archetype layer — pending consolidation into app/)
 ├── docs/
 │   ├── backend/
 │   │   ├── reference/    Live backend specs (master spec, module boundaries, APIs)

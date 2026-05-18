@@ -53,7 +53,7 @@ Build a Flutter-first UI system for Neural Rank that follows `docs/product/SYSTE
 - See `docs/frontend/planning/FRONTEND_PHASE_INDEX.md`
 
 ## Initial Deliverables
-- `frontend/` Flutter app scaffold
+- `ui/` Flutter UI prototype (design archetype layer)
 - Phase docs in `docs/frontend/`
 - Design tokens and app theme
 - Reusable primitives and pattern widgets

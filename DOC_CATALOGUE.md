@@ -1,7 +1,7 @@
 # DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-17 (naming normalisation — 3 files renamed to global standard) | **Total documents:** 78
+**Last updated:** 2026-05-18 (folder restructure — 4 folders renamed: SEOSync_Flutter_App→app, frontend→ui, inspiration-library→library, html-mockups-archetypes-v2→archetypes; all references updated) | **Total documents:** 78
 
 ---
 
@@ -164,7 +164,7 @@ Superseded or stub-only docs moved here during 2026-05-17 deduplication pass. No
 | [FRONTEND_CONTENT_SYSTEM.md](docs/frontend/archive/FRONTEND_CONTENT_SYSTEM.md) | `ARCHIVE` | Base content system spec — fully subsumed by FRONTEND_CONTENT_FULL_SYSTEM.md which contains all its content plus module-specific patterns *(archived 2026-05-17)* |
 | [FRONTEND_CONTENT_PATTERNS_BASE.md](docs/frontend/archive/FRONTEND_CONTENT_PATTERNS_BASE.md) | `ARCHIVE` | Base pattern rules — unique "Pattern Combination Rules" section migrated to FRONTEND_CONTENT_FULL_SYSTEM.md; remainder subsumed *(archived 2026-05-17)* |
 | [FRONTEND_INSIGHT_STRUCTURE.md](docs/frontend/archive/FRONTEND_INSIGHT_STRUCTURE.md) | `ARCHIVE` | Insight structure spec — unique sections (Allowed Insight Formats, module-specific examples) migrated to FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
-| [PHASE_06_PATTERN_LIBRARY.md](docs/frontend/archive/PHASE_06_PATTERN_LIBRARY.md) | `ARCHIVE` | Phase 6 stub — thin spec (42 lines); actual pattern library is in code under frontend/lib/shared/widgets/ *(archived 2026-05-17)* |
+| [PHASE_06_PATTERN_LIBRARY.md](docs/frontend/archive/PHASE_06_PATTERN_LIBRARY.md) | `ARCHIVE` | Phase 6 stub — thin spec (42 lines); actual pattern library is in code under ui/lib/shared/widgets/ *(archived 2026-05-17)* |
 | [PHASE_09_SVG_ICON_LAYER.md](docs/frontend/archive/PHASE_09_SVG_ICON_LAYER.md) | `ARCHIVE` | Phase 9 stub — requirements spec only (28 lines); icon layer implemented in code; content covered by PHASE_10 *(archived 2026-05-17)* |
 | [PHASE_10_COMPONENT_SYSTEM.md](docs/frontend/archive/PHASE_10_COMPONENT_SYSTEM.md) | `ARCHIVE` | Phase 10 stub — requirements spec only (31 lines); component system implemented in code; governance covered by PHASE_05 *(archived 2026-05-17)* |
 | [PHASE_11_ARCHETYPE_ASSEMBLY.md](docs/frontend/archive/PHASE_11_ARCHETYPE_ASSEMBLY.md) | `ARCHIVE` | Phase 11 stub — spec and closure notes only (45 lines); assembly covered by PHASE_01 + PHASE_04; closure notes are in ITERATION_PASS_LOG *(archived 2026-05-17)* |
@@ -211,8 +211,8 @@ Active product planning, specification, and architecture docs.
 
 | File | Status | Description |
 |------|--------|-------------|
-| [frontend/README.md](frontend/README.md) | `LIVE` | Flutter scaffold cross-reference — points to SEOSync_Flutter_App/README.md (production app) and docs/frontend/ (all frontend docs) |
-| [SEOSync_Flutter_App/README.md](SEOSync_Flutter_App/README.md) | `LIVE` | SEOSync BLoC Flutter app README — setup, BLoC architecture overview, state management guide; this is the more mature Flutter codebase |
+| [ui/README.md](ui/README.md) | `LIVE` | Flutter UI prototype README — design archetype layer; points to app/README.md (production app) and docs/frontend/ (all frontend docs) |
+| [app/README.md](app/README.md) | `LIVE` | BLoC Flutter app README — canonical production app; setup, BLoC architecture overview, state management guide |
 
 ---
 

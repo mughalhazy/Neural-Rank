@@ -21,11 +21,11 @@ Evidence anchors used most heavily:
 - [backend/src/modules/competitor-analysis/analysis.js](backend/src/modules/competitor-analysis/analysis.js)
 - [backend/src/modules/optimization-layer/analysis.js](backend/src/modules/optimization-layer/analysis.js)
 - [backend/src/modules/unified-workflow-layer/analysis.js](backend/src/modules/unified-workflow-layer/analysis.js)
-- [frontend/lib/demo_data/app_demo_data.dart](frontend/lib/demo_data/app_demo_data.dart)
-- [frontend/lib/core/models/module_registry.dart](frontend/lib/core/models/module_registry.dart)
-- [frontend/lib/core/constants/module_constants.dart](frontend/lib/core/constants/module_constants.dart)
-- [frontend/lib/features/dashboard/dashboard_screen.dart](frontend/lib/features/dashboard/dashboard_screen.dart)
-- [frontend/lib/features/settings/settings_screen.dart](frontend/lib/features/settings/settings_screen.dart)
+- [ui/lib/demo_data/app_demo_data.dart](ui/lib/demo_data/app_demo_data.dart)
+- [ui/lib/core/models/module_registry.dart](ui/lib/core/models/module_registry.dart)
+- [ui/lib/core/constants/module_constants.dart](ui/lib/core/constants/module_constants.dart)
+- [ui/lib/features/dashboard/dashboard_screen.dart](ui/lib/features/dashboard/dashboard_screen.dart)
+- [ui/lib/features/settings/settings_screen.dart](ui/lib/features/settings/settings_screen.dart)
 - [supabase/migrations/20260422020600_backend_foundation.sql](supabase/migrations/20260422020600_backend_foundation.sql)
 - [docs/backend/reference/BACKEND_MASTER_SPEC.md](docs/backend/reference/BACKEND_MASTER_SPEC.md)
 
@@ -199,7 +199,7 @@ Percentages below are estimated from counted implemented items versus the listed
 - Implemented items:
   - none as runtime business intelligence
 - Partial items:
-  - demo/frontend copy references business framing, value, trust, and conversion in [frontend/lib/demo_data/app_demo_data.dart](</D:/Neural Rank/frontend/lib/demo_data/app_demo_data.dart>)
+  - demo/frontend copy references business framing, value, trust, and conversion in [ui/lib/demo_data/app_demo_data.dart](</D:/Neural Rank/ui/lib/demo_data/app_demo_data.dart>)
   - keyword opportunity and review severity heuristics loosely imply business value, but no business model exists
 - Missing items:
   - revenue pages
@@ -216,9 +216,9 @@ Percentages below are estimated from counted implemented items versus the listed
 ### H. Product / UX Layer
 - Implemented: `30%`
 - Implemented items:
-  - multiple role-like module screens exist in Flutter under [frontend/lib/features](</D:/Neural Rank/frontend/lib/features>)
-  - priority-first dashboard copy exists in [dashboard_screen.dart](</D:/Neural Rank/frontend/lib/features/dashboard/dashboard_screen.dart>)
-  - opportunity queue/workflow language exists in [app_demo_data.dart](</D:/Neural Rank/frontend/lib/demo_data/app_demo_data.dart>)
+  - multiple role-like module screens exist in Flutter under [ui/lib/features](</D:/Neural Rank/ui/lib/features>)
+  - priority-first dashboard copy exists in [dashboard_screen.dart](</D:/Neural Rank/ui/lib/features/dashboard/dashboard_screen.dart>)
+  - opportunity queue/workflow language exists in [app_demo_data.dart](</D:/Neural Rank/ui/lib/demo_data/app_demo_data.dart>)
   - non-technical summaries are strongly represented in frontend copy
 - Partial items:
   - mission-based workflows exist as static content, not real workflow execution
@@ -229,7 +229,7 @@ Percentages below are estimated from counted implemented items versus the listed
   - client-ready reporting
   - live opportunity queue connected to backend state
 - UNCLEAR:
-  - self-serve usability under real data is UNCLEAR because screens are driven by [frontend/lib/demo_data/app_demo_data.dart](</D:/Neural Rank/frontend/lib/demo_data/app_demo_data.dart>), not backend APIs
+  - self-serve usability under real data is UNCLEAR because screens are driven by [ui/lib/demo_data/app_demo_data.dart](</D:/Neural Rank/ui/lib/demo_data/app_demo_data.dart>), not backend APIs
 
 ### I. Governance / Memory Layer
 - Implemented: `0%`
@@ -278,8 +278,8 @@ Percentages below are estimated from counted implemented items versus the listed
 - Implementation dependency: high
 - Safety risk: low
 - Evidence:
-  - feature screens import [app_demo_data.dart](</D:/Neural Rank/frontend/lib/demo_data/app_demo_data.dart>) directly
-  - [dashboard_screen.dart](</D:/Neural Rank/frontend/lib/features/dashboard/dashboard_screen.dart>) and [settings_screen.dart](</D:/Neural Rank/frontend/lib/features/settings/settings_screen.dart>) render static content only
+  - feature screens import [app_demo_data.dart](</D:/Neural Rank/ui/lib/demo_data/app_demo_data.dart>) directly
+  - [dashboard_screen.dart](</D:/Neural Rank/ui/lib/features/dashboard/dashboard_screen.dart>) and [settings_screen.dart](</D:/Neural Rank/ui/lib/features/settings/settings_screen.dart>) render static content only
 
 ### P0. Search/site/technical intelligence is far below target model
 - Commercial impact: high
@@ -306,7 +306,7 @@ Percentages below are estimated from counted implemented items versus the listed
 - Safety risk: medium
 - Evidence:
   - backend runtime activates all eight modules in [core/activation.js](</D:/Neural Rank/backend/src/core/activation.js>)
-  - frontend still hardcodes gated modules in [module_registry.dart](</D:/Neural Rank/frontend/lib/core/models/module_registry.dart>) and [module_constants.dart](</D:/Neural Rank/frontend/lib/core/constants/module_constants.dart>)
+  - frontend still hardcodes gated modules in [module_registry.dart](</D:/Neural Rank/ui/lib/core/models/module_registry.dart>) and [module_constants.dart](</D:/Neural Rank/ui/lib/core/constants/module_constants.dart>)
   - backend master spec still says built inactive in [BACKEND_MASTER_SPEC.md](</D:/Neural Rank/docs/backend/BACKEND_MASTER_SPEC.md>)
 
 ## 4. Architecture Findings
@@ -337,7 +337,7 @@ Percentages below are estimated from counted implemented items versus the listed
   - no durable structured model for tasks, experiments, changes, or business impact
 - Weak UI wiring:
   - frontend screens are static/demo-driven
-  - no clear backend API client or repository layer was found in `frontend/lib`
+  - no clear backend API client or repository layer was found in `ui/lib`
 - Weak execution flow:
   - current flow ends at recommendation output
   - there is no task/change/verify/rollback lifecycle
@@ -346,7 +346,7 @@ Percentages below are estimated from counted implemented items versus the listed
 
 ## 5. UX Findings
 - User-friendly:
-  - frontend copy is non-technical and commercially framed in [frontend/lib/demo_data/app_demo_data.dart](</D:/Neural Rank/frontend/lib/demo_data/app_demo_data.dart>)
+  - frontend copy is non-technical and commercially framed in [ui/lib/demo_data/app_demo_data.dart](</D:/Neural Rank/ui/lib/demo_data/app_demo_data.dart>)
   - screens are structured to lead with action-oriented language
 - Semi-technical:
   - module-level outputs are still exposed as insight/priority/action payloads with backend-centric naming
@@ -381,7 +381,7 @@ Percentages below are estimated from counted implemented items versus the listed
 - Before/after effect: `NO`
   - rank delta exists inside one analysis path, but not as system-level before/after proof
 - Confidence level: `PARTIAL`
-  - confidence appears in frontend/demo copy
+  - confidence appears in ui/demo copy
   - no backend confidence field or causality model found
 - Business impact: `NO`
   - no revenue, lead, CTR, ROI, or attribution model found

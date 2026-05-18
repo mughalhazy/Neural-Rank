@@ -4,11 +4,11 @@
 Translate the frozen UI system into a lean Flutter project structure.
 
 ## Folder Plan
-- `frontend/lib/app`
-- `frontend/lib/core`
-- `frontend/lib/features`
-- `frontend/lib/shared`
-- `frontend/lib/demo_data`
+- `ui/lib/app`
+- `ui/lib/core`
+- `ui/lib/features`
+- `ui/lib/shared`
+- `ui/lib/demo_data`
 
 ## Flutter Architecture
 - `app`: app shell, routes, navigation, app theme

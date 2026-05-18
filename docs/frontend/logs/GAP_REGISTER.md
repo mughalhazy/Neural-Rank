@@ -7,7 +7,7 @@ Record the implementation gaps found by overlaying:
 - `docs/product/archive/MARKET_RESEARCH_PLAYSTORE.md`
 - `docs/frontend/**/*.md`
 
-against the current frontend code in `frontend/lib`.
+against the current frontend code in `ui/lib`.
 
 This register is the authority for pre-polish remediation. No refinement or polish pass should proceed until the structural gaps marked `Critical` and `High` are resolved or explicitly deferred.
 
@@ -19,11 +19,11 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - `docs/frontend/phases/PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md`
   - `docs/frontend/phases/PHASE_04_IMPLEMENTATION_BLUEPRINT.md`
 - Frontend code:
-  - `frontend/lib/app`
-  - `frontend/lib/core`
-  - `frontend/lib/shared`
-  - `frontend/lib/features`
-  - `frontend/lib/demo_data`
+  - `ui/lib/app`
+  - `ui/lib/core`
+  - `ui/lib/shared`
+  - `ui/lib/features`
+  - `ui/lib/demo_data`
 
 ## Current Frontend Baseline
 - Flutter scaffold exists
@@ -60,12 +60,12 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Keep iconography systematic and reusable
   - Implement icon layer before components and screens
 - Current state:
-  - SVG asset set exists under `frontend/assets/icons`
-  - Shared icon wrapper exists under `frontend/lib/shared/icons`
+  - SVG asset set exists under `ui/assets/icons`
+  - Shared icon wrapper exists under `ui/lib/shared/icons`
   - Shared UI surfaces now use the icon wrapper instead of ad hoc raw icons
 - Evidence:
-  - `frontend/lib/shared/widgets/app_shell.dart`
-  - `frontend/lib/shared/widgets/sections.dart`
+  - `ui/lib/shared/widgets/app_shell.dart`
+  - `ui/lib/shared/widgets/sections.dart`
 - Risk:
   - Violates required build order
   - Weakens system consistency
@@ -95,9 +95,9 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Gated modules are indexed under `features/gated_modules`
   - Activation metadata in `core` points to those module surfaces directly
 - Evidence:
-  - `frontend/lib/features`
-  - `frontend/lib/features/gated_modules/gated_modules_index.dart`
-  - `frontend/lib/core/models/module_registry.dart`
+  - `ui/lib/features`
+  - `ui/lib/features/gated_modules/gated_modules_index.dart`
+  - `ui/lib/core/models/module_registry.dart`
 - Risk:
   - Frontend architecture does not yet mirror backend module boundaries
   - Later activation would require feature creation rather than activation
@@ -119,7 +119,7 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Unified workflow preview data exists
   - Unified workflow feature scaffold exists in the frontend codebase
 - Evidence:
-  - `frontend/lib/demo_data/app_demo_data.dart`
+  - `ui/lib/demo_data/app_demo_data.dart`
 - Risk:
   - Product surface is incomplete
   - The app underrepresents the intended operating-system positioning
@@ -139,13 +139,13 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Activation boundaries must be explicit
   - UI logic, state shape, and module gating must be explicit
 - Current state:
-  - Explicit module registry exists in `frontend/lib/core/models/module_registry.dart`
+  - Explicit module registry exists in `ui/lib/core/models/module_registry.dart`
   - Active navigation is derived from module metadata
   - Gated modules are represented explicitly in the registry
 - Evidence:
-  - `frontend/lib/app/app.dart`
-  - `frontend/lib/shared/widgets/app_shell.dart`
-  - `frontend/lib/core/models/ui_models.dart`
+  - `ui/lib/app/app.dart`
+  - `ui/lib/shared/widgets/app_shell.dart`
+  - `ui/lib/core/models/ui_models.dart`
 - Risk:
   - Gating is representational only
   - Future activation may require structural rewrite
@@ -173,8 +173,8 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Dedicated drilldown scaffold exists
   - Gated competitor and workflow feature scaffolds exist
 - Evidence:
-  - `frontend/lib/features`
-  - `frontend/lib/shared/widgets/sections.dart`
+  - `ui/lib/features`
+  - `ui/lib/shared/widgets/sections.dart`
 - Risk:
   - Product composition remains partial
   - Future deep-inspection flows have no scaffold
@@ -198,8 +198,8 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Shared state host exists
   - Active screens now render through success/loading/empty/error composition paths
 - Evidence:
-  - `frontend/lib/features/*`
-  - `frontend/lib/shared/widgets/sections.dart`
+  - `ui/lib/features/*`
+  - `ui/lib/shared/widgets/sections.dart`
 - Risk:
   - Behaviour doc is not implemented
   - UI is closer to a mock shell than a resilient product surface
@@ -239,7 +239,7 @@ This register is the authority for pre-polish remediation. No refinement or poli
     - competitor comparison block
     - review cluster block
 - Evidence:
-  - `frontend/lib/shared/widgets/sections.dart`
+  - `ui/lib/shared/widgets/sections.dart`
 - Risk:
   - Pattern library is incomplete
   - Future modules will reintroduce ad hoc UI
@@ -266,8 +266,8 @@ This register is the authority for pre-polish remediation. No refinement or poli
 - Current state:
   - Cards, tables, filters, chart containers, insight blocks, alerts, buttons, inputs, and navigation items now exist across `shared/widgets` and `shared/components`
 - Evidence:
-  - `frontend/lib/shared/widgets/sections.dart`
-  - `frontend/lib/shared/widgets/app_shell.dart`
+  - `ui/lib/shared/widgets/sections.dart`
+  - `ui/lib/shared/widgets/app_shell.dart`
 - Risk:
   - Settings and future onboarding/integration flows cannot scale cleanly
   - Input-heavy surfaces will likely drift from the system
@@ -295,10 +295,10 @@ This register is the authority for pre-polish remediation. No refinement or poli
     - state system
     - operational flow framing
 - Evidence:
-  - `frontend/assets/icons`
-  - `frontend/lib/shared/icons`
-  - `frontend/lib/shared/components`
-  - `frontend/lib/features`
+  - `ui/assets/icons`
+  - `ui/lib/shared/icons`
+  - `ui/lib/shared/components`
+  - `ui/lib/features`
 - Risk:
   - Rework required during remediation
 - Required remediation:
@@ -319,8 +319,8 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Active screens and gated execution screens now render the five-stage flow explicitly
   - Workflow depth is visible in dashboard, keywords, ranks, content, reviews, optimization, creative, and workflow surfaces
 - Evidence:
-  - `frontend/lib/shared/components/flow_blocks.dart`
-  - `frontend/lib/features/*`
+  - `ui/lib/shared/components/flow_blocks.dart`
+  - `ui/lib/features/*`
 - Risk:
   - Product may still read as a dashboard shell rather than an operational workflow system
 - Required remediation:
@@ -338,8 +338,8 @@ This register is the authority for pre-polish remediation. No refinement or poli
 - Current state:
   - Freshness, source, and confidence are now surfaced through shared trust bars on active screens
 - Evidence:
-  - `frontend/lib/shared/widgets/sections.dart`
-  - `frontend/lib/features/settings/settings_screen.dart`
+  - `ui/lib/shared/widgets/sections.dart`
+  - `ui/lib/features/settings/settings_screen.dart`
 - Risk:
   - Market pain around stale data and trust is only partly addressed
 - Required remediation:
@@ -358,8 +358,8 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Drilldown, workflow, optimization, and creative continuation surfaces now exist
   - Active screens now show explicit operational flow instead of static insight-only cards
 - Evidence:
-  - `frontend/lib/features/*`
-  - `frontend/lib/shared/components/flow_blocks.dart`
+  - `ui/lib/features/*`
+  - `ui/lib/shared/components/flow_blocks.dart`
 - Risk:
   - The app still risks feeling like a polished preview instead of a mobile operating surface
 - Required remediation:
@@ -378,9 +378,9 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - `features/gated_modules` now exists as an explicit index boundary
   - `core` now holds module constants and module registry metadata
 - Evidence:
-  - `frontend/lib/features/gated_modules/gated_modules_index.dart`
-  - `frontend/lib/core/constants/module_constants.dart`
-  - `frontend/lib/core/models/module_registry.dart`
+  - `ui/lib/features/gated_modules/gated_modules_index.dart`
+  - `ui/lib/core/constants/module_constants.dart`
+  - `ui/lib/core/models/module_registry.dart`
 - Risk:
   - Planned architecture and actual code are diverging
 - Required remediation:
@@ -407,7 +407,7 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Inspiration extraction records now exist
   - Pattern checklist records now include allowed variants and anti-patterns for implemented patterns
 - Evidence:
-  - `docs/frontend/PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md`
+  - `docs/frontend/phases/PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md`
 - Risk:
   - Pattern reuse may drift during later implementation
 - Required remediation:
@@ -432,8 +432,8 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - Readiness rules are defined in the phase anchor
   - A dedicated pass log template exists for later execution
 - Evidence:
-  - `docs/frontend/PHASE_12_ITERATION_PASSES.md`
-  - `docs/frontend/ITERATION_PASS_LOG.md`
+  - `docs/frontend/phases/PHASE_12_ITERATION_PASSES.md`
+  - `docs/frontend/logs/ITERATION_PASS_LOG.md`
 - Risk:
   - Refinement could become ad hoc without architectural checkpoints
 - Required remediation:

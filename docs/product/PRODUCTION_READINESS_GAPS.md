@@ -73,14 +73,14 @@ The `execution_recommendations` and `execution_tasks` tables (migration `2026050
 
 ### P0-4 · Two Flutter apps — Play Store submission blocked
 
-**Files:** `frontend/`, `SEOSync_Flutter_App/`
+**Files:** `ui/`, `app/`
 
-Two separate Flutter applications exist with two `pubspec.yaml` files. A Play Store submission requires a single AAB from a single app. `SEOSync_Flutter_App/` is the production-ready BLoC app. `frontend/` is the prototype scaffold.
+Two separate Flutter applications exist with two `pubspec.yaml` files. A Play Store submission requires a single AAB from a single app. `app/` is the production-ready BLoC app (renamed from `SEOSync_Flutter_App/` — 2026-05-18). `ui/` is the UI prototype / design archetype layer (renamed from `frontend/` — 2026-05-18).
 
 **Fix required:**
-1. Designate `SEOSync_Flutter_App/` as the canonical production app — all future frontend work goes here
-2. Archive `frontend/` — move to `design/flutter-scaffold-reference/` or add a root README noting it is not the production app
-3. Update `README.md` project tree to reflect single-app structure
+1. Port screens and components from `ui/` into `app/` — the UI prototype has 12 feature screens, icon system, state host, shared components not yet in the production app
+2. Archive `ui/` once porting is complete — it is not a production app and should not be submitted to the Play Store
+3. All future frontend work goes in `app/` only
 
 **Status:** Open
 
@@ -88,12 +88,12 @@ Two separate Flutter applications exist with two `pubspec.yaml` files. A Play St
 
 ### P0-5 · Zero backend API integration in Flutter — all data is mock
 
-**Files:** `SEOSync_Flutter_App/lib/data/repositories/mock_repository.dart`, `SEOSync_Flutter_App/pubspec.yaml`
+**Files:** `app/lib/data/repositories/mock_repository.dart`, `app/pubspec.yaml`
 
 `mock_repository.dart` (293 lines) uses `Future.delayed()` and hardcoded return values for every method. Zero HTTP calls. `dio: ^5.4.0` and `supabase_flutter: ^2.0.0` are declared in `pubspec.yaml` but never instantiated. None of the 24 backend routes are called by either Flutter app.
 
 **Fix required:**
-1. Create `SEOSync_Flutter_App/lib/data/repositories/api_repository.dart` implementing `SEORepository` with real `Dio` HTTP calls
+1. Create `app/lib/data/repositories/api_repository.dart` implementing `SEORepository` with real `Dio` HTTP calls
 2. Wire at minimum these routes: `POST /run/default`, `GET /modules`, `GET /execution/recommendations`, `PATCH /execution/recommendations/:id/status`
 3. Implement auth token injection via Dio interceptor (`Authorization: Bearer <token>`)
 4. Implement login screen → call auth → store JWT via Hive → inject on all requests
@@ -279,11 +279,11 @@ process.on('unhandledRejection', (reason) => {
 
 ### P1-13 · Frontend archetype subpages not in production app
 
-**Files:** `SEOSync_Flutter_App/lib/presentation/screens/`
+**Files:** `app/lib/presentation/screens/`
 
-All 15 gap register items were resolved in `frontend/` (drilldown scaffold, icon system, state host, shared components). None of those resolutions were ported to `SEOSync_Flutter_App/`, which is the production app. The production app has parent screens only — no drilldown, no configuration screens, no evidence display.
+All 15 gap register items were resolved in `ui/` (drilldown scaffold, icon system, state host, shared components). None of those resolutions were ported to `app/`, which is the production app. The production app has parent screens only — no drilldown, no configuration screens, no evidence display.
 
-**Fix required:** Port from `frontend/lib/shared/` to `SEOSync_Flutter_App/lib/presentation/components/`:
+**Fix required:** Port from `ui/lib/shared/` to `app/lib/presentation/components/`:
 - Icon system (`app_icon.dart`)
 - State host component (`ScreenStateHost`)
 - Shared widgets (cards, buttons, alerts, filters)
@@ -296,7 +296,7 @@ All 15 gap register items were resolved in `frontend/` (drilldown scaffold, icon
 
 ### P1-14 · Insight data model incomplete in production app
 
-**Files:** `SEOSync_Flutter_App/lib/data/models/insight.dart`
+**Files:** `app/lib/data/models/insight.dart`
 
 The `Insight` model is missing `evidence[]`, `explanation`, and `nextStep` fields that `FRONTEND_CONTENT_FULL_SYSTEM.md` mandates. The full `INPUT → ANALYSIS → INSIGHT → PRIORITY → ACTION` chain cannot be rendered in the production app.
 
@@ -320,7 +320,7 @@ These do not block launch but must be resolved before public scale.
 | P2-3 | No API versioning strategy | `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` | Document versioning strategy (e.g. `Accept-Version` header or `/v1/` prefix) before any external consumers are onboarded |
 | P2-4 | Dual intent classifiers undocumented for future integrators | `docs/backend/decisions/BACKEND_DUAL_CLASSIFIER_DECISION.md` | Already has a decision doc — add explicit warning about not exposing both in a single aggregated response |
 | P2-5 | `assertModuleCatalogIntegrity()` is unidirectional | `backend/src/core/activation.js` | Add check: every module in `serviceRegistry` must appear in `DEFAULT_ACTIVE_MODULES` or `BUILT_BUT_INACTIVE_MODULES` |
-| P2-6 | No Play Store assets | `SEOSync_Flutter_App/` | Create branded app icon (1024×1024), splash screen, and privacy policy URL before submission |
+| P2-6 | No Play Store assets | `app/` | Create branded app icon (1024×1024), splash screen, and privacy policy URL before submission |
 | P2-7 | No request body size limit | `backend/src/server.js` | The 1MB limit in `readJsonBody()` (line 104) is already implemented — this P2 was a false alarm from the audit |
 | P2-8 | Cross-workspace contamination at domain service singleton layer | `backend/src/server.js` | Domain service singletons created without workspace context — address as part of P0-3 workspace isolation work |
 | P2-9 | No monitoring or error aggregation | `render.yaml` | Add Sentry DSN env var + `@sentry/node` to backend; add UptimeRobot monitor on `/health` |
