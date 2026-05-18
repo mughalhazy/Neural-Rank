@@ -274,6 +274,85 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 ---
 
+### T1-13 — Add LICENSE file
+
+**Dimension:** Legal · Documentation
+**Current state:** No `LICENSE` file exists in the repository. This means: (a) the project is technically "all rights reserved" by default under copyright law; (b) enterprise clients cannot legally use, modify, or contribute to the code without explicit permission; (c) any open-source contributor has no clarity on terms. This is a blocker for any commercial or enterprise engagement.
+**Files:** New `LICENSE`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Decide on license type: MIT (permissive, recommended for maximum adoption), Apache 2.0 (permissive with patent protection), or proprietary (restrictive, suitable if this is a commercial SaaS product not intended for redistribution).
+2. Create `LICENSE` at the repo root with the chosen license text and correct copyright year and holder name.
+3. Add a `"license"` field to `package.json` matching the chosen license identifier (e.g., `"MIT"`).
+4. Add a one-line license reference to the README header.
+
+**Definition of done:** `LICENSE` file exists; `package.json` declares the same license identifier; README references it.
+
+**Status:** `open`
+
+---
+
+### T1-14 — Add NODE_ENV=production to render.yaml
+
+**Dimension:** Security · DevOps
+**Current state:** `render.yaml` does not set `NODE_ENV`. This means T1-09 (auth bypass hardening) will not function in production — the auth bypass guard uses `NODE_ENV === 'production'` to decide whether to reject unauthenticated mutation requests, but if NODE_ENV is never set, the check never fires and the auth bypass remains exploitable even after T1-09 is coded.
+**Files:** `render.yaml`, `.env.example`
+**Effort:** S · **Risk:** low
+
+**Note:** This item is a hard dependency of T1-09. T1-09 must not be marked resolved until this item is also resolved.
+
+**Implementation steps:**
+1. Add to `render.yaml` envVars: `- key: NODE_ENV` with `value: production` (this is not a secret — it is safe to commit the value).
+2. Add `NODE_ENV=production` to `.env.example` with a comment: "Set to 'production' on Render; leave as 'development' for local dev".
+3. Verify that setting `NODE_ENV=production` does not break any existing tests (tests set their own env or rely on absence of SUPABASE_URL to select the dev auth path).
+
+**Definition of done:** `render.yaml` includes `NODE_ENV: production`; `.env.example` documents it; T1-09 auth guard fires correctly in a local test with `NODE_ENV=production`.
+
+**Status:** `open`
+
+---
+
+### T1-15 — Fix verifySupabaseToken network error handling
+
+**Dimension:** Security
+**Current state:** `auth.js:22` — the catch block in `verifySupabaseToken` returns `null` on any error, including network failures. This means a transient Supabase outage or DNS failure is treated identically to an invalid token. Consequence: during a Supabase network blip, all authenticated requests are rejected with 401 even if the token is valid — a denial-of-service against legitimate users. Additionally, `if (!res.ok) return null` treats HTTP 5xx from Supabase (server errors) the same as HTTP 401 (invalid token), making failures invisible.
+**Files:** `backend/src/api/auth.js`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Distinguish error categories in `verifySupabaseToken`:
+   - HTTP 401/403 from Supabase → token invalid → return `null` (correct)
+   - HTTP 5xx from Supabase → Supabase is down → throw a new `ApiError("auth_service_unavailable", ..., 503)` so the caller gets a 503, not a 401
+   - Network error (fetch throws) → throw `ApiError("auth_service_unavailable", ..., 503)`
+2. In `resolveRequestIdentity`, catch `auth_service_unavailable` specifically — propagate as 503 so the client knows to retry, not to assume the token is invalid.
+3. Add test: mock `fetch` to throw a network error; assert the response is 503 not 401.
+
+**Definition of done:** Supabase network failure returns 503 to the caller; invalid token still returns 401.
+
+**Status:** `open`
+
+---
+
+### T1-16 — Fix governance resultModel classification bug
+
+**Dimension:** Code Quality · Architecture
+**Current state:** `domains/governance/resultModel.js:42-43` — `requiresApproval` is set to `true` when `overallClassification === "block"`. This is a logic error: a "block" classification means the action should be auto-rejected and must not proceed at all. Setting `requiresApproval = true` on a blocked action implies a human reviewer could approve it — which contradicts the entire point of the "block" level. This could allow blocked SEO actions (keyword stuffing, hidden text, mass deindexing) to reach the approval queue and be approved by a reviewer who does not understand the governance classification.
+**Files:** `backend/src/domains/governance/resultModel.js`
+**Effort:** S · **Risk:** medium
+
+**Implementation steps:**
+1. Fix line 42-43: `requiresApproval` should be `overallClassification === "require_approval"` only — not `|| overallClassification === "block"`.
+2. Verify the governance service correctly rejects approval attempts for blocked recommendations — `assertGovernanceAllowsApproval()` in `governance/service.js` already throws if `isBlocked`, so the server-side guard is correct. This fix ensures the result model accurately reflects the classification.
+3. Update any test that expects `requiresApproval: true` for blocked recommendations.
+4. Add a specific test: a governance result with `overallClassification === "block"` must have `requiresApproval === false` and `isBlocked === true`.
+
+**Definition of done:** `resultModel` sets `requiresApproval: false` for "block" classifications; test confirms the fix.
+
+**Status:** `open`
+
+---
+
 ## Tier 2 — Enterprise adoption requirements
 
 These gaps do not cause immediate data loss but block serious production use.
@@ -489,23 +568,32 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 ---
 
-### T2-12 — Per-module execution timeout
+### T2-12 — Per-module execution timeout and error isolation
 
 **Dimension:** Scalability · Architecture
-**Current state:** The orchestrator (`defaultMvpOrchestrator.js`) awaits each `service.run()` sequentially with no timeout. A single hanging SERP/PageSpeed adapter call holds the entire `/run/default` request open indefinitely. T3-01 (async queue) is the full solution but is XL effort. This intermediate fix prevents complete request starvation now.
+**Current state:** The orchestrator (`defaultMvpOrchestrator.js`) awaits each `service.run()` sequentially with no timeout and no try-catch. Two failure modes exist: (1) a hanging adapter holds the entire request open indefinitely; (2) a throwing module propagates the exception and aborts all subsequent modules. Both must be fixed together — a timeout without error isolation still lets synchronous throws kill the flow.
 **Files:** `backend/src/orchestration/defaultMvpOrchestrator.js`, `backend/src/orchestration/activationAwareOrchestrator.js`
 **Effort:** M · **Risk:** low
 
 **Implementation steps:**
 1. Add `MODULE_TIMEOUT_MS = 10_000` constant (configurable via env var `MODULE_TIMEOUT_MS`).
-2. Wrap each `service.run(input, ctx)` call with `Promise.race([service.run(input, ctx), timeoutReject(MODULE_TIMEOUT_MS, moduleKey)])`.
-3. `timeoutReject` rejects with `{ code: "module_timeout", moduleKey }` after the timeout.
-4. In the orchestrator, catch per-module timeouts: store `{ status: "timeout", moduleKey }` in results and continue — do not abort the entire flow.
-5. Include timed-out modules in the response with `status: "timeout"` so callers know which modules failed.
-6. Add `MODULE_TIMEOUT_MS` to `.env.example`.
-7. Add test: a module whose `run()` never resolves produces `status: "timeout"` in results within N seconds.
+2. Wrap each `service.run(input, ctx)` call in a combined guard:
+   ```js
+   async function runModuleSafe(service, input, ctx, moduleKey) {
+     try {
+       return await Promise.race([service.run(input, ctx), timeoutReject(MODULE_TIMEOUT_MS, moduleKey)]);
+     } catch (err) {
+       return { status: err.code === 'module_timeout' ? 'timeout' : 'error', moduleKey, reason: String(err) };
+     }
+   }
+   ```
+3. In the orchestrator loop, replace `await service.run(...)` with `await runModuleSafe(...)`.
+4. Include failed/timed-out modules in the response with `status: "timeout" | "error"` — do not abort the flow.
+5. Add `MODULE_TIMEOUT_MS` to `.env.example`.
+6. Add test: a module whose `run()` throws produces `status: "error"` in results; remaining modules still execute.
+7. Add test: a module whose `run()` never resolves produces `status: "timeout"` within N seconds; remaining modules still execute.
 
-**Definition of done:** A hanging adapter call does not stall the entire orchestration; the response returns within `MODULE_TIMEOUT_MS + overhead` with the timed-out module flagged.
+**Definition of done:** A hanging or throwing module does not abort the orchestration; all other modules run and the response includes the failed module with status flagged.
 
 **Status:** `open`
 
@@ -635,6 +723,88 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 4. Add tests: running keyword-analysis with empty input returns 400 `missing_required_input`.
 
 **Definition of done:** Module run with empty input returns 400 with a specific field-level error; module run with valid input continues normally.
+
+**Status:** `open`
+
+---
+
+### T2-19 — Single source of truth for module activation state
+
+**Dimension:** Architecture · Data Layer
+**Current state:** Module activation state is currently defined in three separate places that can diverge: (1) `core/activation.js` — `DEFAULT_ACTIVE_MODULES` array (runtime authoritative); (2) `backend_module_catalog.initial_state` column in DB; (3) `backend_module_activation_defaults.is_active` column in DB. The DB was already patched once via `20260516130000_fix_activation_defaults.sql` to correct a mismatch — this patch is evidence that the three-source pattern is not maintainable. If the JS catalog changes, the DB diverges silently.
+**Files:** `backend/src/core/activation.js`, `backend/src/core/moduleCatalog.js`, `supabase/migrations/` (new migration)
+**Effort:** M · **Risk:** medium
+
+**Implementation steps:**
+1. Designate `core/activation.js` and `core/moduleCatalog.js` as the single authoritative source of truth for activation state (they already drive runtime behavior).
+2. Write migration `20260519_sync_activation_from_js.sql`: drop the `is_active` column from `backend_module_activation_defaults` (it is now derived from JS) or make it a view that reflects the JS-defined defaults.
+3. Add a CI check `scripts/check-activation-sync.js` — imports the JS catalog, queries the DB `backend_module_catalog` table, and asserts all 18 module keys and `initial_state` values match exactly.
+4. Wire into `npm run test:integration`.
+5. Document in `ADR_003` (from T2-09) that JS is authoritative; DB reflects JS, never the other way around.
+
+**Definition of done:** `check-activation-sync.js` passes in CI; divergence between JS catalog and DB causes a test failure.
+
+**Status:** `open`
+
+---
+
+### T2-20 — Shared database utility extraction
+
+**Dimension:** Code Quality
+**Current state:** Three functions are duplicated verbatim across multiple repository files: (1) `clone()` — `JSON.parse(JSON.stringify(value))` — copied in `measurement/repository.js` and `business-intelligence/repository.js`; (2) `normalizeRows()` — same pattern in both; (3) `upsertProductTarget()` — the same `INSERT ... ON CONFLICT` SQL query is reproduced in at least two repositories. Code duplication means bugs fixed in one copy silently remain in the others. The `clone()` implementation is also incorrect — it cannot handle `Date`, `undefined`, `Symbol`, or circular references.
+**Files:** New `backend/src/core/dbUtils.js`, `backend/src/domains/measurement/repository.js`, `backend/src/domains/business-intelligence/repository.js`, `backend/src/domains/execution/repository.js`
+**Effort:** M · **Risk:** low
+
+**Implementation steps:**
+1. Create `backend/src/core/dbUtils.js` exporting:
+   - `clone(value)` — use `structuredClone()` (available in Node.js 17+) instead of `JSON.parse/stringify`; falls back to JSON method with explicit `Date` handling.
+   - `normalizeRows(result)` — the standard `Array.isArray(result) ? result : result?.rows ?? []` pattern.
+   - `upsertProductTarget(query, target)` — the shared SQL upsert used across repositories.
+2. Replace all three duplicated implementations across repository files with imports from `dbUtils.js`.
+3. Add unit tests for `clone()` covering: Date objects, undefined values, circular reference detection (should throw clearly, not silently corrupt).
+
+**Definition of done:** Zero duplication of `clone`, `normalizeRows`, `upsertProductTarget` across repository files; `clone()` handles Date correctly.
+
+**Status:** `open`
+
+---
+
+### T2-21 — Audit log immutability enforcement
+
+**Dimension:** Data Layer · Security
+**Current state:** The `audit_logs` table is populated by `auditLogWriter.js` but has no database-level immutability constraint. Rows can be updated or deleted by anyone with DB access, defeating the purpose of an audit trail. Enterprise compliance (SOC 2, GDPR audit requirements) requires tamper-evident, append-only audit logs.
+**Files:** `supabase/migrations/` (new migration), `backend/src/domains/execution/auditLogWriter.js`
+**Effort:** M · **Risk:** low
+
+**Implementation steps:**
+1. Write migration `20260519_audit_log_immutability.sql`:
+   - Add a `BEFORE UPDATE` trigger on `audit_logs`: raise exception `'audit_log_rows_are_immutable'`.
+   - Add a `BEFORE DELETE` trigger on `audit_logs`: raise exception `'audit_log_rows_are_immutable'`.
+   - Add a sequence column `seq BIGSERIAL NOT NULL` to `audit_logs` so log entries have an unbroken, monotonically increasing identifier (gaps in the sequence indicate deleted rows).
+2. Verify the existing `auditLogWriter.js` only performs INSERT operations — confirm no UPDATE/DELETE paths exist.
+3. Add test: attempt to delete an audit log row via the DB; assert the trigger exception is raised.
+4. Document in `RUNBOOK.md` (T2-10): audit logs are append-only by design; to "correct" a log, add a new entry with `action: "correction"` referencing the original entry ID.
+
+**Definition of done:** UPDATE and DELETE on `audit_logs` raise DB exceptions; `seq` column is present and monotonically increasing.
+
+**Status:** `open`
+
+---
+
+### T2-22 — Fix hardcoded test suite count assertion
+
+**Dimension:** Testing / QC · Code Quality
+**Current state:** `full-backend-validation.test.js` contains a hardcoded assertion `assert.equal(TEST_SUITES.length, 29)`. Adding a new test suite requires updating two locations: the `TEST_SUITES` array AND this assertion. Forgetting to update the assertion causes a confusing failure. This is a test fragility issue that will recur every time a new module or test is added.
+**Files:** `backend/src/full-backend-validation.test.js`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Remove the hardcoded `assert.equal(TEST_SUITES.length, 29)` assertion.
+2. Replace with a derived assertion: `assert.ok(TEST_SUITES.length >= 29, ...)` — this allows the count to grow without requiring manual updates, while still catching accidental array truncation.
+3. Alternatively, if the intent is to enforce that the count is exact: compute it at runtime from `getRegisteredModuleKeys().length + FIXED_SUITE_COUNT` rather than hardcoding 29.
+4. Add a comment: the suite count is dynamic — add new suites to the array; the assertion auto-adjusts.
+
+**Definition of done:** Adding a new test suite to `TEST_SUITES` does not require changing any assertion; the suite still catches accidental deletions from the array.
 
 **Status:** `open`
 
@@ -1013,6 +1183,96 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 ---
 
+### T3-20 — Flutter app name consistency (seosync → neural-rank)
+
+**Dimension:** Developer Experience · Documentation
+**Current state:** `app/pubspec.yaml` declares the app name as `seosync`. The backend, GitHub repo, Render service, and all documentation refer to the product as `neural-rank`. This mismatch means the Play Store listing, the app's About screen, and the app's binary package name will say "seosync" — a different brand from everything else. This is a Play Store rejection risk and a brand consistency failure.
+**Files:** `app/pubspec.yaml`, `app/android/app/build.gradle` (applicationId), `app/lib/` (any hardcoded app name strings)
+**Effort:** S · **Risk:** medium · **Depends on:** T3-12
+
+**Implementation steps:**
+1. Update `name:` in `pubspec.yaml` from `seosync` to `neural_rank` (snake_case as required by Dart package naming rules).
+2. Update `description:` to match the README description.
+3. Update `applicationId` in `android/app/build.gradle` to `com.neuralrank.app` (or the chosen reverse-domain identifier).
+4. Update `PRODUCT_BUNDLE_IDENTIFIER` in `ios/Runner.xcodeproj/project.pbxproj` to match.
+5. Search all Dart files for hardcoded "seosync" strings and replace.
+6. Rebuild the Flutter app; verify the app name shows correctly on device.
+
+**Definition of done:** App shows as "Neural Rank" on device; no "seosync" references remain in any tracked file.
+
+**Status:** `open`
+
+---
+
+### T3-21 — Implement volatility analysis in search intelligence
+
+**Dimension:** Code Quality · Architecture
+**Current state:** `domains/search-intelligence/service.js` — the `analyzeQuery()` function returns `volatility: "unknown"` or `volatility: "provider_unavailable"` with the comment "not yet fully modeled". This means the SERP volatility signal — a key input for determining whether to act on a ranking opportunity — is always absent. The search intelligence module advertises a capability it does not deliver.
+**Files:** `backend/src/domains/search-intelligence/service.js`, `backend/src/domains/search-intelligence/opportunityScoring.js`
+**Effort:** L · **Risk:** low
+
+**Implementation steps:**
+1. Define volatility signals available without external providers: position variance over multiple runs (if historical data exists), SERP feature presence/absence (featured snippets, knowledge panels indicate volatility), keyword difficulty tier.
+2. Implement `deriveVolatility(serpData, historicalPositions)` in `opportunityScoring.js`:
+   - High volatility: position variance > 10 positions, or SERP features present (frequently reshuffled)
+   - Medium volatility: position variance 5–10, or moderate difficulty
+   - Low volatility: position variance < 5, stable SERP features, low difficulty
+   - Unknown: insufficient historical data (explicitly signal this, not silently return "unknown")
+3. Wire into `analyzeQuery()` — replace hardcoded "unknown" with `deriveVolatility()` result.
+4. Add test: a query with historical position data produces a non-"unknown" volatility classification.
+5. Document the signal model and its limitations in a comment block in `opportunityScoring.js`.
+
+**Definition of done:** `analyzeQuery()` returns a meaningful volatility classification based on available signals; "unknown" is only returned when no signals are present, not by default.
+
+**Status:** `open`
+
+---
+
+### T3-22 — Flutter error boundary and crash resilience
+
+**Dimension:** Developer Experience · Testing / QC
+**Current state:** `app/lib/main.dart` has no error boundary. An unhandled exception in any widget or BLoC will crash the app with a Flutter red-screen error in debug mode or a blank/frozen screen in release mode. There is no global error handler, no crash reporting, and no graceful degradation.
+**Files:** `app/lib/main.dart`, `app/lib/core/`
+**Effort:** M · **Risk:** low · **Depends on:** T3-12
+
+**Implementation steps:**
+1. Add `FlutterError.onError` handler in `main()` — catches Flutter framework errors; logs to console in debug, reports to Sentry (or Firebase Crashlytics) in release.
+2. Add `PlatformDispatcher.instance.onError` handler — catches Dart async errors outside the Flutter framework.
+3. Wrap the root `MaterialApp` in an `ErrorBoundaryWidget` — a custom widget that catches child build errors and shows a friendly error screen instead of a red screen.
+4. Add `runZonedGuarded(() => runApp(...), (error, stack) => reportError(error, stack))` in `main()` to catch synchronous errors in the startup zone.
+5. Add a crash reporting integration (Firebase Crashlytics free tier or Sentry Flutter SDK).
+
+**Definition of done:** An unhandled exception in a widget shows a friendly error screen in release builds; crash is reported to the monitoring service.
+
+**Status:** `open`
+
+---
+
+### T3-23 — Flutter dependency version pinning
+
+**Dimension:** Security · Developer Experience
+**Current state:** `app/pubspec.yaml` uses `^` version constraints for all dependencies (e.g., `flutter_bloc: ^8.1.3`). The `^` prefix allows any compatible minor/patch version — a dependency update between two builds can introduce regressions or security issues without any code change. Enterprise Flutter apps should pin exact versions and update deliberately.
+**Files:** `app/pubspec.yaml`, `app/pubspec.lock`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Remove `^` from all dependency version constraints in `pubspec.yaml` — use exact versions (e.g., `flutter_bloc: 8.1.3`).
+2. Commit `pubspec.lock` to the repository (if not already committed) — this pins the full transitive dependency tree for reproducible builds.
+3. Add `dependabot.yml` entry for Flutter/Dart package ecosystem (separate from the npm entry in T2-13):
+   ```yaml
+   - package-ecosystem: pub
+     directory: /app
+     schedule:
+       interval: weekly
+   ```
+4. Document the update process in `CONTRIBUTING.md`: test the app after any pubspec update before merging.
+
+**Definition of done:** All Flutter dependencies are exact-version pinned; `pubspec.lock` is committed; Dependabot creates update PRs weekly.
+
+**Status:** `open`
+
+---
+
 ## Progress tracker
 
 | ID | Item | Tier | Status | Effort |
@@ -1029,6 +1289,10 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | T1-10 | X-Forwarded-For IP spoofing fix | 1 | `open` | S |
 | T1-11 | Secrets scanning in CI | 1 | `open` | S |
 | T1-12 | README HTTPS discrepancy | 1 | `open` | S |
+| T1-13 | LICENSE file | 1 | `open` | S |
+| T1-14 | NODE_ENV=production in render.yaml | 1 | `open` | S |
+| T1-15 | verifySupabaseToken network error handling | 1 | `open` | S |
+| T1-16 | Fix governance resultModel classification bug | 1 | `open` | S |
 | T2-01 | Correlation IDs | 2 | `open` | S |
 | T2-02 | API versioning /v1/ | 2 | `open` | M |
 | T2-03 | Pagination + filtering + sorting | 2 | `open` | L |
@@ -1047,6 +1311,10 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | T2-16 | Sentry error tracking | 2 | `open` | S |
 | T2-17 | UptimeRobot monitor (owner action) | 2 | `open` | S |
 | T2-18 | Module run input validation | 2 | `open` | M |
+| T2-19 | Single source of truth — module activation state | 2 | `open` | M |
+| T2-20 | Shared database utility extraction | 2 | `open` | M |
+| T2-21 | Audit log immutability enforcement | 2 | `open` | M |
+| T2-22 | Fix hardcoded test suite count assertion | 2 | `open` | S |
 | T3-01 | Async module execution + queue | 3 | `open` | XL |
 | T3-02 | OpenTelemetry tracing | 3 | `open` | L |
 | T3-03 | Prometheus metrics endpoint | 3 | `open` | L |
@@ -1066,8 +1334,12 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | T3-17 | Flutter screen consolidation (ui/ → app/) | 3 | `open` | XL |
 | T3-18 | Automated DB migration CI check | 3 | `open` | M |
 | T3-19 | SLO definition and error budget | 3 | `open` | M |
+| T3-20 | Flutter app name consistency (seosync → neural-rank) | 3 | `open` | S |
+| T3-21 | Volatility analysis implementation | 3 | `open` | L |
+| T3-22 | Flutter error boundary and crash resilience | 3 | `open` | M |
+| T3-23 | Flutter dependency version pinning | 3 | `open` | S |
 
-**Total: 49 items** — 12 × Tier 1 · 18 × Tier 2 · 19 × Tier 3
+**Total: 61 items** — 16 × Tier 1 · 22 × Tier 2 · 23 × Tier 3
 
 ---
 
