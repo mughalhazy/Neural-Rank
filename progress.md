@@ -5,8 +5,11 @@
 - default branch: `main`
 - backend deploy status: live on Render free tier
 - Render health URL: `https://neural-rank-backend.onrender.com/health`
-- backend freeze status: `FROZEN`
-- backend QC final status: `10/10`
+- backend modules: 18 total — 17 default-active, 1 opt-in (`local_seo`)
+- backend QC: Phase 1 `10/10` · Phase 2 `60/60 PASS` · tests `29/29`
+- backend freeze status: Phase 1 (8 modules) FROZEN — Phase 2 (10 modules) DEPLOYED
+- doc health status: CLEAN — 5 passes completed 2026-05-17 · 78 docs
+- workspace structure: restructured 2026-05-18 — 4 folder renames applied
 
 ## Core Milestones Achieved
 
@@ -108,28 +111,89 @@ Outcome:
 - Render free-tier web service created and deployed
 - health endpoint verified live
 
+### 8. Backend architecture layer completed
+> Completed: 2026-05-16/17
+
+Anchors:
+- [docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md](docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md)
+- [docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md](docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md)
+- [docs/backend/implementation/BACKEND_QC_PHASE2.md](docs/backend/implementation/BACKEND_QC_PHASE2.md)
+- [docs/backend/implementation/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md](docs/backend/implementation/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md)
+
+Outcome:
+- all 18 modules mapped to 8 bounded contexts (site-intelligence, search-intelligence, content-operations, technical-operations, execution, measurement, governance, business-intelligence)
+- 24 API routes confirmed, audited, and documented
+- QC Phase 2 completed: 60/60 PASS across all 10 expansion modules (5-file contract, activation, flow, tests, persistence, schema alignment)
+- schema/repository field-name mismatches fixed for both Phase 1 (5 fixes) and Phase 2 (10 modules confirmed aligned)
+
+### 9. Documentation health cycle — 5 passes
+> Completed: 2026-05-17
+
+All 78 docs across backend, frontend, and product directories audited and cleaned in 5 sequential passes.
+
+| Pass | Commit | Scope | Key work |
+|------|--------|-------|----------|
+| 1 — Dedup | `23de4d8` | 78 docs | Archived 10 superseded files, merged duplicate content into canonical docs, added scope notices to analysis docs with stale module counts |
+| 2 — Linkage normalisation | `589dcf0` | 25 files | Fixed all broken cross-references — invalid `](</path>)` syntax, pre-restructure paths missing subfolders, phantom file references, 17 Windows absolute paths in FRONTEND_PHASE_INDEX.md |
+| 3 — Production readiness audit | `b2a5e17` | Entire codebase | 4-agent parallel audit + full manual line-by-line verification of all critical files; created PRODUCTION_READINESS_GAPS.md with 5 P0s, 14 P1s, 10 P2s each with exact file/line evidence; removed committed DB password from progress.md; corrected 4 agent false positives |
+| 4 — Content backfill | `b4871a7` | 3 frontend planning docs | All 18 modules now covered in all LIVE docs — added full feature surface (screen blocks, commercial job, demo data) for all 10 Phase 2 expansion modules to FRONTEND_MODULE_FEATURE_MAPPING.md; updated FRONTEND_MASTER_PLAN.md (4-tier product surface); updated FRONTEND_BACKEND_CAPABILITY_AUDIT.md |
+| 5 — Naming normalisation | `a655aae` | 3 file renames + 8 docs | Renamed 3 docs to global SCREAMING_SNAKE_CASE standard: `SEO-OS-Build-Plan.md` → `PRODUCT_SEO_OS_BUILD_PLAN.md`, `PHASE_07_DESIGN_LANGUAGE.md` → `FRONTEND_DESIGN_LANGUAGE.md`, `PHASE_08_DESIGN_SYSTEM.md` → `FRONTEND_DESIGN_SYSTEM.md`; all references updated |
+
+Anchors:
+- [DOC_CATALOGUE.md](DOC_CATALOGUE.md) — living index of all 78 docs
+- [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md) — authoritative production backlog
+
+### 10. Workspace folder restructure
+> Completed: 2026-05-18
+
+Anchors:
+- [DOC_CATALOGUE.md](DOC_CATALOGUE.md)
+- [README.md](README.md)
+- [.gitignore](.gitignore)
+
+| Old path | New path | Rationale |
+|----------|----------|-----------|
+| `SEOSync_Flutter_App/` | `app/` | Generic canonical name — aligns with `backend/` convention; product-name-as-folder removed |
+| `frontend/` | `ui/` | Signals design-layer prototype; clear distinction from production `app/` |
+| `design/inspiration/inspiration-library/` | `design/library/` | Removed double "inspiration" nesting; HTML review tool promoted to peer-level |
+| `design/mockups/html-mockups-archetypes-v2/` | `design/mockups/archetypes/` | Removed redundant `html-` prefix and anti-pattern versioned folder name |
+
+Outcome:
+- 292 files renamed in single commit `8be4e29` — all renames tracked by git
+- 9 docs updated (README.md, DOC_CATALOGUE.md, ui/README.md, PRODUCTION_READINESS_GAPS.md, GAP_REGISTER.md, SEO_OS_DELTA_ANALYSIS_REPORT.md, FRONTEND_MASTER_PLAN.md, PHASE_04_IMPLEMENTATION_BLUEPRINT.md, PHASE_02_BEHAVIOUR_AND_MARKET_OVERLAY.md)
+- Root `.gitignore` Flutter build exclusion paths updated to match renamed folders (`1c27a3c`)
+- C: leak audit performed: npm cache/prefix on D:, no node_modules (pure built-in scripts), Flutter build artifacts gitignored at all levels, Android `.gradle` excluded — project is sealed at project level; system-level Dart pub cache and Gradle daemon cache reside on C: (system tool behaviour, not project-level leakage)
+
 ## Current Resume Anchors
 Use these first in a new session:
 - [progress.md](progress.md)
 - [README.md](README.md)
-- [docs/backend/archive/BACKEND_V1_FROZEN.md](docs/backend/archive/BACKEND_V1_FROZEN.md)
-- [docs/backend/archive/BACKEND_QC_FINAL.md](docs/backend/archive/BACKEND_QC_FINAL.md)
-- [docs/backend/archive/BACKEND_QC_REPORT.md](docs/backend/archive/BACKEND_QC_REPORT.md)
+- [DOC_CATALOGUE.md](DOC_CATALOGUE.md)
+- [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
+- [docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md](docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md)
 - [backend/src/server.js](backend/src/server.js)
+- [app/README.md](app/README.md)
 - [render.yaml](render.yaml)
 
 ## Current Operational Facts
-- backend is deployed as a Render free-tier web service
-- `/health` is live and returning `status: ok`
-- all 18 backend modules registered; 17 default-active, 1 opt-in (local_seo)
-- GitHub repo is current with deployed code
+- backend: 18 modules live on Render free tier — 17 default-active, 1 opt-in (`local_seo`)
+- tests: 29/29 passing (`npm run ci`)
+- API: 24 routes — health, modules, run, execution lifecycle, measurement, technical-ops, search-intelligence, business-intelligence
+- database: Supabase `neural-rank` — 9 migrations applied, 33 tables in `app_public`; no DB connection wired at startup (P0-2)
+- Flutter apps: `app/` (BLoC architecture — canonical production app) + `ui/` (UI prototype — pending consolidation into `app/`)
+- docs: 78 `.md` files — structurally clean, fully linked, all 18 modules covered in all LIVE docs
+- production gaps: 5 P0 + 14 P1 + 10 P2 — see [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
+- workspace: fully restructured — `app/`, `ui/`, `design/library/`, `design/mockups/archetypes/`
+- npm cache and global prefix: on D: — project does not leak to C:
 
 ## Suggested Next Work Areas
-- add real approved provider integrations behind the existing adapter boundaries
-- add persistent database/runtime wiring beyond the current query-backed pattern where needed
-- define authenticated API surface and request authorization model
-- add production deployment hardening such as environment management, logging, and monitoring
-- begin frontend or API consumer integration against the deployed backend routes
+Ordered by PRODUCTION_READINESS_GAPS.md priority:
+1. **P0-1** — Rotate Supabase credentials; move `SUPABASE_URL` and `SUPABASE_ANON_KEY` out of `render.yaml` into Render dashboard (`sync: false`)
+2. **P0-2** — Wire database: add `pg` client, create `backend/src/db.js`, pass `query` into `baseContext` at startup — currently all data is lost on every Render restart
+3. **P0-3** — Add `workspace_id` column migration; filter all execution queries by workspace — currently all workspaces share data
+4. **P0-4 / P0-5** — Flutter consolidation: port `ui/` screens + components into `app/`; implement `ApiRepository` with real Dio HTTP calls against the 24 live backend routes
+5. **P1-1** — Set `SERP_PROVIDER` and `SERP_API_KEY` in Render dashboard — SERP adapter is wired but env vars are missing
+6. Full P1 list in [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
 
 ---
 
