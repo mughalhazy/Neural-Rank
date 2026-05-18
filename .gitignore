@@ -28,14 +28,14 @@ codex.ps1
 *.zip
 
 # Flutter build outputs
-frontend/build/
-frontend/.dart_tool/
-frontend/.flutter-plugins
-frontend/.flutter-plugins-dependencies
-SEOSync_Flutter_App/build/
-SEOSync_Flutter_App/.dart_tool/
-SEOSync_Flutter_App/.flutter-plugins
-SEOSync_Flutter_App/.flutter-plugins-dependencies
+ui/build/
+ui/.dart_tool/
+ui/.flutter-plugins
+ui/.flutter-plugins-dependencies
+app/build/
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
 
 # Flutter logs
 flutter_*.log
