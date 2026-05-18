@@ -184,14 +184,15 @@ Anchors:
 | `CHANGELOG.md` | keepachangelog.com format; backfilled from git log across all milestones | `CHANGELOG.md` |
 | unhandledRejection handlers | `process.on('unhandledRejection', ...)` + `process.on('uncaughtException', ...)` — structured JSON log, exit(1) on uncaught | `backend/src/server.js` |
 | ESLint | `eslint@8` devDep; `.eslintrc.json` (`no-unused-vars`, `no-undef`); `npm run lint` + `npm run ci` updated; 13 dead variables removed across 12 backend files | `package.json`, `.eslintrc.json`, 12 module files |
-| render.yaml credentials | All 6 env vars changed to `sync: false`; plaintext `SUPABASE_URL` and `SUPABASE_ANON_KEY` values removed from tracked file (P0-1 partially resolved) | `render.yaml` |
+| render.yaml credentials | All 6 env vars changed to `sync: false`; plaintext values removed from tracked file | `render.yaml` |
+| Git history scrub | `git filter-branch` rewrote all 24 commits; JWT + DB password removed from every historical commit; `gc --prune=now` purged stale objects; force-pushed to GitHub (P0-1 code resolved) | all commits |
 | UptimeRobot monitor | Pending owner action — see Suggested Next Work Areas | — |
 
 Outcome:
 - 3 new governance docs (CONTRIBUTING.md, SECURITY.md, CHANGELOG.md) + `.env.example` + `.eslintrc.json`
 - ESLint clean: 0 errors across all 18 backend modules
 - Tests: 29/29 still passing after lint fixes
-- Credential exposure P0-1 partially resolved — render.yaml clean; owner must rotate Supabase keys and verify Render dashboard values before pushing
+- P0-1 code fully resolved — JWT and DB password gone from all 24 commits + GitHub remote; owner must rotate Supabase anon key and set Render env vars
 - P1-9 (unhandledRejection) fully resolved
 - doc count: 78 → 81
 
@@ -214,13 +215,13 @@ Use these first in a new session:
 - database: Supabase `neural-rank` — 9 migrations applied, 33 tables in `app_public`; no DB connection wired at startup (P0-2)
 - Flutter apps: `app/` (BLoC architecture — canonical production app) + `ui/` (UI prototype — pending consolidation into `app/`)
 - docs: 81 `.md` files — structurally clean, fully linked, all 18 modules covered in all LIVE docs
-- production gaps: 5 P0 (1 partially resolved) + 13 P1 (1 resolved) + 10 P2 — see [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
+- production gaps: 5 P0 (P0-1 code resolved, owner action pending) + 13 P1 (P1-9 resolved) + 10 P2 — see [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
 - workspace: fully restructured — `app/`, `ui/`, `design/library/`, `design/mockups/archetypes/`
 - npm cache and global prefix: on D: — project does not leak to C:
 
 ## Suggested Next Work Areas
 Ordered by PRODUCTION_READINESS_GAPS.md priority:
-1. **P0-1 owner action** — Rotate `SUPABASE_ANON_KEY` at Supabase dashboard → Settings → API; verify all 6 env vars are set in Render dashboard before pushing (render.yaml already fixed)
+1. **P0-1 owner action** — Rotate `SUPABASE_ANON_KEY` at Supabase dashboard → Settings → API (old key still valid until rotated); set all 6 env vars in Render dashboard — git history is clean, render.yaml is clean, this is the last step
 2. **Step 8** — Add UptimeRobot free monitor: `https://neural-rank-backend.onrender.com/health`, HTTP monitor, 5-min interval — prevents Render spindown (free tier, owner account required)
 3. **P0-2** — Wire database: add `pg` client, create `backend/src/db.js`, pass `query` into `baseContext` at startup — currently all data is lost on every Render restart
 4. **P0-3** — Add `workspace_id` column migration; filter all execution queries by workspace — currently all workspaces share data
