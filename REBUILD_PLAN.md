@@ -1,15 +1,15 @@
 # Neural Rank — Enterprise Rebuild Plan
 
-Working document for closing every gap identified in the 2026-05-18 enterprise grading audit.
-Target: 100/100 across all ten dimensions.
+Working document for closing every gap identified in the 2026-05-18 enterprise grading audit
+and the 2026-05-18 reaudit that found 21 additional gaps in the original plan.
 
 Current overall grade: **B- (76/100)**
-Target: **A+ (100/100)**
+Target: **A+ (≥98/100)** — final 2 points require external validation (pen test, compliance audit) beyond code scope.
 
 Each item is assigned:
 - **Status** — `open` · `in_progress` · `resolved`
 - **Effort** — S (< 1 hr) · M (1–4 hrs) · L (4–12 hrs) · XL (1–3 days)
-- **Risk** — low · medium · high (risk of breaking something if done wrong)
+- **Risk** — low · medium · high
 
 ---
 
@@ -30,25 +30,26 @@ Each item is assigned:
 
 ---
 
-## Tier 1 — Production blockers (must fix before any serious use)
+## Tier 1 — Production blockers
 
-These are gaps that create data loss, real security vulnerabilities, or misleading system state. None require architectural rewrites.
+Gaps that create data loss, live security vulnerabilities, or misleading system state.
+None require architectural rewrites. All Tier 1 items must be resolved before Tier 2 begins.
 
 ---
 
 ### T1-01 — Wire PostgreSQL connection at server startup
 
 **Dimension:** Data Layer · Scalability
-**Current state:** `createPostgresExecutionRepository` exists and is correct, but `query` is never injected into `baseContext` at startup. Every byte of execution data (recommendations, tasks, audit logs, snapshots) lives in the in-memory repository and is wiped on every Render restart (~15 min inactivity on free tier).
+**Current state:** `createPostgresExecutionRepository` exists but `query` is never injected into `baseContext` at startup. Every byte of execution data lives in RAM and is wiped on every Render restart (~15 min inactivity on free tier).
 **Files:** `backend/src/server.js`, new `backend/src/db.js`
 **Effort:** M · **Risk:** medium
 
 **Implementation steps:**
-1. Create `backend/src/db.js` — exports a `pg.Pool` instance configured from `DATABASE_URL` env var. Pool size 5 (Supabase free tier allows ≤60 connections). Graceful no-op when `DATABASE_URL` is absent (local dev / CI).
-2. In `server.js` `startServer()`, call `db.connect()` to verify connectivity before binding the port.
-3. Pass `{ query: (sql, params) => pool.query(sql, params) }` into `baseContext` so all domain repositories automatically resolve to the Postgres path.
-4. Log `{ kind: "db_connected", host }` on successful connection; log warning and continue when absent.
-5. Add connection pool health check to `/health` — report `db: "pass"` or `db: "no_connection"`.
+1. Create `backend/src/db.js` — exports a `pg.Pool` configured from `DATABASE_URL`. Pool size 5 (Supabase free tier ≤60 connections). Graceful no-op when `DATABASE_URL` is absent.
+2. In `startServer()`, call `pool.query('SELECT 1')` to verify connectivity before binding the port.
+3. Pass `{ query: (sql, params) => pool.query(sql, params) }` into `baseContext` so all domain repositories resolve to the Postgres path automatically.
+4. Log `{ kind: "db_connected", host }` on success; log warning and continue when absent.
+5. Add DB probe to `/health` — see T1-08.
 
 **Definition of done:** Restart Render; create a recommendation; cold-start the service again; recommendation is still present.
 
@@ -59,37 +60,40 @@ These are gaps that create data loss, real security vulnerabilities, or misleadi
 ### T1-02 — Fix prototype pollution in buildRequestContext
 
 **Dimension:** Security · Code Quality
-**Current state:** `buildRequestContext` in `server.js` spreads user-supplied `body.context` directly: `{ ...baseContext, ...bodyContext, requestIdentity: identity }`. A payload `{ "context": { "__proto__": { "isAdmin": true } } }` can pollute `Object.prototype` for the entire process lifetime.
+**Current state:** `buildRequestContext` spreads user-supplied `body.context` directly. A payload `{ "context": { "__proto__": { "isAdmin": true } } }` pollutes `Object.prototype` for the entire process lifetime.
 **Files:** `backend/src/server.js`
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
-1. Replace the spread of `bodyContext` with an allowlist copy: copy only known safe keys (`workspaceId`, `clientId`, `targetRef`, `websiteUrl`, `appId`) from `bodyContext`.
-2. Alternatively, use `Object.assign(Object.create(null), bodyContext)` to produce a null-prototype copy, then spread that.
-3. Add a validation test: send `{ "context": { "__proto__": { "polluted": true } } }` and assert `({}).polluted` is `undefined` after the request.
+1. Replace the spread of `bodyContext` with an allowlist copy: extract only known-safe keys (`workspaceId`, `clientId`, `targetRef`, `websiteUrl`, `appId`) from `bodyContext`.
+2. Add a test: send `{ "context": { "__proto__": { "polluted": true } } }`; assert `({}).polluted` is `undefined` after the request.
 
-**Definition of done:** Prototype not polluted after request with `__proto__` in body.context.
+**Definition of done:** Prototype unpolluted after request with `__proto__` in body.context.
 
 **Status:** `open`
 
 ---
 
-### T1-03 — Add workspace isolation enforcement
+### T1-03 — Add workspace isolation enforcement + RLS audit
 
-**Dimension:** Security · Architecture
-**Current state:** `requireWorkspace` is defined and exported in `auth.js` but never called anywhere. Any authenticated actor can read and write any other workspace's recommendations, tasks, and audit logs. This is P0-3 in the gap register.
+**Dimension:** Security · Architecture · Data Layer
+**Current state:** `requireWorkspace` is defined but never called. Any authenticated actor can read any other workspace's data. Additionally, the 33 existing tables from 9 previous migrations have not been audited for RLS enablement — new isolation policies added without auditing existing tables leaves historical data exposed.
 **Files:** `backend/src/api/auth.js`, `backend/src/server.js`, `supabase/migrations/` (new migration), all execution/measurement repository files
 **Effort:** L · **Risk:** high
 
 **Implementation steps:**
-1. Write migration `20260519_workspace_isolation.sql`: add `workspace_id UUID NOT NULL DEFAULT gen_random_uuid()` to `recommendations`, `tasks`, `task_status_history`, `audit_logs`, `measurement_snapshots`, `attribution_links`. Add index on `workspace_id` for each table.
-2. Add RLS policy per table: `USING (workspace_id = current_setting('app.workspace_id')::uuid)`.
+1. **RLS audit first:** Run `SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'app_public'` against the Supabase DB. For every table where `rowsecurity = false`, add it to the migration in step 2.
+2. Write migration `20260519_workspace_isolation.sql`:
+   - Add `workspace_id UUID NOT NULL DEFAULT gen_random_uuid()` to `recommendations`, `tasks`, `task_status_history`, `audit_logs`, `measurement_snapshots`, `attribution_links`.
+   - Add index on `workspace_id` for each.
+   - Enable RLS on all 33 tables: `ALTER TABLE app_public.<table> ENABLE ROW LEVEL SECURITY`.
+   - Add RLS policy per table: `USING (workspace_id = current_setting('app.workspace_id')::uuid)`.
 3. In `server.js`, call `requireWorkspace(identity)` on all execution and measurement mutation routes.
-4. Pass `workspaceId` from `identity` into all `listRecommendations`, `listTasks`, `listAuditLogs` queries as a WHERE filter.
-5. Update the in-memory repository to also filter by `workspaceId` so tests remain valid.
-6. Add test case: actor A creates recommendation in workspace A; actor B with workspace B cannot read it.
+4. Pass `workspaceId` into all list queries as a WHERE filter.
+5. Update in-memory repository to filter by `workspaceId` so tests remain valid.
+6. Test: actor A creates recommendation in workspace A; actor B in workspace B cannot read it.
 
-**Definition of done:** Cross-workspace data leakage is impossible even with a valid auth token.
+**Definition of done:** Cross-workspace data leakage impossible; all 33 tables have RLS enabled.
 
 **Status:** `open`
 
@@ -98,17 +102,17 @@ These are gaps that create data loss, real security vulnerabilities, or misleadi
 ### T1-04 — Add CORS headers
 
 **Dimension:** Security · API Design
-**Current state:** No `Access-Control-Allow-*` headers anywhere. Any origin can make cross-origin requests from a browser with no restriction.
+**Current state:** No `Access-Control-Allow-*` headers. Any origin can make cross-origin requests from a browser.
 **Files:** `backend/src/server.js`
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
-1. Add `ALLOWED_ORIGIN` env var (default `*` for development; production should be the Flutter web origin or dashboard domain).
-2. In `sendEnvelope`, add headers: `Access-Control-Allow-Origin: <ALLOWED_ORIGIN>`, `Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS`, `Access-Control-Allow-Headers: Content-Type, Authorization, X-Neural-Rank-Actor, X-Neural-Rank-Client-Id, X-Neural-Rank-Workspace-Id`.
-3. Add an `OPTIONS` preflight handler at the top of `createRequestHandler` — return 204 with CORS headers and no body.
+1. Add `ALLOWED_ORIGIN` env var (default `*` for dev; production = Flutter web or dashboard domain).
+2. In `sendEnvelope`, add `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`.
+3. Add an `OPTIONS` preflight handler at the top of `createRequestHandler` — return 204 with CORS headers.
 4. Add `ALLOWED_ORIGIN` to `.env.example` and `render.yaml`.
 
-**Definition of done:** `curl -H "Origin: https://attacker.com" /health` returns correct CORS headers; preflight OPTIONS returns 204.
+**Definition of done:** Preflight OPTIONS returns 204; all responses carry correct CORS headers.
 
 **Status:** `open`
 
@@ -117,19 +121,19 @@ These are gaps that create data loss, real security vulnerabilities, or misleadi
 ### T1-05 — Add security response headers
 
 **Dimension:** Security
-**Current state:** No security headers on any response. Missing `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, `Referrer-Policy`, `X-XSS-Protection`.
+**Current state:** No security headers. Missing `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`, `Referrer-Policy`.
 **Files:** `backend/src/server.js`
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
-1. Add the following to the `headers` object in `sendEnvelope`:
+1. Add to `sendEnvelope` headers:
    - `X-Content-Type-Options: nosniff`
    - `X-Frame-Options: DENY`
    - `Referrer-Policy: strict-origin-when-cross-origin`
    - `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
-   - `X-XSS-Protection: 0` (disabled — modern browsers don't need it and it can cause XSS on old ones)
+   - `X-XSS-Protection: 0`
    - `Permissions-Policy: geolocation=(), camera=(), microphone=()`
-2. Add a test asserting these headers are present on every response.
+2. Add a test asserting all six headers are present on every response.
 
 **Definition of done:** `curl -I /health` returns all six headers.
 
@@ -140,20 +144,16 @@ These are gaps that create data loss, real security vulnerabilities, or misleadi
 ### T1-06 — Add request access log
 
 **Dimension:** DevOps / Observability
-**Current state:** Successful requests are completely silent in logs. Only errors produce log output. You cannot see traffic patterns, slow routes, or unusual callers in production.
+**Current state:** Successful requests are completely silent. Only errors produce log output.
 **Files:** `backend/src/server.js`
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
-1. At the top of `createRequestHandler`, record `const startedAt = Date.now()`.
-2. Wrap `response.end` to capture when the response completes.
-3. After the response is sent (use `response.on('finish')` hook), emit:
-   ```json
-   { "kind": "request", "method": "GET", "path": "/health", "status": 200, "durationMs": 3, "correlationId": "...", "actor": "...", "ip": "..." }
-   ```
-4. Sanitize: never log `Authorization` header value, never log request body.
+1. At top of `createRequestHandler`, record `const startedAt = Date.now()`.
+2. On `response.on('finish')`, emit: `{ kind: "request", method, path, status, durationMs, correlationId, actor, ip }`.
+3. Never log the Authorization header value or request body.
 
-**Definition of done:** Every request — success or error — produces a structured JSON log line.
+**Definition of done:** Every request produces a structured JSON log line with duration.
 
 **Status:** `open`
 
@@ -162,16 +162,15 @@ These are gaps that create data loss, real security vulnerabilities, or misleadi
 ### T1-07 — Fix rate limit documentation discrepancy
 
 **Dimension:** Code Quality · Documentation
-**Current state:** `rateLimiter.js` exports `DEFAULT_LIMIT = 120`. README says "60 req/min". One is wrong.
-**Files:** `backend/src/core/rateLimiter.js` or `README.md`
+**Current state:** `rateLimiter.js` exports `DEFAULT_LIMIT = 120`. README says "60 req/min". Code is authoritative — README is wrong.
+**Files:** `README.md`
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
-1. Decide the correct limit (120 is what the code enforces — README is wrong).
-2. Update README backend table to say 120 req/min (default), 30 req/min (mutations).
-3. Update any other doc references.
+1. Update README backend table: 120 req/min (default), 30 req/min (mutations).
+2. Search all other docs for "60 req/min" and correct.
 
-**Definition of done:** Code and docs agree on the same number.
+**Definition of done:** Code and all docs agree on 120/30.
 
 **Status:** `open`
 
@@ -180,40 +179,119 @@ These are gaps that create data loss, real security vulnerabilities, or misleadi
 ### T1-08 — Harden /health to report real system state
 
 **Dimension:** DevOps / Observability
-**Current state:** `/health` returns `{ deployable: true }` hardcoded. It does not probe the DB or any external dependency. A Render health check routing traffic to a broken instance would never know.
-**Files:** `backend/src/server.js`, `backend/src/db.js` (from T1-01)
-**Effort:** S · **Risk:** low
+**Current state:** `/health` returns `{ deployable: true }` hardcoded. A broken instance appears healthy to load balancers.
+**Files:** `backend/src/server.js`, `backend/src/db.js`
+**Effort:** S · **Risk:** low · **Depends on:** T1-01
 
 **Implementation steps:**
-1. After T1-01 is complete, add an async DB probe in `buildHealthPayload`: run `SELECT 1` with a 2s timeout.
+1. Run `SELECT 1` with 2s timeout in `buildHealthPayload`.
 2. Report `checks: { db: "pass" | "fail" | "not_configured", http: "pass" }`.
-3. If DB check fails, return HTTP 503 (not 200) so load balancers stop routing to the instance.
-4. If `DATABASE_URL` is not set, report `db: "not_configured"` with HTTP 200 (valid for local dev).
+3. Return HTTP 503 when DB check fails.
 
 **Definition of done:** Disconnecting DB causes `/health` to return 503.
 
-**Status:** `open` (depends on T1-01)
+**Status:** `open`
+
+---
+
+### T1-09 — Harden auth against SUPABASE_URL env var removal
+
+**Dimension:** Security
+**Current state:** `auth.js:54` — when `SUPABASE_URL` is absent, the server falls back to trusting the `x-neural-rank-actor` header for all mutations. If this env var is accidentally removed from the Render dashboard, production loses all authentication silently. Any caller who sends `x-neural-rank-actor: admin` gains full mutation access.
+**Files:** `backend/src/api/auth.js`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Add an environment assertion at module load time: if `NODE_ENV === 'production'` and `SUPABASE_URL` is absent, log a structured warning `{ kind: "auth_degraded", reason: "SUPABASE_URL not set — actor-header fallback active" }`.
+2. In `resolveRequestIdentity`, when `SUPABASE_URL` is absent and `NODE_ENV === 'production'`, return `null` for all requests rather than activating the fallback. This forces all mutation callers to fail with 401 in production if auth is misconfigured, making the failure visible rather than silently degrading to no-auth.
+3. The actor-header fallback remains available in `NODE_ENV !== 'production'` (local dev, CI) — no change to existing test paths.
+4. Add `NODE_ENV=production` to `render.yaml` env vars.
+5. Add test: with `NODE_ENV=production` and no `SUPABASE_URL`, mutation request without Bearer token returns 401.
+
+**Definition of done:** Removing `SUPABASE_URL` from Render causes all mutations to return 401 immediately rather than silently accepting actor-header auth.
+
+**Status:** `open`
+
+---
+
+### T1-10 — Harden X-Forwarded-For IP validation
+
+**Dimension:** Security
+**Current state:** `rateLimiter.js:37-41` — `getIpKey` blindly takes the first value from `X-Forwarded-For` with no validation. Any caller can set `X-Forwarded-For: 1.1.1.1` and bypass per-IP rate limiting entirely. This applies to the current in-memory rate limiter, not just the future Redis one.
+**Files:** `backend/src/core/rateLimiter.js`
+**Effort:** S · **Risk:** low
+
+**Note:** T3-04 (Redis rate limiter) originally contained this fix but it was incorrectly placed — the vulnerability exists now in the live rate limiter regardless of the backing store.
+
+**Implementation steps:**
+1. Add `TRUSTED_PROXY_COUNT` env var (default `1` — Render uses one proxy layer).
+2. In `getIpKey`, parse `X-Forwarded-For` as a comma-split array; take the IP at index `[array.length - TRUSTED_PROXY_COUNT]` — this is the last untrusted IP before Render's known proxy.
+3. Validate the result is a valid IP format (basic regex); fall back to `request.socket.remoteAddress` if it fails.
+4. Add `TRUSTED_PROXY_COUNT` to `.env.example`.
+5. Add test: a request with a forged `X-Forwarded-For` value is rate-limited by `socket.remoteAddress`, not by the forged value.
+
+**Definition of done:** Forged `X-Forwarded-For` header does not bypass IP rate limiting.
+
+**Status:** `open`
+
+---
+
+### T1-11 — Add secrets scanning to CI
+
+**Dimension:** Security · DevOps
+**Current state:** No automated gate preventing credential commits. The history was manually scrubbed once (P0-1) but nothing prevents a future accidental commit of a JWT, DB password, or API key.
+**Files:** `package.json`, `.gitignore`, new `scripts/check-secrets.js`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Write `scripts/check-secrets.js` — scans all staged/committed files for patterns: JWT format (`eyJ[A-Za-z0-9._-]{20,}`), common password patterns (`password\s*[:=]\s*\S{8,}`), Supabase anon key format, generic API key patterns (`[Aa][Pp][Ii][-_][Kk][Ee][Yy]\s*[:=]\s*\S{16,}`).
+2. Add `npm run check:secrets` script: `node scripts/check-secrets.js`.
+3. Wire into `npm run ci`: `npm run check && npm run check:secrets && npm run lint && npm run test:backend:ci`.
+4. Also wire into `.husky/pre-commit` once T3-07 is done.
+5. Add known false-positive patterns to an allowlist (e.g., the `eyJ` pattern in test fixtures).
+
+**Definition of done:** `npm run ci` fails if a file containing a JWT-shaped string is staged; the allowlist prevents false positives on test files.
+
+**Status:** `open`
+
+---
+
+### T1-12 — Fix README HTTPS discrepancy
+
+**Dimension:** Documentation · Code Quality
+**Current state:** README lists the health endpoint as `https://neural-rank-backend.onrender.com/health` (correct), but internal cross-references in some docs still use `http://`. Minor factual error in the primary project document.
+**Files:** `README.md`, any other docs with the HTTP URL
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Grep all `.md` files for `http://neural-rank-backend` (not `https://`).
+2. Replace every occurrence with `https://neural-rank-backend`.
+3. Verify README and RUNBOOK (T2-10) both use HTTPS consistently.
+
+**Definition of done:** Zero occurrences of `http://neural-rank-backend` in any tracked file.
+
+**Status:** `open`
 
 ---
 
 ## Tier 2 — Enterprise adoption requirements
 
-These gaps do not cause immediate data loss but block serious production use: auditability, scalability of the API surface, real test coverage, and API discoverability.
+These gaps do not cause immediate data loss but block serious production use.
+All Tier 1 items must be resolved before beginning Tier 2.
 
 ---
 
 ### T2-01 — Request correlation IDs
 
 **Dimension:** DevOps / Observability · Architecture
-**Current state:** No trace ID is generated or threaded through any request. You cannot correlate an error log with the request that triggered it.
+**Current state:** No trace ID generated or threaded through any request.
 **Files:** `backend/src/server.js`
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
-1. At the top of `createRequestHandler`, generate `const correlationId = request.headers['x-request-id'] || randomUUID()`.
+1. Generate `const correlationId = request.headers['x-request-id'] || randomUUID()` at top of `createRequestHandler`.
 2. Add `X-Request-ID: <correlationId>` to all response headers via `sendEnvelope`.
 3. Pass `correlationId` into `logRequestEvent` and the access log (T1-06).
-4. Thread `correlationId` into error logs so errors can be matched to access log entries.
 
 **Definition of done:** Every response carries `X-Request-ID`; every log line for that request carries the same ID.
 
@@ -221,18 +299,18 @@ These gaps do not cause immediate data loss but block serious production use: au
 
 ---
 
-### T2-02 — API versioning
+### T2-02 — API versioning /v1/
 
 **Dimension:** API Design · Architecture
-**Current state:** All routes are at `/` with no version prefix. Breaking changes cannot be introduced without breaking all existing clients.
-**Files:** `backend/src/server.js`, all clients
+**Current state:** All routes at `/`. Breaking changes cannot be introduced safely.
+**Files:** `backend/src/server.js`, all test files, Flutter `app/`
 **Effort:** M · **Risk:** medium
 
 **Implementation steps:**
 1. Add `/v1/` prefix to all routes in `createRequestHandler`.
-2. Add a legacy redirect: requests to unversioned paths return 301 to `/v1/<path>` with a deprecation warning header `Deprecation: true`.
-3. Update README, CONTRIBUTING, all test files, and render.yaml health check URL.
-4. Update Flutter `app/` repository base URL to `/v1/`.
+2. Unversioned paths return 301 to `/v1/<path>` with `Deprecation: true` header.
+3. Update README, CONTRIBUTING, all test files, render.yaml health check URL.
+4. Update Flutter `app/` repository base URL.
 
 **Definition of done:** All 24 routes accessible at `/v1/<path>`; old paths redirect cleanly.
 
@@ -240,22 +318,23 @@ These gaps do not cause immediate data loss but block serious production use: au
 
 ---
 
-### T2-03 — Pagination on all list endpoints
+### T2-03 — Pagination, filtering, and sorting on all list endpoints
 
 **Dimension:** API Design · Scalability
-**Current state:** `listRecommendations`, `listTasks`, `listAuditLogs`, `listBusinessProfiles`, `listMetricSources` return all records. No limit, no cursor, no offset. Under real usage this is a memory and timeout problem.
+**Current state:** List endpoints return all records with no limit, cursor, filter, or sort. Any real workload makes these unusable.
 **Files:** `backend/src/server.js`, all domain repository files, `backend/src/api/validation.js`
 **Effort:** L · **Risk:** low
 
 **Implementation steps:**
-1. Define standard query params: `limit` (integer, 1–200, default 50) and `cursor` (opaque string, base64-encoded last-seen ID + timestamp).
-2. Add `parsePaginationParams(url)` to `validation.js` — returns `{ limit, cursor }` with defaults and clamping.
-3. Update each in-memory repository to apply `limit` and return a `nextCursor`.
-4. Update each Postgres repository to use `WHERE id > $cursor ORDER BY id LIMIT $limit`.
-5. Wrap list responses: `{ items: [...], count: N, nextCursor: "..." | null }`.
-6. Add pagination tests for boundary conditions (empty list, exactly limit, exactly limit+1).
+1. Define standard query params: `limit` (1–200, default 50), `cursor` (opaque base64 of last-seen ID), `sort` (`createdAt` | `updatedAt` | `priority`, default `createdAt`), `order` (`asc` | `desc`, default `desc`).
+2. Define filter params per endpoint: recommendations → `?status=approved&sourceModuleKey=keyword_analysis`; tasks → `?status=queued`; audit logs → `?entityType=recommendation&from=2026-05-01`.
+3. Add `parsePaginationParams(url)` and `parseFilterParams(url, allowedFilters)` to `validation.js`.
+4. Update each in-memory repository: apply limit, cursor, sort, and filter.
+5. Update each Postgres repository: `WHERE id > $cursor AND <filters> ORDER BY <sort> LIMIT $limit`.
+6. Wrap list responses: `{ items: [...], count: N, nextCursor: "..." | null }`.
+7. Add tests for boundary conditions and each filter combination.
 
-**Definition of done:** All list endpoints accept `?limit=N&cursor=X`; response includes `nextCursor`.
+**Definition of done:** All list endpoints accept `?limit=N&cursor=X&sort=Y&status=Z`; response includes `nextCursor`.
 
 **Status:** `open`
 
@@ -264,38 +343,37 @@ These gaps do not cause immediate data loss but block serious production use: au
 ### T2-04 — Transaction wrapper on multi-step writes
 
 **Dimension:** Data Layer
-**Current state:** `createRecommendation` and `writeAuditLog` are two separate async operations with no transaction. If the audit log write fails, the recommendation exists without an audit trail — permanently inconsistent state.
+**Current state:** `createRecommendation` and `writeAuditLog` are separate async operations. A failed audit log write leaves an orphaned recommendation with no audit trail.
 **Files:** `backend/src/domains/execution/service.js`, `backend/src/domains/execution/repository.js`
-**Effort:** M · **Risk:** medium
+**Effort:** M · **Risk:** medium · **Depends on:** T1-01
 
 **Implementation steps:**
-1. Add `withTransaction(pool, callback)` helper in `db.js` — acquires a client, calls `BEGIN`, runs the callback with the client's `query`, calls `COMMIT` on success or `ROLLBACK` on failure, releases the client.
-2. Wrap `createRecommendation → writeAuditLog` in a single transaction.
-3. Wrap `updateRecommendationStatus → writeAuditLog` similarly.
-4. Wrap `createTaskFromRecommendation → updateRecommendation.taskId → writeAuditLog`.
-5. In-memory repository requires no change (it is already synchronous and atomic).
+1. Add `withTransaction(pool, callback)` in `db.js` — acquires client, `BEGIN`, runs callback, `COMMIT` or `ROLLBACK`.
+2. Wrap: `createRecommendation → writeAuditLog`.
+3. Wrap: `updateRecommendationStatus → writeAuditLog`.
+4. Wrap: `createTaskFromRecommendation → updateRecommendation.taskId → writeAuditLog`.
 
-**Definition of done:** An intentionally failing audit log write causes the recommendation create to roll back; no orphan recommendation exists.
+**Definition of done:** Intentionally failing audit log write rolls back the recommendation create; no orphan exists.
 
-**Status:** `open` (depends on T1-01)
+**Status:** `open`
 
 ---
 
 ### T2-05 — Real DB integration tests in CI
 
 **Dimension:** Testing / QC
-**Current state:** Every test uses the in-memory repository. The Postgres code path (`createPostgresExecutionRepository`, `createPostgresModuleRunRepository`) has never been exercised in CI. Schema migrations may diverge from the code without detection.
-**Files:** New `backend/src/integration-tests/` directory, CI configuration
+**Current state:** Every test uses the in-memory repository. The Postgres path has never been exercised in CI.
+**Files:** New `backend/src/integration-tests/`, CI configuration
 **Effort:** L · **Risk:** low
 
 **Implementation steps:**
-1. Add a `docker-compose.test.yml` at root: spins up `postgres:16-alpine` on port 5433, applies migrations via `psql -f supabase/migrations/*.sql`.
-2. Create `backend/src/integration-tests/execution-postgres.test.js` — same lifecycle as `execution-lifecycle.test.js` but with a real `pg.Pool` injected into context.
-3. Create `backend/src/integration-tests/persistence-postgres.test.js` — verifies each of the 18 module `persistRun` functions actually writes and reads from Postgres.
-4. Add `npm run test:integration` script: `docker-compose -f docker-compose.test.yml up -d && node integration-tests/runner.js && docker-compose down`.
-5. Wire into CI: `npm run ci` = syntax check + lint + unit tests + integration tests.
+1. Add `docker-compose.test.yml`: spins up `postgres:16-alpine` on port 5433; applies all migrations.
+2. Create `integration-tests/execution-postgres.test.js` — lifecycle tests with real `pg.Pool`.
+3. Create `integration-tests/persistence-postgres.test.js` — verifies all 18 module `persistRun` functions.
+4. Add `npm run test:integration` script.
+5. Wire into `npm run ci`.
 
-**Definition of done:** `npm run test:integration` passes against a real Postgres instance; schema drift causes a test failure.
+**Definition of done:** `npm run test:integration` passes against real Postgres; schema drift causes test failure.
 
 **Status:** `open`
 
@@ -309,13 +387,12 @@ These gaps do not cause immediate data loss but block serious production use: au
 **Effort:** L · **Risk:** low
 
 **Implementation steps:**
-1. Write `docs/backend/reference/OPENAPI.yaml` — OpenAPI 3.1 spec covering all 24 routes, all request/response schemas, all error codes, authentication scheme (Bearer JWT).
-2. Add a `/v1/openapi.json` route in `server.js` that serves the spec as JSON (read from file at startup).
-3. Add `GET /v1/docs` that serves Swagger UI (single HTML file, no npm dependency — embed the CDN URL with SRI hash).
-4. Add contract test: verify every route in `AVAILABLE_ROUTES` has a corresponding entry in the OpenAPI spec.
-5. Update DOC_CATALOGUE.md and README Key docs table.
+1. Write `docs/backend/reference/OPENAPI.yaml` — OpenAPI 3.1, all 24 routes, schemas, error codes, Bearer JWT auth.
+2. Add `/v1/openapi.json` route serving the spec.
+3. Add `GET /v1/docs` serving Swagger UI (single HTML, CDN with SRI hash, zero npm dependency).
+4. Add contract test: every route in `AVAILABLE_ROUTES` has an entry in the spec.
 
-**Definition of done:** `GET /v1/openapi.json` returns a valid OpenAPI 3.1 document; `GET /v1/docs` renders Swagger UI.
+**Definition of done:** `GET /v1/openapi.json` returns valid OpenAPI 3.1; `GET /v1/docs` renders Swagger UI.
 
 **Status:** `open`
 
@@ -324,16 +401,15 @@ These gaps do not cause immediate data loss but block serious production use: au
 ### T2-07 — Code coverage gate in CI
 
 **Dimension:** Testing / QC
-**Current state:** No coverage measurement. Unknown what percentage of code is exercised by the 29 test suites.
-**Files:** `package.json`, `.nycrc` or `c8` config
+**Current state:** No coverage measurement. Unknown what percentage of code is exercised.
+**Files:** `package.json`
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
-1. Add `c8` as a devDependency (`npm install --save-dev c8`).
+1. Add `c8` as a devDependency.
 2. Update `npm run test:backend:ci` to `c8 --threshold 80 node backend/src/full-backend-validation.test.js`.
-3. Add `.c8rc` config: `{ "exclude": ["**/*.test.js"], "reporter": ["text", "lcov"], "threshold": 80 }`.
+3. Add `.c8rc`: `{ "exclude": ["**/*.test.js"], "reporter": ["text", "lcov"], "threshold": 80 }`.
 4. Add `coverage/` to `.gitignore`.
-5. Raise threshold incrementally to 90% as integration tests are added (T2-05).
 
 **Definition of done:** `npm run ci` fails when line coverage drops below 80%.
 
@@ -344,17 +420,16 @@ These gaps do not cause immediate data loss but block serious production use: au
 ### T2-08 — Input string length validation
 
 **Dimension:** Code Quality · Security
-**Current state:** `validateRecommendationCreateBody` checks field types but applies no maximum length constraints. Titles, summaries, and actor names are unbounded — a 10MB title would pass validation and be stored in the DB.
+**Current state:** Validation checks field types but applies no maximum length. A 10MB title passes validation.
 **Files:** `backend/src/api/validation.js`
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
 1. Add `assertStringMaxLength(value, maxLen, code, label)` helper.
-2. Apply limits: `title` ≤ 500 chars, `summary` ≤ 5000 chars, `actionType` ≤ 100 chars, `actor` ≤ 255 chars, `nextStatus` ≤ 50 chars.
-3. Add `assertStringMaxLength` to the existing `assertString` call chain — no new function invocations needed.
-4. Add validation tests for each over-limit field.
+2. Apply: `title` ≤ 500, `summary` ≤ 5000, `actionType` ≤ 100, `actor` ≤ 255, `nextStatus` ≤ 50 chars.
+3. Add tests for each over-limit field.
 
-**Definition of done:** A 600-character title returns 400 `invalid_recommendation_title`.
+**Definition of done:** 600-character title returns 400 `invalid_recommendation_title`.
 
 **Status:** `open`
 
@@ -363,21 +438,16 @@ These gaps do not cause immediate data loss but block serious production use: au
 ### T2-09 — Architecture decision records (ADRs)
 
 **Dimension:** Documentation · Architecture
-**Current state:** Three non-obvious architectural decisions have no documented rationale: zero runtime npm dependencies, pure `node:http` (no Express/Fastify), and in-memory default for repositories. Future contributors may reverse these without understanding the tradeoffs.
+**Current state:** Three non-obvious decisions have no documented rationale and are at risk of being reversed.
 **Files:** New `docs/backend/decisions/` entries
 **Effort:** M · **Risk:** low
 
 **Implementation steps:**
-Write three ADR files:
-1. `ADR_001_ZERO_RUNTIME_DEPENDENCIES.md` — rationale: eliminates dependency-chain CVEs, guarantees cold-start speed, forces explicit over implicit; tradeoff: no ecosystem middleware.
-2. `ADR_002_PURE_NODE_HTTP.md` — rationale: zero framework lock-in, full HTTP control, pairs with zero-dependency philosophy; tradeoff: manual routing boilerplate.
-3. `ADR_003_IN_MEMORY_DEFAULT_REPOSITORY.md` — rationale: allows CI without a database, enables deterministic test isolation; tradeoff: data loss on restart (documented P0-2).
+1. `ADR_001_ZERO_RUNTIME_DEPENDENCIES.md` — rationale, tradeoffs, alternatives considered.
+2. `ADR_002_PURE_NODE_HTTP.md` — same format.
+3. `ADR_003_IN_MEMORY_DEFAULT_REPOSITORY.md` — same format.
 
-Each ADR format: Status · Context · Decision · Consequences · Alternatives considered.
-
-Update `DOC_CATALOGUE.md`.
-
-**Definition of done:** Three ADR files committed; each cites the specific tradeoffs.
+**Definition of done:** Three ADR files committed; each cites specific tradeoffs and alternatives.
 
 **Status:** `open`
 
@@ -386,22 +456,185 @@ Update `DOC_CATALOGUE.md`.
 ### T2-10 — Operational runbook
 
 **Dimension:** DevOps / Observability · Documentation
-**Current state:** No documented procedure for on-call scenarios: Render cold-start, DB unreachable, SERP provider rate-limited, Supabase outage.
+**Current state:** No documented procedure for any on-call scenario.
 **Files:** New `docs/backend/reference/RUNBOOK.md`
 **Effort:** M · **Risk:** low
 
 **Implementation steps:**
-Write `RUNBOOK.md` covering:
-1. **Cold-start latency** — Render free tier spins down after 15 min. First request takes 10–30s. Expected behavior. Mitigation: UptimeRobot 5-min ping keeps it warm.
-2. **DB unreachable** — `/health` returns 503. In-memory fallback activates. Data created during outage is lost when DB reconnects. Recovery: restart Render service after DB recovers.
-3. **SERP provider rate-limited** — module runs return `integration_not_connected` for SERP-dependent modules. Non-SERP modules continue. No manual action required; provider limit resets.
-4. **Supabase outage** — same as DB unreachable. Monitor at status.supabase.com.
-5. **Force restart Render** — dashboard → service → Manual Deploy → latest commit.
-6. **Rotate credentials** — step-by-step for `SUPABASE_ANON_KEY` rotation and Render dashboard env var update.
+Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider rate-limited, Supabase outage, force restart Render, credential rotation procedure.
 
-Update `DOC_CATALOGUE.md`.
+**Definition of done:** Runbook covers all six scenarios with explicit steps.
 
-**Definition of done:** Runbook covers all five scenarios with explicit steps.
+**Status:** `open`
+
+---
+
+### T2-11 — GitHub Actions CI workflow
+
+**Dimension:** DevOps / Observability · Testing / QC
+**Current state:** No `.github/workflows/` directory exists. There is zero automated CI — a PR can be merged and deployed without any test run. T3-08 (staging) mentions a workflow in passing but it is Tier 3 effort. CI on every PR is a Tier 2 baseline requirement.
+**Files:** New `.github/workflows/ci.yml`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Create `.github/workflows/ci.yml`:
+   - Trigger: `push` to any branch, `pull_request` targeting `main` or `staging`.
+   - Steps: `actions/checkout`, `actions/setup-node@v4` with `node-version: '20'`, `npm ci`, `npm run ci`.
+2. Require the workflow to pass before PRs can be merged (set as required status check in GitHub branch protection rules).
+3. Add badge to README: `![CI](https://github.com/mughalhazy/Neural-Rank/actions/workflows/ci.yml/badge.svg)`.
+
+**Definition of done:** Every PR shows a green/red CI status; merge is blocked on failure.
+
+**Status:** `open`
+
+---
+
+### T2-12 — Per-module execution timeout
+
+**Dimension:** Scalability · Architecture
+**Current state:** The orchestrator (`defaultMvpOrchestrator.js`) awaits each `service.run()` sequentially with no timeout. A single hanging SERP/PageSpeed adapter call holds the entire `/run/default` request open indefinitely. T3-01 (async queue) is the full solution but is XL effort. This intermediate fix prevents complete request starvation now.
+**Files:** `backend/src/orchestration/defaultMvpOrchestrator.js`, `backend/src/orchestration/activationAwareOrchestrator.js`
+**Effort:** M · **Risk:** low
+
+**Implementation steps:**
+1. Add `MODULE_TIMEOUT_MS = 10_000` constant (configurable via env var `MODULE_TIMEOUT_MS`).
+2. Wrap each `service.run(input, ctx)` call with `Promise.race([service.run(input, ctx), timeoutReject(MODULE_TIMEOUT_MS, moduleKey)])`.
+3. `timeoutReject` rejects with `{ code: "module_timeout", moduleKey }` after the timeout.
+4. In the orchestrator, catch per-module timeouts: store `{ status: "timeout", moduleKey }` in results and continue — do not abort the entire flow.
+5. Include timed-out modules in the response with `status: "timeout"` so callers know which modules failed.
+6. Add `MODULE_TIMEOUT_MS` to `.env.example`.
+7. Add test: a module whose `run()` never resolves produces `status: "timeout"` in results within N seconds.
+
+**Definition of done:** A hanging adapter call does not stall the entire orchestration; the response returns within `MODULE_TIMEOUT_MS + overhead` with the timed-out module flagged.
+
+**Status:** `open`
+
+---
+
+### T2-13 — Dependabot configuration
+
+**Dimension:** Security · Developer Experience
+**Current state:** No `.github/dependabot.yml`. DevDependencies (ESLint, c8, Husky) accumulate CVEs silently. No automated PRs for security updates.
+**Files:** New `.github/dependabot.yml`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Create `.github/dependabot.yml`:
+   ```yaml
+   version: 2
+   updates:
+     - package-ecosystem: npm
+       directory: /
+       schedule:
+         interval: weekly
+       open-pull-requests-limit: 5
+       labels: ["dependencies"]
+   ```
+2. Since the backend has zero runtime dependencies, all Dependabot PRs will be devDependency updates — low risk.
+3. Add `npm audit --omit=dev` to `npm run ci` to catch any future runtime dependency CVEs if they are ever added.
+
+**Definition of done:** Dependabot creates weekly PRs for outdated devDependencies; `npm audit` runs in CI.
+
+**Status:** `open`
+
+---
+
+### T2-14 — normalizeError registry refactor
+
+**Dimension:** Code Quality · Architecture
+**Current state:** `errors.js` maps HTTP status codes by string suffix/prefix pattern matching (`.endsWith("_not_found")` → 404). Adding a new error code that coincidentally ends in `_not_found` silently gets the wrong status code. The pattern is fragile as the codebase grows.
+**Files:** `backend/src/api/errors.js`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Build a named registry: `const ERROR_REGISTRY = { recommendation_not_found: 404, task_not_found: 404, module_not_found: 404, ... }` — enumerate every error code thrown in the codebase explicitly.
+2. In `normalizeError`, look up `error.message` in `ERROR_REGISTRY` first; fall back to the pattern matching only as a safety net for unknown codes (log a warning when the fallback triggers so new codes get added to the registry).
+3. Export the registry so callers can reference error codes without string literals.
+4. Add test: every registered error code maps to the expected HTTP status.
+
+**Definition of done:** Zero reliance on string suffix matching for known error codes; unknown codes log a warning.
+
+**Status:** `open`
+
+---
+
+### T2-15 — Negative-path and edge-case test suite
+
+**Dimension:** Testing / QC
+**Current state:** 29 suites cover happy paths and adapter fallbacks. No systematic coverage of: bad inputs, auth failures on protected routes, governance blocks, module-level empty results, payload edge cases, or out-of-range pagination params.
+**Files:** New `backend/src/negative-path.test.js`
+**Effort:** M · **Risk:** low
+
+**Implementation steps:**
+1. Create `backend/src/negative-path.test.js` using the `withServer` test pattern.
+2. Cover per-route: invalid JSON body → 400; missing required field → 400; over-limit string → 400; wrong HTTP method → 405; unknown route → 404.
+3. Cover auth: mutation without identity → 401; Bearer token present but invalid → 401; valid identity but wrong workspace → 403 (post T1-03).
+4. Cover governance: blocked action type → 409.
+5. Cover rate limit: hammer 121 requests → 121st returns 429.
+6. Cover payload size: body > 1MB → 413.
+7. Add to `full-backend-validation.test.js` suite list.
+
+**Definition of done:** Negative-path suite passes; all error branches have at least one test.
+
+**Status:** `open`
+
+---
+
+### T2-16 — Sentry error tracking
+
+**Dimension:** DevOps / Observability
+**Current state:** `unhandledRejection` and `uncaughtException` log to stdout only — no alert fires in production. Mean Time To Detect (MTTD) for a production exception is "whenever someone reads the logs". Sentry free tier covers 5k events/month.
+**Files:** `backend/src/server.js`, `package.json`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Add `@sentry/node` as a **runtime** devDependency. Note: this is the one justified exception to zero-runtime-deps — observability infrastructure is not application logic. Alternatively, implement a lightweight fetch-based error reporter (zero dep) that POSTs to the Sentry HTTP API directly.
+2. Initialize Sentry at the top of `server.js` with `SENTRY_DSN` env var. No-op when absent.
+3. In `unhandledRejection` and `uncaughtException` handlers, call `Sentry.captureException(error)` before logging.
+4. In `normalizeError`, capture 5xx errors via Sentry (not 4xx — those are caller errors, not server errors).
+5. Add `SENTRY_DSN` to `.env.example` and `render.yaml`.
+
+**Preferred alternative (zero-dep):** Write `backend/src/core/errorReporter.js` — fires a `fetch` POST to `https://sentry.io/api/<projectId>/store/` with the Sentry event envelope format. No npm dependency. Graceful no-op when `SENTRY_DSN` is absent.
+
+**Definition of done:** An unhandled exception in production triggers a Sentry alert within 60 seconds.
+
+**Status:** `open`
+
+---
+
+### T2-17 — UptimeRobot monitor setup
+
+**Dimension:** DevOps / Observability
+**Current state:** No external uptime monitoring. The service can be down and no alert fires. This was noted as a pending owner action but has no plan entry.
+**Files:** None (owner action — requires UptimeRobot account)
+**Effort:** S · **Risk:** low
+
+**Implementation steps (owner action — cannot be executed programmatically):**
+1. Log into UptimeRobot (free tier: 50 monitors, 5-minute interval).
+2. Create monitor: Type = HTTP(s), URL = `https://neural-rank-backend.onrender.com/health`, interval = 5 minutes.
+3. Set alert contact to `synteracloud@gmail.com`.
+4. The 5-minute pings also keep the Render free-tier instance warm (prevents 15-min spin-down).
+
+**Definition of done:** UptimeRobot dashboard shows monitor online; test alert email received.
+
+**Status:** `open`
+
+---
+
+### T2-18 — Input validation for module run endpoints
+
+**Dimension:** Code Quality · Security
+**Current state:** `validateModuleRunBody` allows a completely empty `moduleInput` (`{}`). Modules run with no meaningful input and produce generic, non-actionable output. No check that at least one identifying field (e.g., `websiteUrl`, `appId`, `keywords`) is present.
+**Files:** `backend/src/api/validation.js`, per-module `analysis.js` files
+**Effort:** M · **Risk:** medium
+
+**Implementation steps:**
+1. Add `validateModuleInput(moduleKey, moduleInput)` — looks up the module's required fields from a per-module config and validates at least one is present.
+2. Each module's `analysis.js` exports `REQUIRED_INPUT_FIELDS: ['websiteUrl']` (or whichever fields are meaningful for that module).
+3. In `handleSingleModuleRun`, call `validateModuleInput(moduleKey, body.moduleInput)` before `service.run()`.
+4. Add tests: running keyword-analysis with empty input returns 400 `missing_required_input`.
+
+**Definition of done:** Module run with empty input returns 400 with a specific field-level error; module run with valid input continues normally.
 
 **Status:** `open`
 
@@ -416,19 +649,19 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-01 — Async module execution with job queue
 
 **Dimension:** Scalability · Architecture
-**Current state:** `/v1/run/default` runs all 18 modules synchronously within a single HTTP request. A slow SERP or PageSpeed adapter call (3–10s) holds the connection open. Under load, this exhausts the event loop.
+**Current state:** `/v1/run/default` runs all 18 modules synchronously. T2-12 adds per-module timeouts as an intermediate fix. This is the full solution: queue-backed async execution with result polling.
 **Effort:** XL · **Risk:** high
 
 **Implementation steps:**
-1. Add Redis (Render free tier does not include Redis — use Upstash free tier, 10k commands/day).
-2. Add BullMQ (or a zero-dependency custom queue backed by Redis LPUSH/BRPOP) as a devDependency.
-3. Change `/v1/run/default` and `/v1/run/activation-aware` to enqueue a job and return `{ jobId, status: "queued" }` with HTTP 202.
-4. Add `GET /v1/jobs/:jobId` — polls job state (queued / running / completed / failed).
-5. Add optional webhook: caller can provide `callbackUrl` in request body; worker POSTs result when complete.
-6. Worker process runs in a separate Node.js process (`backend/src/worker.js`), started alongside the server.
-7. Module-level `/run/:key` endpoints (single module) remain synchronous — acceptable for targeted single-module calls.
+1. Add Redis via Upstash free tier (10k commands/day).
+2. Add BullMQ as a devDependency (or build a zero-dep queue backed by Redis LPUSH/BRPOP).
+3. Change `/v1/run/default` and `/v1/run/activation-aware` to enqueue a job → return `{ jobId, status: "queued" }` with HTTP 202.
+4. Add `GET /v1/jobs/:jobId` — polls job state.
+5. Add optional webhook: `callbackUrl` in request body; worker POSTs result on completion.
+6. Worker runs in `backend/src/worker.js`, started alongside the server.
+7. Single-module `/run/:key` remains synchronous.
 
-**Definition of done:** `/v1/run/default` returns 202 immediately; result is available at `/v1/jobs/:jobId` within N seconds.
+**Definition of done:** `/v1/run/default` returns 202 immediately; result available at `/v1/jobs/:jobId`.
 
 **Status:** `open`
 
@@ -437,19 +670,16 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-02 — OpenTelemetry distributed tracing
 
 **Dimension:** DevOps / Observability
-**Current state:** No tracing. Cannot see how time is spent across 18 modules in a single run; cannot identify which adapter is the bottleneck.
+**Current state:** No tracing. Cannot identify which module or adapter is the bottleneck.
 **Effort:** L · **Risk:** low
 
 **Implementation steps:**
-1. Add `@opentelemetry/sdk-node`, `@opentelemetry/auto-instrumentations-node` as devDependencies.
-2. Create `backend/src/telemetry.js` — initializes OTel SDK with OTLP exporter pointing to `OTEL_EXPORTER_OTLP_ENDPOINT` env var.
-3. Instrument `server.js` request handler: create a root span per request with `correlationId` as span attribute.
-4. Instrument each module `run()` call: create a child span named `module.<moduleKey>`.
-5. Instrument each external adapter call (SERP, GSC, GA4): create a child span named `adapter.<adapterKey>`.
-6. Export to Grafana Cloud free tier (14-day retention, 50GB traces/month free).
-7. Add `OTEL_EXPORTER_OTLP_ENDPOINT` to `.env.example` and `render.yaml`.
+1. Add `@opentelemetry/sdk-node`, `@opentelemetry/auto-instrumentations-node`.
+2. Create `backend/src/telemetry.js` — OTel SDK with OTLP exporter to Grafana Cloud free tier.
+3. Root span per request; child span per module `run()`; child span per adapter call.
+4. Add `OTEL_EXPORTER_OTLP_ENDPOINT` to `.env.example` and `render.yaml`.
 
-**Definition of done:** A single `/v1/run/default` call produces a waterfall trace showing time per module in Grafana.
+**Definition of done:** Single `/v1/run/default` call produces a waterfall trace in Grafana.
 
 **Status:** `open`
 
@@ -458,14 +688,13 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-03 — Prometheus-compatible metrics endpoint
 
 **Dimension:** DevOps / Observability · Scalability
-**Current state:** No metrics. No visibility into request latency, error rate, module execution time, or queue depth.
+**Current state:** No metrics. No visibility into request latency, error rate, or module execution time.
 **Effort:** L · **Risk:** low
 
 **Implementation steps:**
-1. Track in-process (no npm dependency): request count by route and status, p50/p95/p99 latency histograms (use a simple reservoir sampler), error count by error code, module execution time per module key, rate limit hit count.
-2. Add `GET /v1/metrics` — returns Prometheus text format (no auth required for scraping from internal network; Render does not expose this externally unless you add a route).
-3. Add scrape target to Grafana Cloud (free tier allows 10k active series).
-4. Create a Grafana dashboard: request rate, error rate, p99 latency per route, module execution time heatmap.
+1. Track in-process (no npm dep): request count by route/status, p50/p95/p99 histograms, error count by code, module execution time per key, rate limit hit count.
+2. Add `GET /v1/metrics` returning Prometheus text format.
+3. Add scrape target to Grafana Cloud; create dashboard.
 
 **Definition of done:** `GET /v1/metrics` returns valid Prometheus text; Grafana dashboard shows live data.
 
@@ -476,17 +705,17 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-04 — Redis-backed rate limiter
 
 **Dimension:** Scalability · Security
-**Current state:** In-memory rate limiter resets on every Render restart and cannot work across multiple instances. `X-Forwarded-For` is trusted without validation — clients can forge their IP.
+**Current state:** In-memory rate limiter resets on every Render restart and cannot work across multiple instances.
+**Note:** X-Forwarded-For IP spoofing fix has been moved to T1-10 — it applies to the current in-memory limiter and cannot wait for Tier 3.
 **Effort:** M · **Risk:** medium
 
 **Implementation steps:**
-1. Create `backend/src/core/redisRateLimiter.js` — same API as `rateLimiter.js` but backed by Redis `INCR` + `EXPIRE` (sliding window).
-2. In `server.js`, detect `REDIS_URL` env var: if present, use Redis rate limiter; if absent, fall back to in-memory (local dev/CI unchanged).
-3. Harden `getIpKey`: validate `X-Forwarded-For` against a known proxy allowlist (Render's proxy CIDR range); fall back to `request.socket.remoteAddress` if the header is spoofed.
-4. Add `REDIS_URL` to `.env.example` and `render.yaml`.
-5. Add rate limit integration tests: hammer 121 requests in a window; assert 121st returns 429.
+1. Create `backend/src/core/redisRateLimiter.js` — same API as `rateLimiter.js`, backed by Redis `INCR` + `EXPIRE`.
+2. In `server.js`, detect `REDIS_URL` env var: if present, use Redis limiter; absent = in-memory (dev/CI).
+3. Add `REDIS_URL` to `.env.example` and `render.yaml`.
+4. Add integration test: 121 requests in one window; 121st returns 429; state survives process restart.
 
-**Definition of done:** Rate limit state survives a process restart; forged `X-Forwarded-For` does not bypass IP limit.
+**Definition of done:** Rate limit state survives restarts; works correctly across multiple instances.
 
 **Status:** `open`
 
@@ -495,18 +724,16 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-05 — Response caching layer
 
 **Dimension:** Scalability
-**Current state:** Identical module runs repeat full computation. Keyword analysis, topical authority, and SERP analysis are deterministic for the same input and could be cached.
+**Current state:** Identical module runs repeat full computation. Deterministic modules could be cached.
 **Effort:** L · **Risk:** medium
 
 **Implementation steps:**
 1. Cache key: `sha256(moduleKey + JSON.stringify(sortedInput))`.
-2. Cache store: Redis (from T3-04) with TTL configurable per module (default 5 min; SERP results 15 min; rank tracking 1 hr).
-3. Add `Cache-Control: max-age=<ttl>` and `ETag: <cacheKey>` to cached responses.
-4. Honour `Cache-Control: no-cache` request header to bypass cache.
-5. Add `X-Cache: HIT | MISS` response header for observability.
-6. Module-level single runs only — do not cache full `/run/default` flow (too many dimensions).
+2. Cache store: Redis (T3-04) with per-module TTL.
+3. Add `Cache-Control`, `ETag`, `X-Cache: HIT | MISS` headers.
+4. Honour `Cache-Control: no-cache` to bypass cache.
 
-**Definition of done:** Second identical module run returns `X-Cache: HIT` and responds in < 5ms.
+**Definition of done:** Second identical module run returns `X-Cache: HIT` in < 5ms.
 
 **Status:** `open`
 
@@ -515,18 +742,18 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-06 — Docker and docker-compose local dev
 
 **Dimension:** Developer Experience
-**Current state:** Local dev requires manually managing Node version, env vars, and no PostgreSQL setup path. New contributors cannot get a running environment in under 10 minutes.
+**Current state:** Local dev requires manual Node version management and no Postgres setup path.
 **Effort:** M · **Risk:** low
 
 **Implementation steps:**
-1. Create `Dockerfile` — `node:20-alpine`, non-root user, `COPY package*.json`, `npm ci --omit=dev`, `COPY backend/ backend/`, `CMD ["node", "backend/src/server.js"]`.
-2. Create `docker-compose.yml` — services: `api` (built from Dockerfile), `postgres` (postgres:16-alpine), `redis` (redis:7-alpine). Wires `DATABASE_URL` and `REDIS_URL` automatically.
-3. Create `docker-compose.test.yml` — postgres only, for integration tests.
-4. Add `.dockerignore` — exclude `node_modules`, `.env`, `design/`, `ui/`, `app/`, `docs/`.
-5. Update README with a quickstart: `git clone → cp .env.example .env → docker-compose up → open /health`.
-6. Add `.nvmrc` with `20` and `"engines": { "node": ">=20" }` in `package.json`.
+1. `Dockerfile` — `node:20-alpine`, non-root user, `npm ci --omit=dev`.
+2. `docker-compose.yml` — api + postgres:16-alpine + redis:7-alpine, wired automatically.
+3. `docker-compose.test.yml` — postgres only, for integration tests.
+4. `.dockerignore` — exclude `node_modules`, `.env`, `design/`, `ui/`, `app/`, `docs/`.
+5. README quickstart: `git clone → cp .env.example .env → docker-compose up`.
+6. Add `.nvmrc` with `20`; add `"engines": { "node": ">=20" }` to `package.json`.
 
-**Definition of done:** `docker-compose up` produces a running API on port 10000 connected to a local Postgres and Redis with no manual steps.
+**Definition of done:** `docker-compose up` produces a running API with no manual steps.
 
 **Status:** `open`
 
@@ -535,37 +762,35 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-07 — Pre-commit hooks via Husky
 
 **Dimension:** Developer Experience · Code Quality
-**Current state:** `npm run ci` is a pre-push convention documented in CONTRIBUTING.md only. Nothing enforces it. Contributors can push without running CI.
+**Current state:** `npm run ci` is a convention documented in CONTRIBUTING.md only. Nothing enforces it.
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
 1. `npm install --save-dev husky`.
-2. `npx husky init` — creates `.husky/` directory.
-3. `.husky/pre-commit` — runs `npm run lint` (fast; catches ESLint errors before commit).
-4. `.husky/pre-push` — runs `npm run ci` (full suite including tests).
-5. Add `"prepare": "husky"` to `package.json` scripts so `npm install` auto-installs hooks.
-6. Update CONTRIBUTING.md to note hooks are automatic.
+2. `npx husky init`.
+3. `.husky/pre-commit` — runs `npm run lint && npm run check:secrets`.
+4. `.husky/pre-push` — runs `npm run ci`.
+5. Add `"prepare": "husky"` to `package.json` scripts.
 
-**Definition of done:** A commit with an ESLint error is blocked; a push with a failing test is blocked.
+**Definition of done:** ESLint error blocks commit; failing test blocks push.
 
 **Status:** `open`
 
 ---
 
-### T3-08 — Staging environment
+### T3-08 — Staging environment with smoke tests
 
 **Dimension:** DevOps / Observability
-**Current state:** Every push to `main` deploys directly to the production Render service. No verification before live traffic.
-**Effort:** M · **Risk:** low
+**Current state:** Every push to `main` deploys directly to production with no verification gate.
+**Effort:** M · **Risk:** low · **Depends on:** T2-11 (GitHub Actions)
 
 **Implementation steps:**
-1. Create a second Render service `neural-rank-backend-staging` on the same free account (Render allows multiple free services).
-2. Point it to the `staging` branch (`autoDeploy: true` on `staging`).
-3. Add a GitHub Actions workflow `ci.yml`: on PR, run `npm run ci`; on merge to `staging`, trigger Render staging deploy; add a smoke test step: `curl /health` must return 200.
-4. Promote `staging → main` manually when staging smoke tests pass.
-5. Update CONTRIBUTING.md: PRs target `staging`; `main` is production-only.
+1. Create Render service `neural-rank-backend-staging` — `autoDeploy: true` on `staging` branch.
+2. Expand `.github/workflows/ci.yml` (from T2-11): on merge to `staging`, add a smoke test step — `curl /v1/health` must return 200.
+3. PRs target `staging`; `main` is production-only.
+4. Update CONTRIBUTING.md with the new branch flow.
 
-**Definition of done:** Every PR runs CI and deploys to staging before any code touches production.
+**Definition of done:** Every PR deploys to staging; smoke test must pass before production promotion.
 
 **Status:** `open`
 
@@ -574,16 +799,16 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-09 — Connection pooling and pool health monitoring
 
 **Dimension:** Data Layer · Scalability
-**Current state:** When DB is wired (T1-01), a single `pg.Pool` is used but not tuned. Supabase free tier allows ≤60 connections total. No pool health metrics.
-**Effort:** S · **Risk:** low
+**Current state:** When DB is wired (T1-01), pool is not tuned. No pool health metrics.
+**Effort:** S · **Risk:** low · **Depends on:** T1-01
 
 **Implementation steps:**
-1. Configure `pg.Pool` with: `max: 5`, `idleTimeoutMillis: 30000`, `connectionTimeoutMillis: 5000`.
-2. Add pool event listeners: `pool.on('error', ...)` — log structured JSON; `pool.on('connect', ...)` — increment a metric counter.
-3. Expose pool stats (`totalCount`, `idleCount`, `waitingCount`) in `/v1/health` response.
-4. Add a pool exhaustion test: spin up 6 concurrent requests requiring DB; assert the 6th waits (does not throw) and resolves within timeout.
+1. Configure `pg.Pool`: `max: 5`, `idleTimeoutMillis: 30000`, `connectionTimeoutMillis: 5000`.
+2. Add pool event listeners — log structured JSON on error; increment metric counter on connect.
+3. Expose pool stats in `/v1/health` response.
+4. Add pool exhaustion test: 6 concurrent DB requests do not throw; 6th resolves within timeout.
 
-**Definition of done:** Pool stats visible in `/v1/health`; 6 concurrent DB requests do not cause connection errors.
+**Definition of done:** Pool stats visible in `/v1/health`; 6 concurrent DB requests handled without errors.
 
 **Status:** `open`
 
@@ -592,17 +817,16 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-10 — Module scaffolding code generator
 
 **Dimension:** Developer Experience
-**Current state:** Adding a new module requires manually creating 5 files (service/analysis/insights/actions/repository) following the exact contract. Easy to miss a file or diverge from the pattern.
+**Current state:** Adding a new module requires manually creating 5 files. Easy to miss a file or diverge from the contract.
 **Effort:** M · **Risk:** low
 
 **Implementation steps:**
-1. Create `scripts/scaffold-module.js <moduleKey> <displayName>` — generates all 5 files from templates with correct exports, imports, and placeholder logic.
-2. Registers the module in `core/moduleCatalog.js` automatically.
-3. Generates a `service.test.js` with the three required test cases (happy path, adapter fallback, persistence path) stubbed out.
-4. Prints a checklist of manual steps remaining (implement analysis logic, write migration if needed).
-5. Add `npm run scaffold -- <moduleKey> <displayName>` to `package.json` scripts.
+1. Create `scripts/scaffold-module.js <moduleKey> <displayName>` — generates all 5 contract files from templates plus `service.test.js` with 3 stubbed tests.
+2. Auto-registers module in `core/moduleCatalog.js`.
+3. Prints checklist of manual steps remaining.
+4. Add `npm run scaffold -- <moduleKey> <displayName>` to `package.json`.
 
-**Definition of done:** `npm run scaffold -- local_seo_v2 "Local SEO v2"` produces 6 files that pass `npm run ci` immediately (stubbed but structurally valid).
+**Definition of done:** `npm run scaffold -- local_seo_v2 "Local SEO v2"` produces 6 files that pass `npm run ci` immediately.
 
 **Status:** `open`
 
@@ -611,15 +835,15 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-11 — ETag and conditional request support
 
 **Dimension:** API Design · Scalability
-**Current state:** No `ETag` or `Last-Modified` headers. Clients must re-fetch full lists even when nothing has changed. Wastes bandwidth and compute.
+**Current state:** No `ETag` or `Last-Modified`. Clients must re-fetch full lists even when nothing changed.
 **Effort:** M · **Risk:** low
 
 **Implementation steps:**
-1. For list endpoints, compute `ETag` as `sha256(JSON.stringify(sortedIds + latestUpdatedAt))`.
+1. Compute `ETag` as `sha256(JSON.stringify(sortedIds + latestUpdatedAt))` for list endpoints.
 2. Add `ETag` header to all list responses.
-3. In request handler, check `If-None-Match` header: if it matches, return 304 with no body.
-4. Add `Cache-Control: private, max-age=0, must-revalidate` to list endpoints.
-5. Add tests: first GET returns 200 + ETag; second GET with `If-None-Match` returns 304; after creating a new item, the ETag changes.
+3. Check `If-None-Match` header — return 304 if matched.
+4. Add `Cache-Control: private, max-age=0, must-revalidate`.
+5. Add tests: 304 on unchanged list; ETag changes after new item created.
 
 **Definition of done:** Clients receive 304 on unchanged lists; ETag changes when list changes.
 
@@ -630,19 +854,160 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 ### T3-12 — Flutter ApiRepository implementation
 
 **Dimension:** Scalability · Developer Experience
-**Current state:** `app/` uses `MockRepository` — no real API calls are made. The production app cannot communicate with the 24-route backend. Play Store blocked until this is resolved (P0-4/P0-5).
+**Current state:** `app/` uses `MockRepository`. The production app cannot communicate with the backend. Play Store blocked.
 **Effort:** XL · **Risk:** high
 
 **Implementation steps:**
-1. Add `dio` and `flutter_secure_storage` to `app/pubspec.yaml`.
-2. Create `app/lib/data/api/neural_rank_client.dart` — Dio client configured with base URL from `--dart-define=API_BASE_URL`, Bearer token injection interceptor, retry on 5xx (3 attempts, exponential backoff), request timeout 30s.
-3. Create `app/lib/data/repositories/api_repository.dart` — implements the same abstract `Repository` interface as `MockRepository`; calls all 24 backend routes.
-4. Wire `ApiRepository` as default in `main.dart` via `kDebugMode` flag: debug = Mock, release = Api.
-5. Implement Supabase auth flow in Flutter: `supabase_flutter` package, sign-in screen, store session token in `flutter_secure_storage`, inject into Dio interceptor.
-6. Add API error handling in BLoC layer: map `{ ok: false, error: { code, message } }` to typed `Failure` states.
-7. Test on a real device against the Render staging endpoint before Play Store submission.
+1. Add `dio`, `flutter_secure_storage` to `app/pubspec.yaml`.
+2. Create `neural_rank_client.dart` — Dio client with Bearer token interceptor, retry on 5xx, 30s timeout.
+3. Create `api_repository.dart` implementing the abstract `Repository` interface.
+4. Wire via `kDebugMode`: debug = Mock, release = Api.
+5. Implement Supabase auth flow in Flutter (`supabase_flutter`, sign-in screen, secure storage).
+6. Map `{ ok: false, error }` to typed `Failure` states in BLoC layer.
 
-**Definition of done:** Release build of `app/` communicates with `neural-rank-backend.onrender.com`; MockRepository retained for debug/test builds only.
+**Definition of done:** Release build communicates with Render backend; MockRepository retained for debug/test.
+
+**Status:** `open`
+
+---
+
+### T3-13 — Router refactoring — map-based dispatcher
+
+**Dimension:** Architecture · Code Quality
+**Current state:** `server.js` has a 700+ line if/else routing block. Each new route adds 5–10 lines to an already unwieldy file. At enterprise scale this becomes unmaintainable and hard to code-review.
+**Files:** `backend/src/server.js`
+**Effort:** M · **Risk:** medium
+
+**Implementation steps:**
+1. Define a route map: `const ROUTE_MAP = { "GET /health": handleHealth, "POST /v1/run/default": handleDefaultRun, ... }`.
+2. Write a `dispatch(method, pathname, routeMap)` function: tries exact match first, then pattern match (regex keys for parameterised routes).
+3. Replace the if/else routing block in `createRequestHandler` with a single `dispatch(method, pathname, ROUTE_MAP)` call.
+4. All handler functions remain unchanged — only the dispatch mechanism changes.
+5. Routing block shrinks from ~200 lines to ~30 lines.
+
+**Definition of done:** `createRequestHandler` body is under 50 lines; all 24 routes still pass their tests.
+
+**Status:** `open`
+
+---
+
+### T3-14 — Composable middleware stack
+
+**Dimension:** Architecture · Code Quality
+**Current state:** Auth resolution, rate limiting, body parsing, and identity checks are manually inlined in every handler function. Adding a new cross-cutting concern (e.g., request logging, tracing) requires touching every handler.
+**Files:** `backend/src/server.js`, new `backend/src/api/middleware.js`
+**Effort:** L · **Risk:** medium
+
+**Implementation steps:**
+1. Define `compose(...middlewares)` — returns a function `(request, response, context) => Promise<context>`. Each middleware receives and returns a context object.
+2. Built-in middlewares: `withCorrelationId`, `withIdentity`, `withRateLimit`, `withBody`.
+3. Each handler function receives a pre-built context with `{ identity, body, rateLimitInfo, correlationId }` — no inline parsing.
+4. Route-level middleware selection: public routes skip `withIdentity`; mutation routes include it.
+5. This is the prerequisite for T3-15 (DI pattern) since context becomes the DI container.
+
+**Definition of done:** Adding a new cross-cutting concern (e.g., a new header) requires changing one middleware, not every handler.
+
+**Status:** `open`
+
+---
+
+### T3-15 — Domain service dependency injection
+
+**Dimension:** Architecture · Testing / QC
+**Current state:** Domain services (`measurementService`, `technicalOperationsService`, etc.) are created at module `require()` time as module-level singletons. This makes test isolation fragile and prevents different service configurations per request.
+**Files:** `backend/src/server.js`, all domain service files
+**Effort:** L · **Risk:** medium
+
+**Implementation steps:**
+1. Remove module-level singleton instantiations from `server.js`.
+2. Create `backend/src/container.js` — a factory that builds all domain services and returns them. Called once in `startServer()`.
+3. Pass the service container into `createRequestHandler(container)` instead of `createRequestHandler(baseContext)`.
+4. Handlers receive services from the container rather than importing singletons.
+5. Tests pass a mock container — no global state to reset between tests.
+
+**Definition of done:** `resetExecutionServiceState()` calls are no longer needed in tests; each test creates a fresh container.
+
+**Status:** `open`
+
+---
+
+### T3-16 — Load and performance tests
+
+**Dimension:** Testing / QC · Scalability
+**Current state:** No p99 latency benchmarks. Unknown what `/run/default` costs at p99, or at what concurrency the system degrades.
+**Files:** New `scripts/load-test.js` or `k6` script
+**Effort:** M · **Risk:** low
+
+**Implementation steps:**
+1. Write a `k6` load test script: ramp from 1 to 50 virtual users over 2 minutes; measure p50, p95, p99 latency for `/v1/health`, `/v1/run/default`, and `/v1/execution/recommendations`.
+2. Define pass thresholds: p99 < 2000ms for `/v1/health`; p99 < 15000ms for `/v1/run/default` (18 modules); error rate < 1%.
+3. Run against the staging environment (T3-08) to avoid affecting production.
+4. Document baseline numbers in `progress.md` and `RUNBOOK.md`.
+5. Re-run after T3-01 (async queue) to measure improvement.
+
+**Definition of done:** Load test script runs and produces a pass/fail against defined thresholds; baseline numbers documented.
+
+**Status:** `open`
+
+---
+
+### T3-17 — Flutter screen consolidation (ui/ → app/)
+
+**Dimension:** Developer Experience · Scalability
+**Current state:** `ui/` contains 12 prototype screens that don't exist in `app/`. T3-12 wires the API client but does not port the screens. The Play Store submission requires a single unified app. P0-4/P0-5 from the gap register.
+**Files:** `app/lib/`, `ui/lib/`
+**Effort:** XL · **Risk:** high · **Depends on:** T3-12
+
+**Implementation steps:**
+1. Audit all 12 `ui/` screens against the 10 `app/` screens — produce a consolidation map (which `ui/` screens are new; which overlap with existing `app/` screens).
+2. Port each new `ui/` screen into `app/` following BLoC architecture (Event/State/Bloc files).
+3. Replace all `MockRepository` data references in ported screens with real `ApiRepository` calls (already wired in T3-12).
+4. Remove `ui/` directory once all screens are consolidated.
+5. Update `README.md` project tree; remove `ui/` entry from `.gitignore`.
+6. Test all 22 combined screens on both iOS simulator and Android emulator.
+
+**Definition of done:** `ui/` directory removed; `app/` contains all screens; no `MockRepository` calls in production build.
+
+**Status:** `open`
+
+---
+
+### T3-18 — Automated DB migration CI check
+
+**Dimension:** Data Layer · DevOps
+**Current state:** Migrations are applied manually via Supabase dashboard. A missed migration causes silent schema drift between what the code expects and what the DB contains. No CI step verifies they are in sync.
+**Files:** `scripts/check-migrations.js`, `package.json`, CI workflow
+**Effort:** M · **Risk:** low · **Depends on:** T2-05 (integration test infra / docker-compose)
+
+**Implementation steps:**
+1. Write `scripts/check-migrations.js` — connects to the test Postgres instance (from T2-05 docker-compose), applies all migrations in `supabase/migrations/`, queries `information_schema.tables` for expected table names, and asserts all 33 tables are present.
+2. Add `npm run check:migrations` script.
+3. Wire into `npm run test:integration`.
+4. Document migration application process in `RUNBOOK.md` (T2-10) for production.
+
+**Definition of done:** Missing a migration file causes `npm run test:integration` to fail with a clear error.
+
+**Status:** `open`
+
+---
+
+### T3-19 — SLO definition and error budget
+
+**Dimension:** DevOps / Observability · Architecture
+**Current state:** No defined Service Level Objectives. "Is the service healthy?" has no quantified answer.
+**Files:** New `docs/backend/reference/SLO.md`
+**Effort:** M · **Risk:** low · **Depends on:** T3-03 (metrics), T3-08 (staging), T2-17 (UptimeRobot)
+
+**Implementation steps:**
+1. Define SLOs:
+   - Availability: 99.5% uptime/month (allows ~3.6 hrs downtime; achievable on Render free tier)
+   - Latency: p99 `/v1/health` < 500ms; p99 `/v1/run/default` < 20s (18 modules, external adapters)
+   - Error rate: < 0.5% 5xx per rolling 24hr window
+2. Write `SLO.md` documenting each SLO, its measurement method, and the consequences of breach.
+3. Configure Grafana alerts (from T3-03) to fire when error budget is 50% consumed in a given window.
+4. Review and tighten SLOs after 30 days of production data.
+
+**Definition of done:** `SLO.md` committed; Grafana alerts configured for each SLO breach threshold.
 
 **Status:** `open`
 
@@ -654,15 +1019,19 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 |---|---|---|---|---|
 | T1-01 | Wire PostgreSQL at startup | 1 | `open` | M |
 | T1-02 | Fix prototype pollution | 1 | `open` | S |
-| T1-03 | Workspace isolation | 1 | `open` | L |
+| T1-03 | Workspace isolation + RLS audit | 1 | `open` | L |
 | T1-04 | CORS headers | 1 | `open` | S |
 | T1-05 | Security response headers | 1 | `open` | S |
 | T1-06 | Request access log | 1 | `open` | S |
 | T1-07 | Fix rate limit doc discrepancy | 1 | `open` | S |
 | T1-08 | Real /health checks | 1 | `open` | S |
+| T1-09 | Auth bypass hardening (SUPABASE_URL unset) | 1 | `open` | S |
+| T1-10 | X-Forwarded-For IP spoofing fix | 1 | `open` | S |
+| T1-11 | Secrets scanning in CI | 1 | `open` | S |
+| T1-12 | README HTTPS discrepancy | 1 | `open` | S |
 | T2-01 | Correlation IDs | 2 | `open` | S |
 | T2-02 | API versioning /v1/ | 2 | `open` | M |
-| T2-03 | Pagination on list endpoints | 2 | `open` | L |
+| T2-03 | Pagination + filtering + sorting | 2 | `open` | L |
 | T2-04 | Transaction wrapper | 2 | `open` | M |
 | T2-05 | Real DB integration tests | 2 | `open` | L |
 | T2-06 | OpenAPI specification | 2 | `open` | L |
@@ -670,6 +1039,14 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | T2-08 | Input string length limits | 2 | `open` | S |
 | T2-09 | Architecture decision records | 2 | `open` | M |
 | T2-10 | Operational runbook | 2 | `open` | M |
+| T2-11 | GitHub Actions CI workflow | 2 | `open` | S |
+| T2-12 | Per-module execution timeout | 2 | `open` | M |
+| T2-13 | Dependabot configuration | 2 | `open` | S |
+| T2-14 | normalizeError registry refactor | 2 | `open` | S |
+| T2-15 | Negative-path test suite | 2 | `open` | M |
+| T2-16 | Sentry error tracking | 2 | `open` | S |
+| T2-17 | UptimeRobot monitor (owner action) | 2 | `open` | S |
+| T2-18 | Module run input validation | 2 | `open` | M |
 | T3-01 | Async module execution + queue | 3 | `open` | XL |
 | T3-02 | OpenTelemetry tracing | 3 | `open` | L |
 | T3-03 | Prometheus metrics endpoint | 3 | `open` | L |
@@ -677,13 +1054,20 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | T3-05 | Response caching | 3 | `open` | L |
 | T3-06 | Docker + docker-compose | 3 | `open` | M |
 | T3-07 | Pre-commit hooks (Husky) | 3 | `open` | S |
-| T3-08 | Staging environment | 3 | `open` | M |
+| T3-08 | Staging environment + smoke tests | 3 | `open` | M |
 | T3-09 | Connection pool tuning | 3 | `open` | S |
 | T3-10 | Module scaffolding generator | 3 | `open` | M |
 | T3-11 | ETag / conditional requests | 3 | `open` | M |
 | T3-12 | Flutter ApiRepository | 3 | `open` | XL |
+| T3-13 | Router refactoring (map-based dispatcher) | 3 | `open` | M |
+| T3-14 | Composable middleware stack | 3 | `open` | L |
+| T3-15 | Domain service DI pattern | 3 | `open` | L |
+| T3-16 | Load and performance tests | 3 | `open` | M |
+| T3-17 | Flutter screen consolidation (ui/ → app/) | 3 | `open` | XL |
+| T3-18 | Automated DB migration CI check | 3 | `open` | M |
+| T3-19 | SLO definition and error budget | 3 | `open` | M |
 
-**Total: 30 items** — 8 × Tier 1 · 10 × Tier 2 · 12 × Tier 3
+**Total: 49 items** — 12 × Tier 1 · 18 × Tier 2 · 19 × Tier 3
 
 ---
 
@@ -692,17 +1076,22 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | After | Code | Arch | API | Docs | DX | QC | Security | Data | DevOps | Scale | Overall |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | Current | 88 | 82 | 83 | 90 | 80 | 78 | 72 | 70 | 65 | 55 | **76** |
-| Tier 1 done | 91 | 82 | 87 | 92 | 80 | 78 | 90 | 82 | 78 | 62 | **82** |
-| Tier 2 done | 93 | 90 | 95 | 98 | 85 | 92 | 90 | 90 | 85 | 70 | **91** |
-| Tier 3 done | 98 | 98 | 98 | 98 | 98 | 98 | 98 | 98 | 98 | 96 | **98** |
+| Tier 1 done | 91 | 83 | 88 | 93 | 80 | 78 | 95 | 83 | 80 | 63 | **85** |
+| Tier 2 done | 94 | 91 | 96 | 99 | 87 | 94 | 95 | 91 | 90 | 73 | **92** |
+| Tier 3 done | 99 | 99 | 99 | 99 | 99 | 99 | 99 | 99 | 99 | 97 | **98** |
+
+**On the 98 vs 100 ceiling:** The final ~2 points require actions that are external to code:
+a formal penetration test (converts "we believe it is secure" to "it has been externally verified"),
+a compliance audit (SOC 2 Type II or equivalent), and sustained operational track record
+(SLO met over 90 days). These cannot be committed as code. 98/100 is the realistic code-achievable ceiling.
 
 ---
 
 ## How to use this document
 
-1. Pick the next open item from Tier 1 (work top-to-bottom within each tier).
+1. Pick the next open item from Tier 1 (top-to-bottom within each tier).
 2. Set status to `in_progress` when work begins.
-3. When the item is resolved: set status to `resolved`, add the commit SHA and date.
+3. When resolved: set status to `resolved`, add the commit SHA and date.
 4. Update `PRODUCTION_READINESS_GAPS.md` if the item maps to a P0/P1/P2 gap.
-5. Add a `CHANGELOG.md` entry when a tier is fully complete.
-6. When all Tier 1 items are resolved, regrade the Security, Data, and DevOps dimensions.
+5. Add a `CHANGELOG.md` entry when a full tier is complete.
+6. When all Tier 1 items are resolved, regrade Security, Data, and DevOps dimensions.

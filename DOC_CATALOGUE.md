@@ -27,7 +27,7 @@ Future audits: scan this file first. If a doc's status or description is wrong, 
 | [CHANGELOG.md](CHANGELOG.md) | `LOG` | All notable changes — keepachangelog.com format; append on every significant milestone |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | `LIVE` | Branch naming, commit style, pre-push checklist, doc update rules, backend module contract |
 | [SECURITY.md](SECURITY.md) | `LIVE` | Responsible disclosure policy — contact, scope, SLA; in-scope: backend API, auth, schema, governance |
-| [REBUILD_PLAN.md](REBUILD_PLAN.md) | `LIVE` | Enterprise rebuild plan — 30-item gap register across Tier 1 (blockers), Tier 2 (adoption), Tier 3 (elite); current grade B- (76/100), target A+ (100/100) |
+| [REBUILD_PLAN.md](REBUILD_PLAN.md) | `LIVE` | Enterprise rebuild plan — 49-item gap register across Tier 1 (blockers), Tier 2 (adoption), Tier 3 (elite); current grade B- (76/100), target A+ (98/100) |
 
 ---
 
