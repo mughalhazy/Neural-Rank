@@ -1,7 +1,8 @@
 # Neural Rank — Enterprise Rebuild Plan
 
-Working document for closing every gap identified in the 2026-05-18 enterprise grading audit
-and the 2026-05-18 reaudit that found 21 additional gaps in the original plan.
+Working document for closing every gap identified in the 2026-05-18 enterprise grading audit,
+the 2026-05-18 reaudit that found 21 additional gaps, and the 2026-05-18 DOC_CATALOGUE anchor
+audit that found 10 additional gaps (bringing total from 61 to 71 items).
 
 Current overall grade: **B- (76/100)**
 Target: **A+ (≥98/100)** — final 2 points require external validation (pen test, compliance audit) beyond code scope.
@@ -348,6 +349,54 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 4. Add a specific test: a governance result with `overallClassification === "block"` must have `requiresApproval === false` and `isBlocked === true`.
 
 **Definition of done:** `resultModel` sets `requiresApproval: false` for "block" classifications; test confirms the fix.
+
+**Status:** `open`
+
+---
+
+### T1-17 — Add pre-persist governance block gate in createRecommendation
+
+**Dimension:** Security · Architecture
+**Current state:** `domains/execution/service.js` evaluates governance via `evaluateActionGovernance(input)` but then immediately builds and persists the recommendation record regardless of the result. A `block`-classified action is stored in the database and only rejected later when `assertGovernanceAllowsApproval()` fires at approval time. This pollutes the audit trail with dangerous actions (keyword stuffing, hidden text, deindexing) and means the DB contains records that should never have been created. This is distinct from T1-16 (which fixes the resultModel field); this fixes the missing pre-persist gate in `execution/service.js`.
+**Files:** `backend/src/domains/execution/service.js`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. In `createRecommendation()`, immediately after `evaluateActionGovernance(input)`, add:
+   ```js
+   if (governanceResult.overallClassification === "block") {
+     throw new Error(`governance_blocks_${input.actionType || "action"}`);
+   }
+   ```
+2. This throws before `createRecommendationRecord()` and `repository.createRecommendation()` are called — the blocked action is never persisted.
+3. Ensure `normalizeError` maps `governance_blocks_` prefix to 409 (it already does via pattern match; confirm in T2-14 registry refactor).
+4. Add test: calling `createRecommendation` with an input that triggers a block classification throws before any repository call; the repository's `createRecommendation` is never invoked.
+
+**Definition of done:** `createRecommendation()` throws `governance_blocks_*` before any DB write when `overallClassification === "block"`; no blocked recommendation row is ever created.
+
+**Status:** `open`
+
+---
+
+### T1-18 — Auth enforcement on all domain POST endpoints
+
+**Dimension:** Security
+**Current state:** Six POST mutation endpoints bypass identity enforcement entirely — no `requireIdentity()` call exists in their handlers. Any unauthenticated caller can create measurement snapshots, attribution links, technical audit records, business intelligence profiles, and fire search intelligence analysis. This is a wider version of P1-6 from `PRODUCTION_READINESS_GAPS.md`, which only identified the two measurement endpoints; code inspection confirms four additional handlers are also unprotected:
+- `POST /measurement/snapshots` (`handleMeasurementSnapshots`)
+- `POST /measurement/attributions` (`handleMeasurementAttributions`)
+- `POST /technical-operations/audit` (`handleTechnicalOperationsAudit`)
+- `POST /search-intelligence/classify` (`handleSearchIntelligenceClassify`)
+- `POST /search-intelligence/analyze` (`handleSearchIntelligenceAnalyze`)
+- `POST /business-intelligence/profiles` (`handleBusinessIntelligenceProfiles`)
+**Files:** `backend/src/server.js`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Add `requireIdentity(identity)` as the first line in each of the six handler functions listed above (after the method check and rate limit check).
+2. Pass `identity` into each handler from `createRequestHandler` — it is already resolved at the top of the request handler loop; confirm it is threaded to each handler call site.
+3. Add tests: calling each POST endpoint without a valid identity returns 401; with a valid identity proceeds normally.
+
+**Definition of done:** All 6 domain POST endpoints return 401 for unauthenticated callers; authenticated callers proceed normally; test coverage confirms both paths.
 
 **Status:** `open`
 
@@ -805,6 +854,82 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 4. Add a comment: the suite count is dynamic — add new suites to the array; the assertion auto-adjusts.
 
 **Definition of done:** Adding a new test suite to `TEST_SUITES` does not require changing any assertion; the suite still catches accidental deletions from the array.
+
+**Status:** `open`
+
+---
+
+### T2-23 — SERP provider configuration (owner action)
+
+**Dimension:** API Design · Scalability
+**Current state:** The SERP adapter (`integrations/adapters/serp-provider.js`) is fully implemented for both SerpApi and DataForSEO but returns `integration_not_connected` for all requests because `SERP_PROVIDER` and `SERP_API_KEY` are not set in Render. `serp_feature_analyzer` and any module relying on SERP data produce empty results for all production runs. This is tracked as P1-1 in `PRODUCTION_READINESS_GAPS.md` but has no REBUILD_PLAN entry.
+**Files:** None (owner action — requires API credentials)
+**Effort:** S · **Risk:** low
+
+**Implementation steps (owner action — cannot be executed programmatically):**
+1. Obtain API credentials from SerpApi (`https://serpapi.com`, free tier: 100 searches/month) or DataForSEO (`https://dataforseo.com`).
+2. In Render dashboard, set env vars: `SERP_PROVIDER=serpapi` (or `dataforseo`) and `SERP_API_KEY=<key>`.
+3. Add both as `sync: false` entries in `render.yaml` (key only, no value — values stay in Render dashboard).
+4. Verify by triggering a `/run/default` request and checking that `serp_feature_analyzer` returns real SERP data rather than `integration_not_connected`.
+
+**Definition of done:** `serp_feature_analyzer` module returns live SERP data; `integration_not_connected` no longer appears in default run results.
+
+**Status:** `open`
+
+---
+
+### T2-24 — Renderer endpoint configuration (owner action)
+
+**Dimension:** Architecture · Scalability
+**Current state:** `domains/technical-operations/service.js` calls `buildRenderedDomPlaceholder()` for all rendered DOM analysis because `RENDERER_ENDPOINT` is not configured. Core Web Vitals, JS-rendered content analysis, and rendering error detection are permanently skipped. This is tracked as P1-2 in `PRODUCTION_READINESS_GAPS.md` but has no REBUILD_PLAN entry.
+**Files:** None (owner action — requires a headless browser service)
+**Effort:** M · **Risk:** low
+
+**Implementation steps (owner action):**
+1. Deploy a headless Playwright or Puppeteer renderer:
+   - Option A: Second Render free-tier service using `browserless/chrome` Docker image (free tier: limited hours/month).
+   - Option B: Managed headless browser API (Browserless.io free tier: 6 hours/month).
+2. Set `RENDERER_ENDPOINT=https://<your-renderer-service-url>` in Render dashboard as a `sync: false` env var.
+3. Add `RENDERER_ENDPOINT` as a `sync: false` entry in `render.yaml`.
+4. Test: trigger a `POST /technical-operations/audit` with a real URL; verify the response no longer contains `renderer_not_configured`.
+
+**Definition of done:** `POST /technical-operations/audit` returns rendered DOM analysis data; `renderer_not_configured` no longer appears.
+
+**Status:** `open`
+
+---
+
+### T2-25 — Supabase database keep-alive
+
+**Dimension:** DevOps / Observability
+**Current state:** Supabase free tier pauses the database after 7 days of no activity. T2-17 (UptimeRobot) pings the Render HTTP service every 5 minutes, keeping Render alive, but does NOT prevent Supabase from pausing. When the DB pauses, every request that requires persistence fails with a DB connection error until the DB is manually resumed. No scheduled DB activity exists to prevent this.
+**Files:** `backend/src/server.js` or a scheduled script
+**Effort:** S · **Risk:** low · **Depends on:** T1-01 (DB connection), T2-17 (UptimeRobot alive)
+
+**Implementation steps:**
+1. Add a `GET /health` enhancement (see T1-08): the existing DB probe (`SELECT 1`) runs on every health check. Since UptimeRobot (T2-17) pings `/health` every 5 minutes, the DB is queried automatically and will not hit the 7-day inactivity threshold as long as UptimeRobot is active.
+2. Verify: confirm that T1-08 (health probe runs `SELECT 1`) + T2-17 (UptimeRobot pings `/health` every 5 min) together prevent the Supabase pause. Document this relationship in `RUNBOOK.md` (T2-10) — the keep-alive is a side effect of the health probe, not a dedicated scheduled job.
+3. Add a note to `README.md`: "Supabase database keep-alive is maintained by UptimeRobot health pings — do not disable the monitor."
+
+**Definition of done:** Supabase DB has not paused after 14 days of UptimeRobot active; documented in RUNBOOK.
+
+**Status:** `open`
+
+---
+
+### T2-26 — Module catalog integrity reverse check
+
+**Dimension:** Architecture · Code Quality
+**Current state:** `assertModuleCatalogIntegrity()` in `core/activation.js` verifies that every module in `DEFAULT_ACTIVE_MODULES` and `BUILT_BUT_INACTIVE_MODULES` is present in `moduleCatalog.js`. However, the reverse check is missing: a module added to `serviceRegistry.js` but forgotten from both activation sets would silently bypass the integrity check and run as neither active nor inactive — an orphan. This is P2-5 in `PRODUCTION_READINESS_GAPS.md`.
+**Files:** `backend/src/core/activation.js`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. In `assertModuleCatalogIntegrity()`, add a reverse check: for every module key registered in `serviceRegistry.js` (import `getRegisteredModuleKeys()` from `serviceRegistry.js`), assert it appears in either `DEFAULT_ACTIVE_MODULES` or `BUILT_BUT_INACTIVE_MODULES`.
+2. If any registered key is missing from both sets, throw with a clear message: `"Module '<key>' is registered in serviceRegistry but absent from both DEFAULT_ACTIVE_MODULES and BUILT_BUT_INACTIVE_MODULES — add it to one."`.
+3. Add test: temporarily adding a module key to `serviceRegistry` without adding it to either activation set causes `assertModuleCatalogIntegrity()` to throw.
+
+**Definition of done:** `assertModuleCatalogIntegrity()` throws on a serviceRegistry key absent from both activation sets; test confirms the forward and reverse checks both work.
 
 **Status:** `open`
 
@@ -1273,6 +1398,88 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 ---
 
+### T3-24 — Wire real provider integrations for 13 stub adapters
+
+**Dimension:** Architecture · Scalability
+**Current state:** Only 5 of 18 module adapters are implemented: GSC, GA4, PageSpeed, backlink-provider, serp-provider. The remaining 13 modules run with `integration_incomplete` status and produce insights from synthetic or empty inputs. Users receive fabricated SEO analysis rather than signal-driven results. This is P1-3 in `PRODUCTION_READINESS_GAPS.md` — the highest-impact missing capability in the product.
+**Files:** `backend/src/integrations/adapters/`, per-module `service.js` files
+**Effort:** XL · **Risk:** high
+
+**Implementation steps:**
+1. Prioritise by signal value: (1) `keyword_analysis` → GSC keyword data; (2) `rank_tracking` → GSC position data; (3) `competitor_analysis` → needs a competitor intelligence provider (SEMrush, Ahrefs API); (4) `on_page_seo_scorer` → PageSpeed already wired; (5) `eeat_signals` → heuristic, no provider needed; (6) `topical_authority` → GSC + crawl data; (7) `site_architecture` → crawl data; (8) `analytics_integration` → GSC + GA4 both wired, wire into module.
+2. For each module: create an adapter file in `integrations/adapters/`, wire it into the module's `service.js` via `createProviderAdapter`, update `integrations/catalog.js` to set `isImplemented: true`.
+3. Each new adapter must handle the `integration_not_connected` fallback path identically to the existing 5 adapters.
+4. Update `BACKEND_INTEGRATION_BOUNDARIES.md` as each adapter is implemented.
+5. Note: `creative_messaging_layer`, `unified_workflow_layer`, `optimization_layer`, and `content_listing_insights` are synthesis modules — they can derive from other modules' outputs without external providers.
+
+**Definition of done:** All 18 modules return signal-driven results; `integration_incomplete` no longer appears in any module run on a fully-configured instance.
+
+**Status:** `open`
+
+---
+
+### T3-25 — Flutter Insight model — add missing mandatory fields
+
+**Dimension:** Developer Experience · Architecture
+**Current state:** `app/lib/data/models/insight.dart` is missing `evidence[]`, `explanation`, and `nextStep` fields that `FRONTEND_CONTENT_FULL_SYSTEM.md` mandates for every insight. The full `INPUT → ANALYSIS → INSIGHT → PRIORITY → ACTION` chain cannot be rendered in the production app without these fields — evidence chips, action buttons, and next-step links are not possible. This is P1-14 in `PRODUCTION_READINESS_GAPS.md`.
+**Files:** `app/lib/data/models/insight.dart`, `app/lib/data/repositories/mock_repository.dart`, relevant screen widgets
+**Effort:** M · **Risk:** low · **Depends on:** T3-12
+
+**Implementation steps:**
+1. Add fields to `Insight` model: `List<String> evidence`, `String explanation`, `String nextStep` — all nullable to avoid breaking existing mock data.
+2. Update `MockRepository` to populate these fields with representative demo data for all insight types.
+3. Update screen widgets to render:
+   - `evidence` → evidence chip row below insight card
+   - `explanation` → expandable detail section
+   - `nextStep` → primary action button linking to recommendation creation
+4. Update `ApiRepository` (T3-12) to deserialize these fields from backend responses when implemented.
+5. Test: verify all 18 module insight types have populated `evidence`, `explanation`, and `nextStep` in the mock data.
+
+**Definition of done:** All insight cards in the app display evidence, explanation, and a next-step action; no insight renders with empty evidence section.
+
+**Status:** `open`
+
+---
+
+### T3-26 — Play Store submission assets
+
+**Dimension:** Developer Experience
+**Current state:** `app/` has no branded app icon (1024×1024 px), no splash screen, and no privacy policy URL — all three are required before Google Play Store submission. Without them, the app cannot be submitted regardless of code quality. This is P2-6 in `PRODUCTION_READINESS_GAPS.md`.
+**Files:** `app/android/app/src/main/res/`, `app/lib/`, new `docs/product/PRIVACY_POLICY.md`
+**Effort:** M · **Risk:** low · **Depends on:** T3-12, T3-20
+
+**Implementation steps:**
+1. Design and export a Neural Rank branded app icon at 1024×1024 px (PNG with transparency) and at all required Android density sizes (mdpi through xxxhdpi).
+2. Add icon to `app/android/app/src/main/res/mipmap-*/` using `flutter_launcher_icons` package.
+3. Add splash screen via `flutter_native_splash` package — use brand primary colour and Neural Rank wordmark.
+4. Write `docs/product/PRIVACY_POLICY.md` — covers: data collected, how it's used, third-party services (Supabase, GSC, GA4), user rights, contact. Host as a public URL before submission.
+5. Register privacy policy URL in Play Console and in `app/android/app/src/main/AndroidManifest.xml` as a metadata entry.
+
+**Definition of done:** App icon appears on device home screen; splash screen shows on launch; privacy policy URL is live and linked in Play Console.
+
+**Status:** `open`
+
+---
+
+### T3-27 — DB backup strategy documentation
+
+**Dimension:** Data Layer · DevOps
+**Current state:** No backup strategy is documented anywhere. Supabase free tier does not include point-in-time recovery (PITR). If the Supabase project is accidentally deleted or corrupted, all execution data, recommendations, tasks, and audit logs are unrecoverable. This is P2-2 in `PRODUCTION_READINESS_GAPS.md`.
+**Files:** `README.md`, `docs/backend/reference/RUNBOOK.md` (T2-10)
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Document in `README.md` (Operations section): Supabase free tier does not include PITR. Manual export procedure: `pg_dump` via Supabase CLI (`supabase db dump -f backup_$(date +%Y%m%d).sql`) — run weekly.
+2. Add to `RUNBOOK.md` (T2-10): "Database backup" scenario — exact `pg_dump` command, expected output size, storage location, restore procedure.
+3. Add a `npm run db:dump` script to `package.json` that runs the Supabase CLI dump command.
+4. Note the upgrade path: Supabase Pro tier ($25/month) enables daily PITR; document this as the production-scale recommendation.
+
+**Definition of done:** `README.md` and `RUNBOOK.md` document the manual backup procedure with exact commands; `npm run db:dump` runs the export.
+
+**Status:** `open`
+
+---
+
 ## Progress tracker
 
 | ID | Item | Tier | Status | Effort |
@@ -1293,6 +1500,8 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | T1-14 | NODE_ENV=production in render.yaml | 1 | `open` | S |
 | T1-15 | verifySupabaseToken network error handling | 1 | `open` | S |
 | T1-16 | Fix governance resultModel classification bug | 1 | `open` | S |
+| T1-17 | Pre-persist governance block gate | 1 | `open` | S |
+| T1-18 | Auth on all 6 domain POST endpoints | 1 | `open` | S |
 | T2-01 | Correlation IDs | 2 | `open` | S |
 | T2-02 | API versioning /v1/ | 2 | `open` | M |
 | T2-03 | Pagination + filtering + sorting | 2 | `open` | L |
@@ -1315,6 +1524,10 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | T2-20 | Shared database utility extraction | 2 | `open` | M |
 | T2-21 | Audit log immutability enforcement | 2 | `open` | M |
 | T2-22 | Fix hardcoded test suite count assertion | 2 | `open` | S |
+| T2-23 | SERP provider configuration (owner action) | 2 | `open` | S |
+| T2-24 | Renderer endpoint configuration (owner action) | 2 | `open` | M |
+| T2-25 | Supabase database keep-alive | 2 | `open` | S |
+| T2-26 | Module catalog integrity reverse check | 2 | `open` | S |
 | T3-01 | Async module execution + queue | 3 | `open` | XL |
 | T3-02 | OpenTelemetry tracing | 3 | `open` | L |
 | T3-03 | Prometheus metrics endpoint | 3 | `open` | L |
@@ -1338,8 +1551,12 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | T3-21 | Volatility analysis implementation | 3 | `open` | L |
 | T3-22 | Flutter error boundary and crash resilience | 3 | `open` | M |
 | T3-23 | Flutter dependency version pinning | 3 | `open` | S |
+| T3-24 | Wire real provider integrations — 13 stub adapters | 3 | `open` | XL |
+| T3-25 | Flutter Insight model — add evidence/explanation/nextStep | 3 | `open` | M |
+| T3-26 | Play Store submission assets | 3 | `open` | M |
+| T3-27 | DB backup strategy documentation | 3 | `open` | S |
 
-**Total: 61 items** — 16 × Tier 1 · 22 × Tier 2 · 23 × Tier 3
+**Total: 71 items** — 18 × Tier 1 · 26 × Tier 2 · 27 × Tier 3
 
 ---
 
