@@ -4,8 +4,10 @@ Working document for closing every gap identified in the 2026-05-18 enterprise g
 the 2026-05-18 reaudit that found 21 additional gaps, the 2026-05-18 DOC_CATALOGUE anchor
 audit that found 10 additional gaps (bringing total from 61 to 71 items), and the
 2026-05-18 full 82-doc deterministic catalogue read that found 5 additional gaps (bringing
-total from 71 to 76 items), and the 2026-05-18 doc-vs-code verification audit that found 2
-additional gaps and corrected 2 existing items (bringing total from 76 to 78 items).
+total from 71 to 76 items), and the 2026-05-18 doc-vs-code verification audit that found 2 additional gaps and corrected
+2 existing items (bringing total from 76 to 78 items), and the 2026-05-18 full
+module-code audit of all 18 analysis.js files that removed 1 false item (T3-30 —
+Phase 2 signals already implemented) bringing total from 78 to 77 items.
 
 Current overall grade: **B- (76/100)**
 Target: **A+ (≥98/100)** — final 2 points require external validation (pen test, compliance audit) beyond code scope.
@@ -1545,33 +1547,18 @@ The SERP (`SERP_PROVIDER`, `SERP_API_KEY`) and renderer (`RENDERER_ENDPOINT`) ad
 
 ---
 
-### T3-30 — Phase 2 module signal enhancements per PRODUCT_SEO_OS_BUILD_PLAN.md
+~~### T3-30 — REMOVED: Phase 2 module signal enhancements already implemented~~
 
-**Dimension:** Architecture · Code Quality
-**Current state:** `docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md` (the authoritative product specification) defines field-level enhancements for 7 modules that are not yet implemented. The backend currently satisfies Phase 1 specs only. These Phase 2 fields are unimplemented and have no REBUILD_PLAN entry:
-1. `keyword-analysis`: `intentSignal`, `trendDirection`, context-aware expansion (replace hardcoded tokens), `serpFeaturePresent`, `opportunityTier`
-2. `competitor-analysis`: `backlinkGap`, `topicalGap`, `serpOverlapScore`, `contentVelocity`, 6-dimension `pressureScore`
-3. `rank-tracking`: `clicks`, `impressions`, `ctr`, `ctrEfficiency`, `positionZeroTracking`, `quickWinFlag`, `rankingUrl`
-4. `optimization-layer`: `readabilityScore`, `semanticRichness`, `keywordDensity`, `freshnessSignal`
-5. `content-listing-insights`: `readabilityTier`, `eeAtContentSignals`, `competitorDepthComparison`, `structuredContentSignals`
-6. `review-analysis`: reviewSource normalization (web reviews), `verifiedBuyerRatio`, review recency buckets, `responseRate`
-7. `unified-workflow-layer`: `moduleWeights` multipliers, `foundationHealthCheck`, `quickWinCluster`
+**Removed after full code audit (2026-05-18):** All 7 module Phase 2 signal enhancements from `PRODUCT_SEO_OS_BUILD_PLAN.md` were already present in module `analysis.js` files at the time this item was added. Code evidence per module:
+- `review-analysis`: `verifiedBuyerRatio`, `responseRate`, `recencyBuckets`, `sourceCounts` — `buildSummary()` lines 233–248
+- `content-listing-insights`: `readabilityTier`, `eeAtSignals`, `hasStructuredContent`, `competitorDepthComparison` — `analyzeWebsiteContent()` lines 168–192
+- `keyword-analysis`: `intentSignal`, `trendDirection`, `opportunityTier`, `serpFeaturePresent` — `buildKeywordSuggestions()` lines 139–157
+- `rank-tracking`: `clicks`, `impressions`, `ctr`, `rankingUrl`, `ctrEfficiency`, `isPositionZero`, `isQuickWin` — `normalizeRankEntry()` + `analyzeRankInput()`
+- `optimization-layer`: `readabilityLevel`, `semanticRichness`, `keywordDensity`, `freshnessSignal` — `scoreSection()` lines 81–114
+- `competitor-analysis`: 6-dimension `pressureScore`, `topicalGap`, `serpOverlapScore`, `contentVelocity` — `identifyGaps()` lines 83–133
+- `unified-workflow-layer`: `MODULE_WEIGHTS`, `detectFoundationIssue()`, `buildQuickWinCluster()` — lines 9, 146, 165
 
-**Files:** Per-module `analysis.js`, `insights.js`, `actions.js`, `service.js` (7 modules); `docs/backend/reference/BACKEND_MASTER_SPEC.md`; `docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md`
-**Effort:** XL · **Risk:** medium · **Depends on:** T3-24 (provider adapters for provider-dependent fields), T3-28 (adapter env vars)
-
-**Implementation steps:**
-1. Implement provider-independent enhancements first: `optimization-layer`, `content-listing-insights`, `unified-workflow-layer`, `review-analysis`.
-2. Implement `keyword-analysis`: `intentSignal` derives from `core/intentClassifier.js`; `serpFeaturePresent` requires SERP provider (T2-23); `trendDirection` requires historical GSC data.
-3. Implement `rank-tracking`: `clicks/impressions/ctr` require GSC connection (GSC_ACCESS_TOKEN set per T3-28).
-4. Implement `competitor-analysis`: `serpOverlapScore` requires SERP provider; `backlinkGap` requires backlink provider.
-5. For each module: update `analysis.js` to derive new signals, `insights.js` to generate insights from them, `actions.js` for specific action items.
-6. Update `BACKEND_MASTER_SPEC.md` and `BACKEND_MODULE_BOUNDARIES.md` with new field definitions.
-7. Add test coverage for each new signal field.
-
-**Definition of done:** All 7 modules produce the Phase 2 signal fields specified in `PRODUCT_SEO_OS_BUILD_PLAN.md`; each new field has test coverage; module boundaries doc reflects updated output shapes.
-
-**Status:** `open`
+Item was added based on doc description of fields as "planned" — code was ahead of the doc. Not a gap.
 
 ---
 
@@ -1733,13 +1720,14 @@ Both are shared infrastructure used across the codebase with no documented inter
 | T3-27 | DB backup strategy documentation | 3 | `open` | S |
 | T3-28 | Adapter env vars missing from .env.example | 3 | `open` | S |
 | T3-29 | Fix BACKEND_DOMAIN_SERVICE_ROUTES.md drift | 3 | `open` | S |
-| T3-30 | Phase 2 module signal enhancements (7 modules) | 3 | `open` | XL |
+| T3-30 | ~~REMOVED — Phase 2 signals already implemented in code~~ | — | — | — |
 | T3-31 | Frontend capability audit — 17 remaining modules | 3 | `open` | L |
 | T3-32 | Extend FRONTEND_CONTENT_FULL_SYSTEM.md to Phase 2 | 3 | `open` | M |
 | T3-33 | Update BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md — 14→24 routes | 3 | `open` | S |
 | T3-34 | Document prioritization.js + rateLimiter.js in BACKEND_CORE_UTILITIES.md | 3 | `open` | S |
 
-**Total: 78 items** — 18 × Tier 1 · 26 × Tier 2 · 34 × Tier 3
+**Total: 77 items** — 18 × Tier 1 · 26 × Tier 2 · 33 × Tier 3
+*(T3-30 removed after full code audit confirmed Phase 2 signals already implemented)*
 
 ---
 
