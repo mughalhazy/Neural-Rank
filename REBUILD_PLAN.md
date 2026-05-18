@@ -1,8 +1,10 @@
 # Neural Rank — Enterprise Rebuild Plan
 
 Working document for closing every gap identified in the 2026-05-18 enterprise grading audit,
-the 2026-05-18 reaudit that found 21 additional gaps, and the 2026-05-18 DOC_CATALOGUE anchor
-audit that found 10 additional gaps (bringing total from 61 to 71 items).
+the 2026-05-18 reaudit that found 21 additional gaps, the 2026-05-18 DOC_CATALOGUE anchor
+audit that found 10 additional gaps (bringing total from 61 to 71 items), and the
+2026-05-18 full 82-doc deterministic catalogue read that found 5 additional gaps (bringing
+total from 71 to 76 items).
 
 Current overall grade: **B- (76/100)**
 Target: **A+ (≥98/100)** — final 2 points require external validation (pen test, compliance audit) beyond code scope.
@@ -1480,6 +1482,136 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 ---
 
+### T3-28 — Adapter env vars missing from .env.example and README
+
+**Dimension:** Developer Experience · Documentation
+**Current state:** `.env.example` documents 7 env vars but 4 of the 5 implemented integration adapters read additional env vars that appear nowhere in documentation. A developer following the setup docs cannot configure GSC, GA4, PageSpeed, or Backlink adapters. Confirmed against adapter source files:
+- `integrations/adapters/google-search-console.js`: `GSC_ACCESS_TOKEN`, `GSC_SITE_URL`
+- `integrations/adapters/google-analytics-4.js`: `GA4_ACCESS_TOKEN`, `GA4_PROPERTY_ID`
+- `integrations/adapters/pagespeed-insights.js`: `PAGESPEED_API_KEY`
+- `integrations/adapters/backlink-provider.js`: `BACKLINK_PROVIDER`, `BACKLINK_API_KEY`, `BACKLINK_TARGET`
+
+The SERP (`SERP_PROVIDER`, `SERP_API_KEY`) and renderer (`RENDERER_ENDPOINT`) adapters are already documented. Also: README intro text says "All 6 vars" but .env.example already has 7 (PORT is omitted from the README table) — fix both the count and the missing adapter section.
+**Files:** `.env.example`, `README.md`, `render.yaml`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Add an "Integration adapter credentials" section to `.env.example`:
+   ```
+   # Google Search Console (rank_tracking, topical_authority modules)
+   GSC_ACCESS_TOKEN=<oauth2-access-token>
+   GSC_SITE_URL=https://your-site.com/
+   
+   # Google Analytics 4 (analytics_integration module)
+   GA4_ACCESS_TOKEN=<oauth2-access-token>
+   GA4_PROPERTY_ID=<ga4-property-id>
+   
+   # PageSpeed Insights (technical_seo_audit module)
+   PAGESPEED_API_KEY=<google-cloud-api-key>
+   
+   # Backlink provider — choose one: ahrefs | moz | semrush
+   BACKLINK_PROVIDER=ahrefs
+   BACKLINK_API_KEY=<your-backlink-api-key>
+   BACKLINK_TARGET=<default-target-domain>
+   ```
+2. Add all 8 vars as `sync: false` entries to `render.yaml`.
+3. Add all 8 vars to the environment variables table in `README.md`; fix "All 6 vars" intro text to reflect the actual count.
+
+**Definition of done:** `.env.example` documents all adapter env vars; README table includes all of them; render.yaml includes all 8 as `sync: false` entries.
+
+**Status:** `open`
+
+---
+
+### T3-29 — Fix BACKEND_DOMAIN_SERVICE_ROUTES.md documentation drift
+
+**Dimension:** Documentation
+**Current state:** `docs/backend/decisions/BACKEND_DOMAIN_SERVICE_ROUTES.md` describes 4 domain services (technical-operations, search-intelligence, measurement, business-intelligence) as "intentionally routeless" — served only through the module run system. However, these domains now have explicit POST routes in `server.js` that were added on 2026-05-15 per CHANGELOG.md: `POST /technical-operations/audit`, `POST /search-intelligence/classify`, `POST /search-intelligence/analyze`, `POST /measurement/snapshots`, `POST /measurement/attributions`, `POST /measurement/attributions` (GET also), `POST /business-intelligence/profiles` (GET also). The doc has been stale since May 15 and misrepresents the current API surface.
+**Files:** `docs/backend/decisions/BACKEND_DOMAIN_SERVICE_ROUTES.md`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Update the doc to describe the current state: the 4 domain services have dedicated POST (and some GET) routes in addition to being accessible through the module run system.
+2. List all 6 current domain service routes with their purposes.
+3. Add a historical note: "Decision origin: domains were initially routeless (modules-only access); direct routes added 2026-05-15 to enable standalone domain operations without a full module run."
+4. Retire the "intentionally routeless" language.
+
+**Definition of done:** Doc accurately reflects current server.js routing; no stale "routeless" claim without qualification.
+
+**Status:** `open`
+
+---
+
+### T3-30 — Phase 2 module signal enhancements per PRODUCT_SEO_OS_BUILD_PLAN.md
+
+**Dimension:** Architecture · Code Quality
+**Current state:** `docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md` (the authoritative product specification) defines field-level enhancements for 7 modules that are not yet implemented. The backend currently satisfies Phase 1 specs only. These Phase 2 fields are unimplemented and have no REBUILD_PLAN entry:
+1. `keyword-analysis`: `intentSignal`, `trendDirection`, context-aware expansion (replace hardcoded tokens), `serpFeaturePresent`, `opportunityTier`
+2. `competitor-analysis`: `backlinkGap`, `topicalGap`, `serpOverlapScore`, `contentVelocity`, 6-dimension `pressureScore`
+3. `rank-tracking`: `clicks`, `impressions`, `ctr`, `ctrEfficiency`, `positionZeroTracking`, `quickWinFlag`, `rankingUrl`
+4. `optimization-layer`: `readabilityScore`, `semanticRichness`, `keywordDensity`, `freshnessSignal`
+5. `content-listing-insights`: `readabilityTier`, `eeAtContentSignals`, `competitorDepthComparison`, `structuredContentSignals`
+6. `review-analysis`: reviewSource normalization (web reviews), `verifiedBuyerRatio`, review recency buckets, `responseRate`
+7. `unified-workflow-layer`: `moduleWeights` multipliers, `foundationHealthCheck`, `quickWinCluster`
+
+**Files:** Per-module `analysis.js`, `insights.js`, `actions.js`, `service.js` (7 modules); `docs/backend/reference/BACKEND_MASTER_SPEC.md`; `docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md`
+**Effort:** XL · **Risk:** medium · **Depends on:** T3-24 (provider adapters for provider-dependent fields), T3-28 (adapter env vars)
+
+**Implementation steps:**
+1. Implement provider-independent enhancements first: `optimization-layer`, `content-listing-insights`, `unified-workflow-layer`, `review-analysis`.
+2. Implement `keyword-analysis`: `intentSignal` derives from `core/intentClassifier.js`; `serpFeaturePresent` requires SERP provider (T2-23); `trendDirection` requires historical GSC data.
+3. Implement `rank-tracking`: `clicks/impressions/ctr` require GSC connection (GSC_ACCESS_TOKEN set per T3-28).
+4. Implement `competitor-analysis`: `serpOverlapScore` requires SERP provider; `backlinkGap` requires backlink provider.
+5. For each module: update `analysis.js` to derive new signals, `insights.js` to generate insights from them, `actions.js` for specific action items.
+6. Update `BACKEND_MASTER_SPEC.md` and `BACKEND_MODULE_BOUNDARIES.md` with new field definitions.
+7. Add test coverage for each new signal field.
+
+**Definition of done:** All 7 modules produce the Phase 2 signal fields specified in `PRODUCT_SEO_OS_BUILD_PLAN.md`; each new field has test coverage; module boundaries doc reflects updated output shapes.
+
+**Status:** `open`
+
+---
+
+### T3-31 — Frontend capability audit for 17 remaining modules
+
+**Dimension:** Documentation · Developer Experience
+**Current state:** `docs/frontend/planning/FRONTEND_BACKEND_CAPABILITY_AUDIT.md` has a complete audit only for Review Analysis (RA-01 through RA-15). The governing rule in that doc: "The frontend must not invent module capabilities. Each capability must be extracted from backend code, then projected into a feature surface before any UI work begins." 17 modules — the 7 Phase 1 modules excluding Review Analysis, plus all 10 Phase 2 modules — have no capability audit. `FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md` likewise only maps Review Analysis to subpages (RA-SP-01 through RA-SP-05); all other modules are listed as "Pending." Any frontend Phase 2 screen work without this audit violates the product's own methodology.
+**Files:** `docs/frontend/planning/FRONTEND_BACKEND_CAPABILITY_AUDIT.md`, `docs/frontend/planning/FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md`
+**Effort:** L · **Risk:** low
+
+**Implementation steps:**
+1. For each of the 17 remaining modules, read backend `service.js`, `analysis.js`, `insights.js`, `actions.js` to extract the full user-visible capability set.
+2. Add capability entries to `FRONTEND_BACKEND_CAPABILITY_AUDIT.md` following the Review Analysis format (capability ID, source file, signal name, intended frontend surface).
+3. After each module's audit, add the subpage map to `FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md` following the RA-SP-01 format.
+4. Priority order: Phase 1 modules first (Content/Listing Insights, Keyword Analysis, Rank Tracking, Competitor Analysis, Optimization Layer, Creative/Messaging Layer, Unified Workflow Layer), then Phase 2 modules.
+5. Gate: no new frontend screens for a module until its capability audit entry is complete.
+
+**Definition of done:** Both audit docs have entries for all 18 modules; every module has at least one subpage map entry; no module has a frontend screen without a corresponding capability audit.
+
+**Status:** `open`
+
+---
+
+### T3-32 — Extend FRONTEND_CONTENT_FULL_SYSTEM.md to cover 10 Phase 2 modules
+
+**Dimension:** Documentation · Developer Experience
+**Current state:** `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md` defines the shared content block model (Block name, Input, Analysis, Insight, Explanation, Evidence, Impact, Action, Optional next step) and covers the original 8 modules only — its stated completion criteria are "all eight modules." The 10 Phase 2 backend modules (Technical SEO Audit, On-Page SEO Scorer, Backlink Intelligence, E-E-A-T Signals, Search Intent Classifier, SERP Feature Analyzer, Topical Authority, Site Architecture, Analytics Integration, Local SEO) have no content block definitions. Without this, any frontend Phase 2 screen work has no content model to build against — the insight/explanation/evidence/action fields that T3-25 mandates in the Flutter model have no source of truth for Phase 2 modules.
+**Files:** `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`
+**Effort:** M · **Risk:** low · **Depends on:** T3-31 (capability audit provides the signal inventory needed to define content blocks)
+
+**Implementation steps:**
+1. For each of the 10 Phase 2 modules, review backend `insights.js` and `actions.js` to understand the output shape.
+2. Define content blocks for each module following the same format as the original 8 modules (block name, input, analysis, insight, explanation, evidence, impact, action, optional next step).
+3. Add a "Phase 2 Modules" section to `FRONTEND_CONTENT_FULL_SYSTEM.md` covering all 10.
+4. Update the doc's completion criteria from "all eight modules" to "all 18 modules."
+5. Flag any Phase 2 module where backend output is insufficient to populate evidence/explanation fields — these cases justify backend work in T3-30.
+
+**Definition of done:** `FRONTEND_CONTENT_FULL_SYSTEM.md` covers all 18 modules; content blocks defined for all 10 Phase 2 modules; completion criteria updated.
+
+**Status:** `open`
+
+---
+
 ## Progress tracker
 
 | ID | Item | Tier | Status | Effort |
@@ -1555,8 +1687,13 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 | T3-25 | Flutter Insight model — add evidence/explanation/nextStep | 3 | `open` | M |
 | T3-26 | Play Store submission assets | 3 | `open` | M |
 | T3-27 | DB backup strategy documentation | 3 | `open` | S |
+| T3-28 | Adapter env vars missing from .env.example | 3 | `open` | S |
+| T3-29 | Fix BACKEND_DOMAIN_SERVICE_ROUTES.md drift | 3 | `open` | S |
+| T3-30 | Phase 2 module signal enhancements (7 modules) | 3 | `open` | XL |
+| T3-31 | Frontend capability audit — 17 remaining modules | 3 | `open` | L |
+| T3-32 | Extend FRONTEND_CONTENT_FULL_SYSTEM.md to Phase 2 | 3 | `open` | M |
 
-**Total: 71 items** — 18 × Tier 1 · 26 × Tier 2 · 27 × Tier 3
+**Total: 76 items** — 18 × Tier 1 · 26 × Tier 2 · 32 × Tier 3
 
 ---
 
