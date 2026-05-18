@@ -34,8 +34,13 @@ Neural Rank/
 │       └── *.md          Active product docs (build plan, UI architecture, build spec)
 ├── scripts/              CI and build scripts
 ├── supabase/             Database migrations (9 applied)
-├── package.json          Root scripts — start, check, test, ci
-├── render.yaml           Render free-tier deployment blueprint
+├── .env.example          Environment variable reference — copy to .env for local dev
+├── .eslintrc.json        ESLint config (no-unused-vars, no-undef)
+├── CHANGELOG.md          All notable changes — keepachangelog.com format
+├── CONTRIBUTING.md       Branch naming, commit style, doc update rules
+├── SECURITY.md           Responsible disclosure policy
+├── package.json          Root scripts — start, check, lint, test, ci
+├── render.yaml           Render free-tier deployment blueprint (env vars via dashboard)
 └── progress.md           Session anchor and milestone log
 ```
 
@@ -51,7 +56,8 @@ Neural Rank/
 | Entry point | `backend/src/server.js` |
 | Start | `npm start` |
 | Test | `npm run test:backend` |
-| CI | `npm run ci` (syntax check + full suite) |
+| Lint | `npm run lint` (ESLint — no-unused-vars, no-undef) |
+| CI | `npm run ci` (syntax check + lint + full suite) |
 
 ### 18 active modules
 
@@ -121,17 +127,22 @@ Neural Rank/
 | `docs/backend/implementation/BACKEND_QC_PHASE2.md` | Phase 2 QC — 10 expansion modules |
 | `docs/backend/analysis/SEO_OS_BACKEND_GAP_FILL_REPORT.md` | Production readiness gaps |
 | `docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md` | Full expansion build plan (authoritative) |
+| `docs/product/PRODUCTION_READINESS_GAPS.md` | Live gap register — P0/P1/P2 backlog with fix instructions |
+| `CONTRIBUTING.md` | Branch naming, commit style, doc update rules |
 | `progress.md` | Session milestone log and resume anchors |
 
 ---
 
-## Environment variables (production)
+## Environment variables
+
+All 6 vars are documented in `.env.example`. Copy it to `.env` for local dev. Production values live in the Render dashboard only — `render.yaml` uses `sync: false` and contains no plaintext secrets.
 
 | Variable | Purpose |
 |---|---|
-| `SUPABASE_URL` | Supabase project URL (set in render.yaml) |
+| `SUPABASE_URL` | Supabase project URL |
 | `SUPABASE_ANON_KEY` | Supabase anon key for JWT verification |
 | `SERP_PROVIDER` | `serpapi` or `dataforseo` |
 | `SERP_API_KEY` | API key for the SERP provider |
 | `RENDERER_ENDPOINT` | URL of a headless renderer service (optional) |
+| `DATABASE_URL` | PostgreSQL connection string for persistent execution data |
 | `PORT` | Server port (default 10000 on Render) |

@@ -5,21 +5,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased]
+## [2026-05-18] — Production Hardening
 
 ### Added
-- `.env.example` — documents all env vars for local setup
-- `SECURITY.md` — responsible disclosure policy
-- `CONTRIBUTING.md` — branch naming, commit style, doc update rules
-- `CHANGELOG.md` — this file
-- `process.on('unhandledRejection')` and `process.on('uncaughtException')` handlers in `server.js`
-- ESLint (`no-unused-vars`, `no-undef`) wired into `npm run ci`
+- `.env.example` — documents all 6 env vars with placeholder values; copy to `.env` for local dev
+- `SECURITY.md` — responsible disclosure policy; contact, scope, 48hr/14-day SLA
+- `CONTRIBUTING.md` — branch naming, commit style, pre-push checklist, doc update rules, module contract
+- `CHANGELOG.md` — this file; keepachangelog.com format, backfilled from git log
+- `.eslintrc.json` — ESLint config (`no-unused-vars`, `no-undef`); `npm run lint` + wired into `npm run ci`
+- `process.on('unhandledRejection')` and `process.on('uncaughtException')` handlers in `server.js` — structured JSON log output; P1-9 resolved
 
 ### Changed
-- `render.yaml` — credentials moved to `sync: false`; plaintext values removed from tracked file
+- `render.yaml` — all 6 env vars moved to `sync: false`; no plaintext values in tracked file
+- `npm run ci` — now runs syntax check + ESLint + full test suite (was syntax check + tests only)
+- 13 dead variables removed across 12 backend module files (ESLint `no-unused-vars` enforcement)
+- `README.md` — project tree, CI command, env vars table updated
 
 ### Security
-- `render.yaml` credential exposure resolved — `SUPABASE_URL` and `SUPABASE_ANON_KEY` values removed from version control
+- `render.yaml` credential exposure (P0-1) — `SUPABASE_URL` and `SUPABASE_ANON_KEY` plaintext values removed from tracked file
+- Full git history scrubbed — JWT anon key and DB password removed from all 24 historical commits via `git filter-branch`; stale objects pruned; force-pushed to GitHub
 
 ---
 
