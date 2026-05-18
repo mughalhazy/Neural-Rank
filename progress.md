@@ -196,9 +196,37 @@ Outcome:
 - P1-9 (unhandledRejection) fully resolved
 - doc count: 78 → 81
 
+### 12. Enterprise grading audit + full code verification — REBUILD_PLAN finalized at 77 items
+> Completed: 2026-05-18
+
+Anchors:
+- [REBUILD_PLAN.md](REBUILD_PLAN.md) — 77-item gap closure plan (all items code-verified)
+- [DOC_CATALOGUE.md](DOC_CATALOGUE.md) — 82-doc index
+
+Three-pass audit anchored to DOC_CATALOGUE.md:
+
+**Pass 1 — Enterprise grading audit:** 30 gaps → reaudit added 21 more → 51 items  
+**Pass 2 — 82-doc deterministic read:** every doc read in full; 15 further gaps added → 66 items; then 5 gap additions → 71 items  
+**Pass 3 — Full code verification:** all 90 module files (18×5), 9 SQL migrations, all backend infrastructure, all Flutter app/ and ui/ files read
+
+Key findings from code:
+- All 24 API routes confirmed in AVAILABLE_ROUTES — 6 domain POST endpoints confirmed unprotected (T1-18)
+- governance/resultModel.js:42-43 confirmed bug (T1-16)
+- execution/service.js: no pre-persist block gate confirmed (T1-17)
+- activation.js: assertModuleCatalogIntegrity() forward-only confirmed (T2-26)
+- SQL: `backend_module_catalog.initial_state` for 4 modules stuck at 'built_inactive' (DB) vs 'backend_active' (JS) — confirms T2-19
+- SQL: 33 tables confirmed across 9 migrations
+- T3-30 REMOVED — Phase 2 signal fields (verifiedBuyerRatio, intentSignal, ctrEfficiency, semanticRichness, pressureScore, MODULE_WEIGHTS etc.) fully implemented in all 7 module analysis.js files
+- app/ `Insight` model missing evidence/impact/nextStep (T3-25); ui/ `InsightData` has all fields
+- 8 adapter env vars confirmed missing from .env.example (T3-28): GSC_ACCESS_TOKEN, GSC_SITE_URL, GA4_ACCESS_TOKEN, GA4_PROPERTY_ID, PAGESPEED_API_KEY, BACKLINK_PROVIDER, BACKLINK_API_KEY, BACKLINK_TARGET
+
+Final REBUILD_PLAN: **77 items** — 18×Tier1 · 26×Tier2 · 33×Tier3  
+No code changes made — audit only.
+
 ## Current Resume Anchors
 Use these first in a new session:
 - [progress.md](progress.md)
+- [REBUILD_PLAN.md](REBUILD_PLAN.md)
 - [README.md](README.md)
 - [DOC_CATALOGUE.md](DOC_CATALOGUE.md)
 - [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)

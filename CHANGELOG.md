@@ -5,6 +5,28 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-05-18] — Enterprise Grading Audit + Gap Register Finalized
+
+### Added
+- `REBUILD_PLAN.md` — 77-item enterprise gap register across Tier 1 (18 production blockers), Tier 2 (26 adoption requirements), Tier 3 (33 enterprise-elite items); current grade B- (76/100), target A+ (98/100)
+
+### Changed
+- `DOC_CATALOGUE.md` — REBUILD_PLAN entry updated to reflect 77-item count
+- `progress.md` — milestone #12 appended (audit methodology, findings, key code-verified gaps)
+
+### Audit methodology
+Three-pass audit: (1) enterprise grading of all 18 modules and infrastructure; (2) deterministic read of all 82 docs in DOC_CATALOGUE.md; (3) full code verification — all 90 module source files (18×5), 9 SQL migrations, all backend infrastructure, and all Flutter app/ and ui/ files read in full. Zero sampling.
+
+### Key findings
+- T3-30 removed — Phase 2 signal fields already implemented across all 7 modules (verifiedBuyerRatio, intentSignal, ctrEfficiency, serpOverlapScore, MODULE_WEIGHTS etc.)
+- T3-28 added — 8 adapter env vars confirmed missing from .env.example (GSC, GA4, PageSpeed, Backlink adapters)
+- T3-33 added — BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md confirmed covering only 14 of 24 routes
+- T3-34 added — prioritization.js and rateLimiter.js confirmed undocumented in BACKEND_CORE_UTILITIES.md
+- 33 tables confirmed from SQL across 9 migrations
+- Existing items T1-16, T1-17, T1-18, T2-19, T2-26 all confirmed from source code
+
+---
+
 ## [2026-05-18] — Production Hardening
 
 ### Added
