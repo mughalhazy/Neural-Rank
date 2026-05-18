@@ -4,7 +4,8 @@ Working document for closing every gap identified in the 2026-05-18 enterprise g
 the 2026-05-18 reaudit that found 21 additional gaps, the 2026-05-18 DOC_CATALOGUE anchor
 audit that found 10 additional gaps (bringing total from 61 to 71 items), and the
 2026-05-18 full 82-doc deterministic catalogue read that found 5 additional gaps (bringing
-total from 71 to 76 items).
+total from 71 to 76 items), and the 2026-05-18 doc-vs-code verification audit that found 2
+additional gaps and corrected 2 existing items (bringing total from 76 to 78 items).
 
 Current overall grade: **B- (76/100)**
 Target: **A+ (≥98/100)** — final 2 points require external validation (pen test, compliance audit) beyond code scope.
@@ -845,17 +846,17 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 ### T2-22 — Fix hardcoded test suite count assertion
 
 **Dimension:** Testing / QC · Code Quality
-**Current state:** `full-backend-validation.test.js` contains a hardcoded assertion `assert.equal(TEST_SUITES.length, 29)`. Adding a new test suite requires updating two locations: the `TEST_SUITES` array AND this assertion. Forgetting to update the assertion causes a confusing failure. This is a test fragility issue that will recur every time a new module or test is added.
-**Files:** `backend/src/full-backend-validation.test.js`
+**Current state:** Two locations hardcode the number 29: (1) `full-backend-validation.test.js:36` — `assert.equal(TEST_SUITES.length, 29)`; (2) `CONTRIBUTING.md:26` — "All 29 test suites must pass and lint must be clean." Adding a new test suite requires updating three locations: the `TEST_SUITES` array, the assertion, AND CONTRIBUTING.md. Forgetting either causes a confusing failure or stale documentation.
+**Files:** `backend/src/full-backend-validation.test.js`, `CONTRIBUTING.md`
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**
-1. Remove the hardcoded `assert.equal(TEST_SUITES.length, 29)` assertion.
-2. Replace with a derived assertion: `assert.ok(TEST_SUITES.length >= 29, ...)` — this allows the count to grow without requiring manual updates, while still catching accidental array truncation.
-3. Alternatively, if the intent is to enforce that the count is exact: compute it at runtime from `getRegisteredModuleKeys().length + FIXED_SUITE_COUNT` rather than hardcoding 29.
-4. Add a comment: the suite count is dynamic — add new suites to the array; the assertion auto-adjusts.
+1. Remove the hardcoded `assert.equal(TEST_SUITES.length, 29)` assertion from `full-backend-validation.test.js`.
+2. Replace with a derived assertion: `assert.ok(TEST_SUITES.length >= 29, ...)` — allows the count to grow without manual updates while still catching accidental array truncation.
+3. Update `CONTRIBUTING.md:26` — replace "All 29 test suites must pass" with "All test suites must pass" (remove hardcoded count).
+4. Add a comment in the test file: the suite count is dynamic — add new suites to the array; the assertion auto-adjusts.
 
-**Definition of done:** Adding a new test suite to `TEST_SUITES` does not require changing any assertion; the suite still catches accidental deletions from the array.
+**Definition of done:** Adding a new test suite to `TEST_SUITES` requires no changes to any assertion or CONTRIBUTING.md; CONTRIBUTING.md no longer contains a hardcoded count.
 
 **Status:** `open`
 
@@ -1154,12 +1155,14 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 **Current state:** `app/` uses `MockRepository`. The production app cannot communicate with the backend. Play Store blocked.
 **Effort:** XL · **Risk:** high
 
+**Note (confirmed from code):** `dio: ^5.4.0` and `supabase_flutter: ^2.0.0` already exist in `app/pubspec.yaml` — step 1 only needs to add `flutter_secure_storage`. The supabase_flutter package is present as a dependency but not wired for auth; step 5 wires it.
+
 **Implementation steps:**
-1. Add `dio`, `flutter_secure_storage` to `app/pubspec.yaml`.
+1. Add `flutter_secure_storage` to `app/pubspec.yaml` (dio and supabase_flutter already present).
 2. Create `neural_rank_client.dart` — Dio client with Bearer token interceptor, retry on 5xx, 30s timeout.
 3. Create `api_repository.dart` implementing the abstract `Repository` interface.
 4. Wire via `kDebugMode`: debug = Mock, release = Api.
-5. Implement Supabase auth flow in Flutter (`supabase_flutter`, sign-in screen, secure storage).
+5. Wire supabase_flutter auth flow (sign-in screen, secure token storage via flutter_secure_storage).
 6. Map `{ ok: false, error }` to typed `Failure` states in BLoC layer.
 
 **Definition of done:** Release build communicates with Render backend; MockRepository retained for debug/test.
@@ -1612,6 +1615,47 @@ The SERP (`SERP_PROVIDER`, `SERP_API_KEY`) and renderer (`RENDERER_ENDPOINT`) ad
 
 ---
 
+### T3-33 — Update BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md to cover all 24 routes
+
+**Dimension:** Documentation · Security
+**Current state:** `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` is marked `LIVE` in DOC_CATALOGUE and described as "Audit of all 24 API routes." Code inspection of `server.js` confirms 24 routes in `AVAILABLE_ROUTES`. The doc only audits 14 routes — it ends at `GET /execution/audit-logs` and is entirely missing the 10 routes added on 2026-05-15: `GET /measurement/metrics`, `POST /measurement/snapshots`, `POST /measurement/attributions`, `GET /measurement/attributions/:id`, `POST /technical-operations/audit`, `POST /search-intelligence/classify`, `POST /search-intelligence/analyze`, `GET /business-intelligence/profiles`, `POST /business-intelligence/profiles`. The doc also describes rate-limiting as a "placeholder" and the actor header as a "placeholder" — both are now fully implemented. The 10 missing routes include 6 that T1-18 identifies as having no auth enforcement. A LIVE hardening reference doc that misrepresents 10 of 24 routes and calls implemented security "placeholders" gives false assurance.
+**Files:** `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md`
+**Effort:** S · **Risk:** low · **Depends on:** T1-18 (auth on 6 endpoints must be resolved before their audit row can be marked compliant)
+
+**Implementation steps:**
+1. Add audit rows for the 10 missing routes, following the existing format (validated, auditable mutation, actor required, envelope).
+2. For the 6 currently-unprotected POST routes (T1-18), mark `actor required: no (gap — see T1-18)` until T1-18 is resolved, then update to `actor required: yes`.
+3. Update the "Hardening Summary" section: replace "mutation identity placeholder" with "Supabase JWT or actor-header fallback (see T1-09)" and replace "rate-limit placeholder headers" with "rate-limit enforcement active (DEFAULT_LIMIT=120, MUTATION_LIMIT=30)."
+4. Update DOC_CATALOGUE description to accurately reflect the audit scope.
+
+**Definition of done:** Audit doc covers all 24 routes; no route is missing; Hardening Summary no longer says "placeholder" for implemented features.
+
+**Status:** `open`
+
+---
+
+### T3-34 — Document prioritization.js and rateLimiter.js in BACKEND_CORE_UTILITIES.md
+
+**Dimension:** Documentation
+**Current state:** `docs/backend/reference/BACKEND_CORE_UTILITIES.md` claims to catalogue "the nine core utility modules in `backend/src/core/`." Code inspection shows 13 files in that directory. `moduleCatalog.js` and `activation.js` are documented separately in `BACKEND_ACTIVATION_AND_GATING.md`. But two genuine shared utilities have no documentation anywhere:
+- `prioritization.js` — exports `normalizePriority`, `getPriorityScore`, `orderActionEntries`, `orderPriorityEntries`, `getReferenceValue`; imported by `backend/src/index.js` and consumed across modules
+- `rateLimiter.js` — exports `DEFAULT_LIMIT (120)`, `MUTATION_LIMIT (30)`, `checkLimit`, `getIpKey`, `getActorKey`, `resetForTests`; central to API rate enforcement; multiple REBUILD_PLAN items (T1-07, T1-10, T3-04) reference it but no doc describes its contract
+
+Both are shared infrastructure used across the codebase with no documented interface.
+**Files:** `docs/backend/reference/BACKEND_CORE_UTILITIES.md`
+**Effort:** S · **Risk:** low
+
+**Implementation steps:**
+1. Add section "10. prioritization.js" to `BACKEND_CORE_UTILITIES.md` — purpose, key exports with signatures, consumed-by list.
+2. Add section "11. rateLimiter.js" — purpose (in-memory sliding-window rate limiter), key exports, `DEFAULT_LIMIT` and `MUTATION_LIMIT` values, `resetForTests()` note (test-only), consumed-by (`server.js`).
+3. Update the doc's opening sentence from "nine" to "eleven core utility modules."
+
+**Definition of done:** BACKEND_CORE_UTILITIES.md covers all 11 non-activation core utilities; opening sentence count is correct.
+
+**Status:** `open`
+
+---
+
 ## Progress tracker
 
 | ID | Item | Tier | Status | Effort |
@@ -1692,8 +1736,10 @@ The SERP (`SERP_PROVIDER`, `SERP_API_KEY`) and renderer (`RENDERER_ENDPOINT`) ad
 | T3-30 | Phase 2 module signal enhancements (7 modules) | 3 | `open` | XL |
 | T3-31 | Frontend capability audit — 17 remaining modules | 3 | `open` | L |
 | T3-32 | Extend FRONTEND_CONTENT_FULL_SYSTEM.md to Phase 2 | 3 | `open` | M |
+| T3-33 | Update BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md — 14→24 routes | 3 | `open` | S |
+| T3-34 | Document prioritization.js + rateLimiter.js in BACKEND_CORE_UTILITIES.md | 3 | `open` | S |
 
-**Total: 76 items** — 18 × Tier 1 · 26 × Tier 2 · 32 × Tier 3
+**Total: 78 items** — 18 × Tier 1 · 26 × Tier 2 · 34 × Tier 3
 
 ---
 
