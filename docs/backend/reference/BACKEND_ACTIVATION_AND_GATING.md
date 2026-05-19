@@ -121,10 +121,15 @@ Without `allowInactiveActivation: true`, the override is silently ignored and `l
 
 1. Every key in `DEFAULT_ACTIVE_MODULES` is present in the module catalog.
 2. Every key in `BUILT_BUT_INACTIVE_MODULES` is present in the module catalog.
+3. Every key registered in `serviceRegistry` appears in either `DEFAULT_ACTIVE_MODULES` or `BUILT_BUT_INACTIVE_MODULES` — **reverse check added (T2-26)**.
 
-It does **not** enforce full bidirectional coverage — catalog entries that appear in neither set will not cause a failure. The invariant being checked is: "nothing in the activation model is pointing at a module that doesn't exist." The inverse — a catalog entry that is in neither set — is a documentation gap, not a runtime error.
+The check is now fully bidirectional. Adding a new module to `serviceRegistry` without also adding it to one of the two activation sets will cause `assertModuleCatalogIntegrity()` to throw at orchestrator entry:
 
-Consequence: if a new module is added to the catalog without being added to either set, `assertModuleCatalogIntegrity()` will not catch it. The addition must be made manually to one of the two sets.
+```
+Module 'new_module' is registered in serviceRegistry but absent from both DEFAULT_ACTIVE_MODULES and BUILT_BUT_INACTIVE_MODULES — add it to one.
+```
+
+This prevents silent catalog drift: a module that is registered but in neither activation set cannot run and would not be documented as inactive — that is now a hard error, not a documentation gap.
 
 ## Gating Principles
 

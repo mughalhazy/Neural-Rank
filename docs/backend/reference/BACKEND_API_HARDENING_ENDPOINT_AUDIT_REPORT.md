@@ -22,83 +22,135 @@
 - normalized safe errors:
   - no raw stack traces in responses
 - request validation on write endpoints
-- mutation identity placeholder:
-  - `x-neural-rank-actor`
-- rate-limit placeholder headers:
-  - `X-RateLimit-Policy`
-  - `X-RateLimit-Enforced`
-- workspace/client boundary placeholders:
+- mutation identity header (implemented):
+  - `x-neural-rank-actor` — required on all auditable mutation endpoints
+- rate-limit headers (implemented — in-process, resets on restart):
+  - `X-RateLimit-Limit`
+  - `X-RateLimit-Remaining`
+  - `X-RateLimit-Reset`
+- workspace/client boundary headers:
   - `x-neural-rank-client-id`
   - `x-neural-rank-workspace-id`
 - health/readiness split:
-  - `GET /health`
-  - `GET /ready`
+  - `GET /v1/health`
+  - `GET /v1/ready`
+- API versioning: all routes under `/v1/`; legacy unversioned paths redirect 301 with `Deprecation: true`
+- OpenAPI 3.1 spec served at `GET /v1/openapi.json`; Swagger UI at `GET /v1/docs`
 - safe logging:
   - strips auth/service-key style headers
 
 ## Endpoint Audit
-- `GET /health`
+- `GET /v1/health`
   - validated: method only
   - auditable mutation: no
   - envelope: yes
-- `GET /ready`
+- `GET /v1/ready`
   - validated: method only
   - auditable mutation: no
   - envelope: yes
-- `GET /modules`
+- `GET /v1/modules`
   - validated: method only
   - auditable mutation: no
   - envelope: yes
-- `POST /run/default`
+- `POST /v1/run/default`
   - validated: request body schema
   - auditable mutation: not a lifecycle mutation endpoint
   - envelope: yes
-- `POST /run/activation-aware`
+- `POST /v1/run/activation-aware`
   - validated: request body schema
   - auditable mutation: not a lifecycle mutation endpoint
   - envelope: yes
-- `POST /modules/:moduleKey/run`
+- `POST /v1/modules/:moduleKey/run`
   - validated: request body schema
   - auditable mutation: not a lifecycle mutation endpoint
   - envelope: yes
-- `POST /execution/recommendations`
+- `POST /v1/execution/recommendations`
   - validated: yes
   - auditable mutation: yes
   - actor required: yes
   - envelope: yes
-- `PATCH /execution/recommendations/:recommendationId/status`
+- `GET /v1/execution/recommendations`
+  - validated: method + pagination params
+  - auditable mutation: no
+  - envelope: yes
+- `PATCH /v1/execution/recommendations/:recommendationId/status`
   - validated: yes
   - auditable mutation: yes
   - actor required: yes
   - envelope: yes
-- `POST /execution/recommendations/:recommendationId/tasks`
+- `POST /v1/execution/recommendations/:recommendationId/tasks`
   - validated: yes
   - auditable mutation: yes
   - actor required: yes
   - envelope: yes
-- `GET /execution/tasks`
+- `GET /v1/execution/tasks`
+  - validated: method + pagination params
+  - auditable mutation: no
+  - envelope: yes
+- `GET /v1/execution/tasks/:taskId`
   - validated: method only
   - auditable mutation: no
   - envelope: yes
-- `GET /execution/tasks/:taskId`
-  - validated: method only
-  - auditable mutation: no
-  - envelope: yes
-- `PATCH /execution/tasks/:taskId/status`
+- `PATCH /v1/execution/tasks/:taskId/status`
   - validated: yes
   - auditable mutation: yes
   - actor required: yes
   - envelope: yes
-- `GET /execution/tasks/:taskId/history`
+- `GET /v1/execution/tasks/:taskId/history`
   - validated: method only
   - auditable mutation: no
   - envelope: yes
-- `GET /execution/audit-logs`
+- `GET /v1/execution/audit-logs`
   - validated: method only
   - auditable mutation: no
   - envelope: yes
+- `GET /v1/measurement/metrics`
+  - validated: method only
+  - auditable mutation: no
+  - envelope: yes
+- `POST /v1/measurement/snapshots`
+  - validated: request body schema
+  - auditable mutation: yes
+  - envelope: yes
+- `POST /v1/measurement/attributions`
+  - validated: request body schema
+  - auditable mutation: yes
+  - envelope: yes
+- `GET /v1/measurement/attributions`
+  - validated: method + pagination params
+  - auditable mutation: no
+  - envelope: yes
+- `POST /v1/technical-operations/audit`
+  - validated: request body schema
+  - auditable mutation: no
+  - envelope: yes
+- `POST /v1/search-intelligence/classify`
+  - validated: request body schema
+  - auditable mutation: no
+  - envelope: yes
+- `POST /v1/search-intelligence/analyze`
+  - validated: request body schema
+  - auditable mutation: no
+  - envelope: yes
+- `GET /v1/business-intelligence/profiles`
+  - validated: method only
+  - auditable mutation: no
+  - envelope: yes
+- `POST /v1/business-intelligence/profiles`
+  - validated: request body schema
+  - auditable mutation: yes
+  - envelope: yes
+- `GET /v1/openapi.json`
+  - validated: method only
+  - auditable mutation: no
+  - envelope: no (raw JSON spec)
+- `GET /v1/docs`
+  - validated: method only
+  - auditable mutation: no
+  - envelope: no (raw HTML)
 
 ## Notes
 - no raw stack traces are exposed through API responses
 - no auth or service keys are echoed back in logs
 - lifecycle mutation endpoints remain auditable through the execution audit trail
+- all routes versioned under `/v1/`; legacy unversioned paths return 301 with `Deprecation: true` header

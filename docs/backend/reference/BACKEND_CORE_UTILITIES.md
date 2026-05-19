@@ -5,7 +5,7 @@ Anchors:
 - [BACKEND_MASTER_SPEC.md](BACKEND_MASTER_SPEC.md)
 - [BACKEND_MODULE_BOUNDARIES.md](BACKEND_MODULE_BOUNDARIES.md)
 
-This document catalogs the nine core utility modules in `backend/src/core/`. These files are shared infrastructure consumed by modules, domains, orchestration, and persistence layers. They do not contain business logic specific to any one module.
+This document catalogs the twelve core utility modules in `backend/src/core/`. These files are shared infrastructure consumed by modules, domains, orchestration, and persistence layers. They do not contain business logic specific to any one module.
 
 ---
 
@@ -178,3 +178,49 @@ This document catalogs the nine core utility modules in `backend/src/core/`. The
 **Consumed by:** modules that produce prioritized action outputs. Also used by the execution and governance domains when scoring cross-module recommendations.
 
 **Design decision:** A base offset of +15 is added to the raw score before clamping to 0–100. This ensures that recommendations with all inputs at moderate neutral values (50) score above 50, reflecting that a recommendation with no strong negative signals is net-positive by default. Missing inputs do not zero out a recommendation; they reduce confidence only.
+
+---
+
+## 10. dbUtils.js
+
+**File:** `backend/src/core/dbUtils.js`
+
+**Purpose:** Shared database utility helpers used by module repositories and domain services when interacting with Postgres. Extracts common operations that would otherwise be duplicated across all 18 module repositories.
+
+**Key exports:**
+
+- `clone(value)` — deep-clones a value using `structuredClone` (Node.js 17+) with a JSON round-trip fallback for older runtimes. Used before mutating query result objects.
+- `normalizeRows(result)` — normalizes a Postgres query result to a plain array. Accepts either an array directly or a `{ rows: [...] }` result object; returns `[]` for null/undefined. Prevents `result.rows` access errors across different pg client response shapes.
+- `upsertProductTarget(query, target)` — inserts or updates a row in `app_public.product_targets` using `on conflict (target_kind, canonical_ref) do update set updated_at = now()`. Returns the resolved `id` for use as a foreign key in module records tables. Delegates to `resolveTargetKind` and `resolveCanonicalRef` from `core/persistence.js`.
+
+**Consumed by:** module repositories that need to upsert the product target before inserting their own records; domain services that read or transform query results.
+
+---
+
+## 11. errorReporter.js
+
+**File:** `backend/src/core/errorReporter.js`
+
+**Purpose:** Zero-dependency Sentry error reporter. Posts error events to the Sentry HTTP store API using `node:https` directly — no Sentry SDK is installed. Is a no-op when `SENTRY_DSN` is absent or unparseable.
+
+**Key exports:**
+
+- `reportError(error, context)` — fire-and-forget POST to `sentry.io/api/{projectId}/store/`. Parses `SENTRY_DSN` at module load time to extract `sentryPublicKey` and `sentryProjectId`. The event payload includes `event_id` (random UUID), `timestamp`, `platform: "node"`, stack frames (up to 7 lines), and optional `tags` / `extra` from the `context` argument. Network errors are silently swallowed — reporting failures must not crash the server.
+
+**Configuration:** Set `SENTRY_DSN` environment variable to a valid Sentry DSN (e.g. `https://<key>@sentry.io/<projectId>`). Module is disabled if the env var is absent.
+
+**Consumed by:** `server.js` (unhandled request errors) and orchestrators (module timeout or unexpected failures).
+
+---
+
+## 12. moduleInputRequirements.js
+
+**File:** `backend/src/core/moduleInputRequirements.js`
+
+**Purpose:** Declares the per-module required input field sets. Used by validation middleware to gate module execution: at least one field from a module's required set must be present in `moduleInput` for the run to proceed. Modules with no meaningful input constraints are marked `"none"`.
+
+**Key exports:**
+
+- `MODULE_INPUT_REQUIREMENTS` — a frozen map of `{ [moduleKey]: string[] }` covering all 18 modules. Each value is an array of acceptable input field names; a non-empty intersection with the incoming `moduleInput` object satisfies the requirement. Example entries: `review_analysis: ["appId", "websiteUrl"]`, `local_seo: ["websiteUrl", "domain", "location"]`.
+
+**Consumed by:** `api/validation.js` (per-module run validation for `POST /v1/modules/:key/run`) and the orchestration entry points when validating batch inputs.

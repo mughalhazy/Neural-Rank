@@ -96,6 +96,9 @@ All migration files live in `supabase/migrations/`.
 | `20260506193000_recommendation_scoring_foundation.sql` | Creates recommendation scoring schema: recommendation score dimension records supporting shared recommendation scoring infrastructure. |
 | `20260516120000_seo_os_expansion_modules.sql` | Creates module records tables for all 10 Phase 2 modules: technical_seo_audit, on_page_seo, backlink_intelligence, eeat_signal, search_intent, serp_feature, topical_authority, site_architecture, analytics_integration, local_seo. |
 | `20260516130000_fix_activation_defaults.sql` | Patches activation default records to align runtime catalog state with database defaults after Phase 2 expansion. |
+| `20260519000000_workspace_isolation.sql` | Adds `workspace_id` column to execution and measurement tables; enables RLS on all 33 `app_public` tables; creates workspace-scoped access policies. Service role (DATABASE_URL) bypasses RLS — policies apply to anon/authenticated JWT callers. |
+| `20260519000001_audit_log_immutability.sql` | Adds monotonic `seq BIGSERIAL` column to `audit_logs`; adds BEFORE UPDATE and BEFORE DELETE triggers that raise `audit_log_rows_are_immutable` — enforces append-only semantics for SOC 2 / GDPR compliance. |
+| `20260519000002_sync_activation_from_js.sql` | Drops the `is_active` column from `backend_module_activation_defaults`; the JS catalog (`core/activation.js` + `core/moduleCatalog.js`) is now the single authoritative source for module activation state. |
 
 ## Data Separation Principles By Module
 

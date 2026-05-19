@@ -51,7 +51,7 @@ Neural Rank/
 
 ## Backend
 
-**Status:** Live on Render free tier · 18 modules · 29/29 tests passing
+**Status:** Live on Render free tier · 18 modules · 30/30 tests passing · grade 91/100
 
 | | |
 |---|---|
@@ -85,7 +85,7 @@ Neural Rank/
 | Unified Workflow Layer | ✅ |
 | Local SEO | opt-in |
 
-### API surface (24 routes — all under `/v1/`)
+### API surface (26 routes — all under `/v1/`)
 
 All routes are versioned under `/v1/`. Legacy unversioned paths (e.g. `/health`) redirect 301 → `/v1/health`.
 
@@ -112,6 +112,8 @@ All routes are versioned under `/v1/`. Legacy unversioned paths (e.g. `/health`)
 | `POST /v1/search-intelligence/classify` | Intent classification |
 | `POST /v1/search-intelligence/analyze` | Full SERP query analysis |
 | `GET/POST /v1/business-intelligence/profiles` | Business profiles |
+| `GET /v1/openapi.json` | OpenAPI 3.1 spec (machine-readable) |
+| `GET /v1/docs` | Swagger UI (browser) |
 
 ### Rate limiting
 
@@ -121,8 +123,8 @@ All requests are rate-limited by IP address: **120 req/min** default, **30 req/m
 
 - Project: `neural-rank` · ref `bvujfwwwwzlpsxbshxyn` · `us-east-1` · free tier
 - Dashboard: `https://supabase.com/dashboard/project/bvujfwwwwzlpsxbshxyn`
-- Migrations: 10 applied · 33 tables in `app_public`
-- **Keep-alive:** The `/health` probe runs `SELECT 1` on every call. UptimeRobot (T2-17) pings `/health` every 5 minutes, preventing Supabase from pausing after 7 days of inactivity. **Do not disable the UptimeRobot monitor.**
+- Migrations: 12 applied · 33 tables in `app_public`
+- **Keep-alive:** The `/v1/health` probe runs `SELECT 1` on every call. UptimeRobot (T2-17) pings `/v1/health` every 5 minutes, preventing Supabase from pausing after 7 days of inactivity. **Do not disable the UptimeRobot monitor.**
 
 ---
 

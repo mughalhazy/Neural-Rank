@@ -97,6 +97,10 @@ All 18 modules satisfy this contract. Each module's `service.js` exports a `run(
 
 All 18 modules are registered in `serviceRegistry` regardless of activation state. The activation gate in the orchestrators — not the registry — determines which modules actually run.
 
+## Module Timeout Isolation
+
+Each module run is wrapped by `runModuleSafe(moduleKey, service, moduleInput, moduleContext)` in both orchestrators. `runModuleSafe` races the module's `service.run()` call against a 10-second timeout. If the module does not resolve within 10 seconds, `runModuleSafe` resolves with a `{ status: "timeout", moduleKey }` result rather than letting the slow module stall the entire flow. This means a single unresponsive integration or slow computation cannot block all 17 (or 18) parallel module results from returning.
+
 ## Default Orchestration: runDefaultMvpFlow
 
 `src/orchestration/defaultMvpOrchestrator.js` exports `runDefaultMvpFlow` (aliased as `runDefaultBackendFlow`).
@@ -107,7 +111,7 @@ Behaviour:
 2. Calls `getDefaultActivationState()` — resolves all 18 keys; `local_seo` resolves to `false`.
 3. Iterates `getRegisteredModuleKeys()` (the `executionOrder` array).
 4. For each key: skips if `activationState[moduleKey] !== true`.
-5. Calls `service.run(moduleInput, moduleContext)` with `activatedBy: "default_backend_orchestrator"`.
+5. Calls `runModuleSafe(moduleKey, service, moduleInput, moduleContext)` with `activatedBy: "default_backend_orchestrator"`.
 6. Returns `{ activationState, inactiveModules, moduleResults, results }`.
 
 Result: 17 modules run; `local_seo` is skipped. `inactiveModules` contains `["local_seo"]`.
@@ -151,7 +155,7 @@ Behaviour differences from the default orchestrator:
 - supports deactivating default-active modules via `activationOverrides: { moduleKey: false }`
 - supports activating `local_seo` (and any future built-but-inactive modules) via `activationOverrides: { local_seo: true }` plus `options: { allowInactiveActivation: true }`
 - tags each module context with `activatedBy: "default_activation"` or `activatedBy: "explicit_activation_override"` depending on whether the resolved state matches the default state
-- otherwise follows the same execution-order loop as the default orchestrator
+- otherwise follows the same `runModuleSafe`-wrapped execution-order loop as the default orchestrator
 
 `allowInactiveActivation` guard: if `options.allowInactiveActivation` is not `true`, any override that attempts to activate a `BUILT_BUT_INACTIVE_MODULES` entry is silently rejected. `local_seo` will remain inactive even if `{ local_seo: true }` is passed without the flag.
 
