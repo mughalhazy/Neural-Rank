@@ -1,9 +1,10 @@
 # Neural Rank — Production Readiness Gap Register
 
 **Audit date:** 2026-05-17
+**Last updated:** 2026-05-19 (Tier 1 resolution — P0-2, P0-3, P1-5, P1-6, P1-7, P1-9, P1-11, P2-1 resolved)
 **Method:** 4-agent parallel audit (backend runtime · data/persistence · frontend/API · infra/ops) + full manual line-by-line verification of all critical files
 **Anchor:** `DOC_CATALOGUE.md`
-**Status:** Open — no P0 resolved as of audit date
+**Status:** 8 of 29 items resolved — P0-1 (code resolved, owner rotation pending), P0-2, P0-3 resolved; P1-5, P1-6, P1-7, P1-9, P1-11 resolved; P2-1 resolved
 
 ---
 
@@ -49,7 +50,7 @@ These must be fixed before any real users are onboarded.
 5. Set `DATABASE_URL` in Render dashboard — format: `postgresql://postgres:[PASSWORD]@db.bvujfwwwwzlpsxbshxyn.supabase.co:5432/postgres`
 6. Ensure graceful fallback with a clear warning log if `DATABASE_URL` is not set (so CI continues to work)
 
-**Status:** Open
+**Status:** RESOLVED (2026-05-19) — `backend/src/db.js` created with `pg.Pool` (max 5); `startServer()` now async, calls `initDb()`, passes `{ query }` into `baseContext`; graceful no-op when `DATABASE_URL` absent; DB probe added to `/health` (returns 503 on failure). Commit `285df1f` (T1-01, T1-08).
 
 ---
 
@@ -67,7 +68,7 @@ The `execution_recommendations` and `execution_tasks` tables (migration `2026050
 3. Update all `SELECT` statements to filter `WHERE workspace_id = $1` when `context.workspaceId` is present
 4. Apply migration to Supabase: `supabase db push` or via dashboard SQL editor
 
-**Status:** Open
+**Status:** RESOLVED (2026-05-19) — Migration `20260519000000_workspace_isolation.sql` adds `workspace_id` column to `execution_recommendations`, `execution_tasks`, `execution_task_status_history`, `execution_audit_logs`, `measurement_snapshots`, `measurement_attribution_links`; RLS enabled on all 33 `app_public` tables; workspace-scoped policies added; `createRecommendationRecord` and `createTaskRecord` carry `workspaceId`; `listRecommendations(workspaceId)` and `listTasks(workspaceId)` filter in both Postgres and in-memory repositories; `createRecommendation` in service.js passes `context.workspaceId`. Commit `285df1f` (T1-03).
 
 ---
 
@@ -172,7 +173,7 @@ Rate limiting is enforced and does block requests (confirmed). However, the `Map
 
 **Fix required:** In `createRecommendation()`, after `evaluateActionGovernance()`, check if `governanceResult.overallClassification === 'block'` and throw a `governance_blocked` API error (403) before calling `repository.createRecommendation()`.
 
-**Status:** Open
+**Status:** RESOLVED (2026-05-19) — Pre-persist block gate added: `if (governanceResult.overallClassification === 'block') throw new Error('governance_blocks_${actionType}')` before any repository call. Also fixed: `resultModel.js` `requiresApproval` now correctly `false` for `block` classification (was erroneously `true`). Tests updated in `server.test.js` and `governance-engine.test.js` to assert 409 on block creation. Commit `285df1f` (T1-16, T1-17).
 
 ---
 
@@ -184,7 +185,7 @@ Rate limiting is enforced and does block requests (confirmed). However, the `Map
 
 **Fix required:** Add `requireIdentity(identity)` call at the top of the POST branches in `handleMeasurementSnapshots` and `handleMeasurementAttributions`. Pass `identity` parameter into these handler functions from the main request handler.
 
-**Status:** Open
+**Status:** RESOLVED (2026-05-19) — Extended beyond the 2 measurement endpoints to all 6 unprotected domain POST handlers: `handleMeasurementSnapshots`, `handleMeasurementAttributions` (POST), `handleTechnicalOperationsAudit`, `handleSearchIntelligenceClassify`, `handleSearchIntelligenceAnalyze`, `handleBusinessIntelligenceProfiles` (POST). All now call `requireIdentity(identity)` and apply mutation rate limiting. Commit `285df1f` (T1-18).
 
 ---
 
@@ -196,7 +197,7 @@ When `SUPABASE_URL` is null, `resolveRequestIdentity()` accepts any `x-neural-ra
 
 **Fix required:** Remove the header fallback entirely, or add an explicit `NODE_ENV !== 'production'` guard so the fallback only works in dev/CI. In production, missing `SUPABASE_URL` should cause all authenticated routes to return 503, not accept unverified headers.
 
-**Status:** Open
+**Status:** RESOLVED (2026-05-19) — `IS_PRODUCTION` guard added in `auth.js`: in production, absent `SUPABASE_URL` returns `null` (all mutations rejected) rather than activating the actor-header fallback. Startup warning logged at `{ kind: "auth_degraded" }`. `NODE_ENV=production` added to `render.yaml`. Actor-header fallback retained for `NODE_ENV !== 'production'` (local dev, CI). Commit `285df1f` (T1-09, T1-14).
 
 ---
 
@@ -258,7 +259,7 @@ process.on('unhandledRejection', (reason) => {
 2. Add `"lint": "eslint backend/src --ext .js"` to `package.json` scripts
 3. Add `npm run lint` to the `ci` script: `npm run check && npm run lint && npm run test:backend:ci`
 
-**Status:** Open
+**Status:** RESOLVED (2026-05-18) — ESLint (`^8.57.0`) added as devDependency; `.eslintrc.json` with `no-unused-vars` + `no-undef`; `npm run lint` added; `ci` script updated to `npm run check && npm run lint && npm run test:backend:ci`. Also: `npm run check:secrets` (secrets scanner) added to CI pipeline 2026-05-19 (commit `285df1f`, T1-11).
 
 ---
 
@@ -315,7 +316,7 @@ These do not block launch but must be resolved before public scale.
 
 | ID | Finding | File(s) | Fix |
 |----|---------|---------|-----|
-| P2-1 | No `.env.example` — local setup requires reading `render.yaml` | root | Create `/.env.example` documenting all 6 env vars with descriptions |
+| P2-1 | ~~No `.env.example`~~ **RESOLVED (2026-05-18)** — `.env.example` created documenting all env vars; expanded 2026-05-19 with `NODE_ENV`, `ALLOWED_ORIGIN`, `TRUSTED_PROXY_COUNT` (T1-04, T1-09, T1-10, T1-14) | root | ✅ |
 | P2-2 | No database backup strategy | none | Document backup schedule in `README.md`; enable Supabase PITR when upgrading tier |
 | P2-3 | No API versioning strategy | `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` | Document versioning strategy (e.g. `Accept-Version` header or `/v1/` prefix) before any external consumers are onboarded |
 | P2-4 | Dual intent classifiers undocumented for future integrators | `docs/backend/decisions/BACKEND_DUAL_CLASSIFIER_DECISION.md` | Already has a decision doc — add explicit warning about not exposing both in a single aggregated response |
