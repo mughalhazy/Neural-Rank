@@ -73,4 +73,14 @@ async function withTransaction(callback) {
   }
 }
 
-module.exports = { initDb, probeDb, getQuery, withTransaction };
+function getPoolStats() {
+  if (!pool) return null;
+  return {
+    total: pool.totalCount,
+    idle: pool.idleCount,
+    waiting: pool.waitingCount,
+    max: 5,
+  };
+}
+
+module.exports = { initDb, probeDb, getQuery, getPoolStats, withTransaction };

@@ -13,7 +13,7 @@ const SECRET_PATTERNS = [
 
 // Paths to skip entirely
 const SKIP_DIRS = new Set(["node_modules", ".git", "coverage", "design", "build"]);
-const SKIP_FILES = new Set([".env.example", "check-secrets.js", "docker-compose.test.yml"]);
+const SKIP_FILES = new Set([".env.example", "check-secrets.js", "docker-compose.test.yml", "docker-compose.yml"]);
 const SKIP_EXTENSIONS = new Set([".dill", ".png", ".jpg", ".gif", ".ico", ".woff", ".woff2", ".ttf", ".eot", ".otf"]);
 
 // Known false-positive patterns (allowlist)

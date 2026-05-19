@@ -5,6 +5,60 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-05-19] — Tier 3 Production Hardening — 16/33 Resolved (14 Owner-Pending, 3 Open)
+
+### Added
+- `backend/src/core/metrics.js` — in-process Prometheus-compatible metrics registry (zero npm dep): `increment`, `observe`, `getMetricsText`; counters + histograms with configurable buckets (T3-03)
+- `GET /v1/metrics` — Prometheus text format endpoint; tracks `http_request_total`, `http_request_duration_ms`, `http_error_total`, `rate_limit_hit_total` per route (T3-03)
+- `Dockerfile` — node:20-alpine, non-root appuser, `npm ci --omit=dev` (T3-06)
+- `docker-compose.yml` — api + postgres:16-alpine; `docker-compose up` produces running API with no manual steps (T3-06)
+- `.dockerignore` — excludes node_modules, .env, design/, ui/, app/, docs/ (T3-06)
+- `.nvmrc` — pins Node.js version to 20 (T3-06)
+- `.husky/pre-commit` — runs `npm run lint && npm run check:secrets` before every commit (T3-07)
+- `.husky/pre-push` — runs `npm run ci` before every push (T3-07)
+- `scripts/scaffold-module.js` — generates 5 contract files + service test from templates; prints manual-step checklist (T3-10)
+- `scripts/check-migrations.js` — verifies all 37+ expected `app_public` tables exist; skips when DATABASE_URL unset (T3-18)
+- `docs/backend/reference/SLO.md` — SLO definitions: 99.5% availability, p99 latency targets, 0.5% error rate; error budget policy; review cadence (T3-19)
+
+### Changed
+- `backend/src/server.js` — ETag + `If-None-Match` / 304 support on all list endpoints (recommendations, tasks, audit-logs) (T3-11)
+- `backend/src/server.js` — `buildHealthPayload()` now includes `pool` stats from `getPoolStats()` (T3-09)
+- `backend/src/server.js` — metrics tracking on every request completion via `response.on("finish")` (T3-03)
+- `backend/src/db.js` — new `getPoolStats()` export: `{ total, idle, waiting, max }` (T3-09)
+- `backend/src/domains/search-intelligence/opportunityScoring.js` — implemented `deriveVolatility()`: derives high/medium/low/unknown from position variance history or SERP feature presence; no longer returns `"unknown"` by default (T3-21)
+- `backend/src/domains/search-intelligence/service.js` — `analyzeQuery()` uses `deriveVolatility()` instead of hardcoded `"unknown"` (T3-21)
+- `backend/src/api/openapi.js` — added `/metrics` path to spec (T3-03)
+- `app/pubspec.yaml` — name `seosync` → `neural_rank`; description updated; all dependency versions pinned (removed `^`) (T3-20, T3-23)
+- `app/android/app/build.gradle` — namespace + applicationId `com.seosync.app` → `com.neuralrank.app` (T3-20)
+- `.env.example` — added 8 integration adapter credential vars (GSC, GA4, PageSpeed, Backlink) (T3-28)
+- `render.yaml` — added 8 adapter credential vars as `sync: false` entries (T3-28)
+- `docs/backend/decisions/BACKEND_DOMAIN_SERVICE_ROUTES.md` — fully rewritten: all 4 domain services now have HTTP routes; complete 26-route inventory; historical "routeless" decision preserved as context (T3-29)
+- `docs/backend/reference/BACKEND_CORE_UTILITIES.md` — nine→fourteen; added entries 10–14: dbUtils, errorReporter, moduleInputRequirements, prioritization, rateLimiter (T3-34 + prior session T3-28 additions)
+- `docs/backend/reference/BACKEND_DATA_AND_PERSISTENCE.md` — 3 new migration rows: workspace_isolation, audit_log_immutability, sync_activation_from_js
+- `docs/backend/reference/RUNBOOK.md` — added "Database backup procedure" scenario (T3-27)
+- `README.md` — Operations section with db:dump command; full env var table (11 core + 8 adapter vars); route count 24→27 (T3-27, T3-28)
+- `scripts/check-secrets.js` — added `docker-compose.yml` to SKIP_FILES (dev credentials)
+- `.github/dependabot.yml` — added Flutter `pub` ecosystem entry for `/app` directory (T3-23)
+- `package.json` — added `engines: { node: ">=20" }`, `db:dump`, `scaffold`, `check:migrations`, `prepare` scripts; `husky` devDependency (T3-06, T3-07, T3-10, T3-18, T3-27)
+
+### Owner-pending (14 items — require external infrastructure)
+- T3-01: Async queue → needs Upstash Redis free tier
+- T3-02: OpenTelemetry → needs `@opentelemetry/sdk-node` + Grafana Cloud free tier
+- T3-04: Redis rate limiter → needs Upstash Redis
+- T3-05: Response caching → depends on T3-04
+- T3-08: Staging environment → needs second Render service on `staging` branch
+- T3-12: Flutter ApiRepository → XL effort (Dio client, Supabase auth, BLoC wiring)
+- T3-14: Composable middleware stack → L effort refactor
+- T3-15: Domain service DI → depends on T3-14
+- T3-16: Load and performance tests → needs k6 + staging (T3-08)
+- T3-17: Flutter screen consolidation → XL effort, depends on T3-12
+- T3-22: Flutter error boundary → depends on T3-12
+- T3-24: Wire 13 stub provider integrations → needs API keys for each provider
+- T3-25: Flutter Insight model fields → depends on T3-12
+- T3-26: Play Store assets → needs design assets (icon, splash screen)
+
+---
+
 ## [2026-05-19] — Tier 2 Adoption Requirements — 23/26 Resolved (3 Owner-Pending)
 
 ### Added

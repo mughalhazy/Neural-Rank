@@ -106,6 +106,32 @@
 
 ---
 
+## Database backup procedure
+
+**Free tier limitation:** Supabase free tier does not include point-in-time recovery (PITR). If the project is accidentally deleted or data is corrupted, the only recovery path is a manual export taken before the incident. Upgrade to Supabase Pro ($25/month) for daily PITR.
+
+**Manual export (run weekly):**
+
+```bash
+# Requires Supabase CLI installed: npm install -g supabase
+supabase db dump --project-ref bvujfwwwwzlpsxbshxyn -f backup_$(date +%Y%m%d).sql
+```
+
+Or via `npm run db:dump` (configured in `package.json`).
+
+**Expected output size:** ~50–200 KB for the current schema + execution data.
+
+**Storage:** Store the `.sql` file in a location outside the project repository (e.g., a private Google Drive folder or S3 bucket). Do not commit backup files to Git.
+
+**Restore procedure:**
+1. Create a new Supabase project (or use a restored one).
+2. Run: `supabase db push --project-ref <new-ref>` to apply migrations first.
+3. Then: `psql $DATABASE_URL -f backup_YYYYMMDD.sql` to restore data.
+
+**Production upgrade path:** Supabase Pro tier enables daily automated PITR with 7-day recovery window. Recommended before any paid tier launch.
+
+---
+
 ## Audit log correction procedure
 
 Audit log rows are immutable by DB trigger — `UPDATE` and `DELETE` raise `audit_log_rows_are_immutable`. To "correct" an audit log entry, insert a new row with:

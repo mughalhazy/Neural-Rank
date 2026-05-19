@@ -41,13 +41,14 @@ Actively consulted specs. These are the source of truth for how the backend is d
 | [BACKEND_MODULE_BOUNDARIES.md](docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md) | `LIVE` | Per-module boundary definitions for all 18 modules — responsibilities, input/output contracts, persistence ownership, activation states |
 | [BACKEND_ACTIVATION_AND_GATING.md](docs/backend/reference/BACKEND_ACTIVATION_AND_GATING.md) | `LIVE` | Activation model — DEFAULT_ACTIVE_MODULES (17), BUILT_BUT_INACTIVE_MODULES (local_seo only), assertModuleCatalogIntegrity() contract |
 | [BACKEND_SERVICES_AND_ORCHESTRATION.md](docs/backend/reference/BACKEND_SERVICES_AND_ORCHESTRATION.md) | `LIVE` | Service layer principles — domain/data/orchestration separation, per-module service expectations, 18-module execution order |
-| [BACKEND_DATA_AND_PERSISTENCE.md](docs/backend/reference/BACKEND_DATA_AND_PERSISTENCE.md) | `LIVE` | Persistence architecture — ownership table for all 18 modules, 9 migration file inventory, schema conventions |
-| [BACKEND_CORE_UTILITIES.md](docs/backend/reference/BACKEND_CORE_UTILITIES.md) | `LIVE` | Catalogue of 9 core utility modules — runtimeContext, createProviderAdapter, seoScorer, intentClassifier, recommendationScoring and more, with signatures and purpose |
+| [BACKEND_DATA_AND_PERSISTENCE.md](docs/backend/reference/BACKEND_DATA_AND_PERSISTENCE.md) | `LIVE` | Persistence architecture — ownership table for all 18 modules, 12 migration file inventory, schema conventions |
+| [BACKEND_CORE_UTILITIES.md](docs/backend/reference/BACKEND_CORE_UTILITIES.md) | `LIVE` | Catalogue of 14 core utility modules — runtimeContext, createProviderAdapter, seoScorer, intentClassifier, recommendationScoring, dbUtils, errorReporter, moduleInputRequirements, prioritization, rateLimiter and more |
+| [SLO.md](docs/backend/reference/SLO.md) | `LIVE` | Service Level Objectives — availability 99.5%, p99 latency targets for /health and /run/default, 0.5% error rate; error budget policy; review cadence *(created 2026-05-19, T3-19)* |
 | [BACKEND_INTEGRATION_BOUNDARIES.md](docs/backend/reference/BACKEND_INTEGRATION_BOUNDARIES.md) | `LIVE` | 18 integration boundary catalogue — 5 implemented adapters (GSC, GA4, PageSpeed, backlink-provider, serp-provider), boundary contracts, fallback rules |
 | [BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md](docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md) | `LIVE` | Audit of all 26 API routes — envelope format, input validation, actor identity, rate-limit headers, safe logging compliance |
 | [BACKEND_DOMAIN_BOUNDARIES.md](docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md) | `LIVE` | All 18 modules mapped to 8 bounded contexts — site-intelligence, search-intelligence, content-operations, technical-operations, execution, measurement, governance, business-intelligence; includes domain layer rationale and compatibility mapping. Supersedes BACKEND_DOMAIN_BOUNDARY_MAP.md and BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md *(created 2026-05-17)* |
 | [OPENAPI.yaml](docs/backend/reference/OPENAPI.yaml) | `LIVE` | OpenAPI 3.1 specification — 26 paths, full schemas (Recommendation, Task, AuditLog, Snapshot, Attribution, BusinessProfile), error responses, Bearer JWT auth *(created 2026-05-19, T2-06)* |
-| [RUNBOOK.md](docs/backend/reference/RUNBOOK.md) | `LIVE` | Operational runbook — 6 scenarios: cold-start latency, DB unreachable, SERP rate-limited, Supabase outage, force restart, credential rotation + audit log correction procedure *(created 2026-05-19, T2-10)* |
+| [RUNBOOK.md](docs/backend/reference/RUNBOOK.md) | `LIVE` | Operational runbook — 7 scenarios: cold-start latency, DB unreachable, SERP rate-limited, Supabase outage, force restart, credential rotation, database backup procedure *(created 2026-05-19, T2-10; updated T3-27)* |
 
 ---
 
@@ -57,7 +58,7 @@ One-time decisions captured for future reference. These explain WHY things are t
 
 | File | Status | Description |
 |------|--------|-------------|
-| [BACKEND_DOMAIN_SERVICE_ROUTES.md](docs/backend/decisions/BACKEND_DOMAIN_SERVICE_ROUTES.md) | `DECISION` | Records the deliberate choice to keep 4 domain services (measurement, technical-ops, search-intelligence, business-intelligence) without HTTP routes — explains rationale and planned future route shapes |
+| [BACKEND_DOMAIN_SERVICE_ROUTES.md](docs/backend/decisions/BACKEND_DOMAIN_SERVICE_ROUTES.md) | `DECISION` | All 4 domain services now have HTTP routes; complete 26-route inventory; historical "routeless" decision preserved as context *(rewritten 2026-05-19, T3-29)* |
 | [BACKEND_DUAL_CLASSIFIER_DECISION.md](docs/backend/decisions/BACKEND_DUAL_CLASSIFIER_DECISION.md) | `DECISION` | Records the intentional existence of two separate intent classifiers: core/intentClassifier.js (4-intent heuristic for module layer) vs search-intelligence domain (7-intent semantic) — prevents future consolidation attempts |
 | [ADR_001_ZERO_RUNTIME_DEPENDENCIES.md](docs/backend/decisions/ADR_001_ZERO_RUNTIME_DEPENDENCIES.md) | `DECISION` | Zero runtime npm dependencies — rationale, alternatives considered, review trigger *(created 2026-05-19, T2-09)* |
 | [ADR_002_PURE_NODE_HTTP.md](docs/backend/decisions/ADR_002_PURE_NODE_HTTP.md) | `DECISION` | Pure node:http (no Express/Fastify) — rationale, consequences *(created 2026-05-19, T2-09)* |

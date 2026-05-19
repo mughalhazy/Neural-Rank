@@ -1,6 +1,8 @@
 const http = require("node:http");
 const { URL } = require("node:url");
-const { initDb, probeDb } = require("./db");
+const { createHash } = require("node:crypto");
+const { initDb, probeDb, getPoolStats } = require("./db");
+const { increment, observe, getMetricsText } = require("./core/metrics");
 const { reportError } = require("./core/errorReporter");
 
 const {
@@ -119,6 +121,25 @@ function sendTooManyRequests(response, rateLimitInfo) {
   );
 }
 
+// ── ETag helpers ─────────────────────────────────────────────────────────────
+
+function computeETag(data) {
+  return `"${createHash("sha256").update(JSON.stringify(data)).digest("hex").slice(0, 16)}"`;
+}
+
+function sendWithETag(response, statusCode, envelope, rateLimitInfo, items) {
+  const etag = computeETag(items);
+  response.setHeader("ETag", etag);
+  response.setHeader("Cache-Control", "private, max-age=0, must-revalidate");
+  sendEnvelope(response, statusCode, envelope, rateLimitInfo);
+}
+
+function checkIfNoneMatch(request, items) {
+  const clientETag = request.headers["if-none-match"];
+  if (!clientETag) return false;
+  return clientETag === computeETag(items);
+}
+
 // ── Request parsing ───────────────────────────────────────────────────────────
 
 function readJsonBody(request) {
@@ -172,6 +193,7 @@ async function buildHealthPayload() {
   const activationState = getDefaultActivationState();
   const grouped = listModulesByActivation();
   const db = await probeDb();
+  const poolStats = getPoolStats();
   const deployable = db.status !== "fail";
   return {
     status: deployable ? "ok" : "degraded",
@@ -182,6 +204,7 @@ async function buildHealthPayload() {
     activeModules: grouped.active,
     inactiveModules: grouped.inactive,
     activationState,
+    pool: poolStats,
   };
 }
 
@@ -291,7 +314,8 @@ async function handleExecutionRecommendations(request, response, baseContext, id
       return true;
     });
     const { items, count, nextCursor } = applyPagination(filtered, pagination);
-    sendEnvelope(response, 200, { ok: true, data: { recommendations: items, count, nextCursor }, meta: {} }, rl);
+    if (checkIfNoneMatch(request, items)) { response.writeHead(304); response.end(); return; }
+    sendWithETag(response, 200, { ok: true, data: { recommendations: items, count, nextCursor }, meta: {} }, rl, items);
     return;
   }
 
@@ -377,7 +401,8 @@ async function handleExecutionTasks(request, response, baseContext) {
     return true;
   });
   const { items, count, nextCursor } = applyPagination(filtered, pagination);
-  sendEnvelope(response, 200, { ok: true, data: { tasks: items, count, nextCursor }, meta: {} }, rl);
+  if (checkIfNoneMatch(request, items)) { response.writeHead(304); response.end(); return; }
+  sendWithETag(response, 200, { ok: true, data: { tasks: items, count, nextCursor }, meta: {} }, rl, items);
 }
 
 async function handleExecutionTask(request, response, pathname, baseContext) {
@@ -446,7 +471,8 @@ async function handleExecutionAuditLogs(request, response, baseContext) {
     return true;
   });
   const { items, count, nextCursor } = applyPagination(filtered, pagination);
-  sendEnvelope(response, 200, { ok: true, data: { auditLogs: items, count, nextCursor }, meta: {} }, rl);
+  if (checkIfNoneMatch(request, items)) { response.writeHead(304); response.end(); return; }
+  sendWithETag(response, 200, { ok: true, data: { auditLogs: items, count, nextCursor }, meta: {} }, rl, items);
 }
 
 // ── Measurement domain handlers ───────────────────────────────────────────────
@@ -601,6 +627,7 @@ const AVAILABLE_ROUTES = [
   "POST /v1/business-intelligence/profiles",
   "GET /v1/openapi.json",
   "GET /v1/docs",
+  "GET /v1/metrics",
 ];
 
 function createRequestHandler(baseContext = {}) {
@@ -613,13 +640,23 @@ function createRequestHandler(baseContext = {}) {
     response.setHeader("X-Request-ID", correlationId);
 
     response.on("finish", () => {
+      const durationMs = Date.now() - startedAt;
       logRequestEvent("request", {
         method: request.method,
         path: rawPathname,
         status: response.statusCode,
-        durationMs: Date.now() - startedAt,
+        durationMs,
         correlationId,
       });
+      const routeLabel = rawPathname.replace(/\/[0-9a-f-]{36}/gi, "/:id").replace(/^\/v1/, "/v1");
+      increment("http_request_total", { route: routeLabel, method: request.method, status: String(response.statusCode) });
+      observe("http_request_duration_ms", durationMs, { route: routeLabel });
+      if (response.statusCode >= 500) {
+        increment("http_error_total", { route: routeLabel, status: String(response.statusCode) });
+      }
+      if (response.statusCode === 429) {
+        increment("rate_limit_hit_total", { route: routeLabel });
+      }
     });
 
     try {
@@ -791,6 +828,16 @@ function createRequestHandler(baseContext = {}) {
         addSecurityHeaders(headers);
         response.writeHead(200, headers);
         response.end(SWAGGER_UI_HTML);
+        return;
+      }
+
+      if (pathname === "/metrics") {
+        if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
+        const body = getMetricsText();
+        const headers = { "Content-Type": "text/plain; version=0.0.4; charset=utf-8", "Content-Length": Buffer.byteLength(body) };
+        addSecurityHeaders(headers);
+        response.writeHead(200, headers);
+        response.end(body);
         return;
       }
 

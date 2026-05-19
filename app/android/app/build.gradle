@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.seosync.app"
+    namespace = "com.neuralrank.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.seosync.app"
+        applicationId = "com.neuralrank.app"
         minSdkVersion = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

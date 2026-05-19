@@ -5,7 +5,7 @@ Anchors:
 - [BACKEND_MASTER_SPEC.md](BACKEND_MASTER_SPEC.md)
 - [BACKEND_MODULE_BOUNDARIES.md](BACKEND_MODULE_BOUNDARIES.md)
 
-This document catalogs the twelve core utility modules in `backend/src/core/`. These files are shared infrastructure consumed by modules, domains, orchestration, and persistence layers. They do not contain business logic specific to any one module.
+This document catalogs the fourteen core utility modules in `backend/src/core/`. These files are shared infrastructure consumed by modules, domains, orchestration, and persistence layers. They do not contain business logic specific to any one module.
 
 ---
 
@@ -224,3 +224,44 @@ This document catalogs the twelve core utility modules in `backend/src/core/`. T
 - `MODULE_INPUT_REQUIREMENTS` — a frozen map of `{ [moduleKey]: string[] }` covering all 18 modules. Each value is an array of acceptable input field names; a non-empty intersection with the incoming `moduleInput` object satisfies the requirement. Example entries: `review_analysis: ["appId", "websiteUrl"]`, `local_seo: ["websiteUrl", "domain", "location"]`.
 
 **Consumed by:** `api/validation.js` (per-module run validation for `POST /v1/modules/:key/run`) and the orchestration entry points when validating batch inputs.
+
+---
+
+## 13. prioritization.js
+
+**File:** `backend/src/core/prioritization.js`
+
+**Purpose:** Shared priority ordering and deduplication primitives used by module services when building their `priority` and `action` output arrays. Provides deterministic, stable sorting so that equivalent recommendations from different modules are ordered consistently.
+
+**Key exports:**
+
+- `normalizePriority(priority)` — coerces any string to `"high"`, `"medium"`, or `"low"`; unknown values fall back to `"low"`.
+- `getPriorityScore(priority)` — maps `"high"` → 300, `"medium"` → 200, `"low"` → 100. Used as the primary sort key.
+- `getReferenceValue(entry)` — extracts the best available reference string from an entry (`reference`, `sectionRef`, `assetRef`, `clusterKey`, `competitorRef`, `keyword`). Returns `null` if none are present.
+- `orderPriorityEntries(entries)` — deduplicates and sorts priority entries. Primary key: `getPriorityScore` (descending). Secondary key: `businessValue` (descending, nulls last). Tertiary keys: `moduleKey` → `type` → `reference` (all ascending, for stable deterministic order).
+- `orderActionEntries(actions)` — sorts action entries by the same priority ordering plus `action` string as a final tiebreaker.
+- `dedupePriorityEntries(entries)` — deduplicates entries by `moduleKey:type:reference` composite key; on collision, keeps the higher-priority entry.
+- `comparePriorityEntries(left, right)` — comparator function used internally; exported for custom sort extensions.
+
+**Consumed by:** `backend/src/index.js` and all 18 module `service.js` files that produce priority or action output arrays.
+
+---
+
+## 14. rateLimiter.js
+
+**File:** `backend/src/core/rateLimiter.js`
+
+**Purpose:** In-memory sliding-window rate limiter. Enforces per-IP and per-actor request limits within a fixed 60-second window. Designed as a lightweight in-process limiter with no npm dependencies; state resets on server restart. A Redis-backed replacement is planned under T3-04.
+
+**Key exports:**
+
+- `DEFAULT_LIMIT` — `120` requests per minute per IP (applies to all routes).
+- `MUTATION_LIMIT` — `30` requests per minute per actor (applies only to POST/PATCH mutation endpoints when an actor identity is present).
+- `checkLimit(key, limit)` — increments the counter for `key` within the current 60-second window. Returns `{ allowed: boolean, remaining: number, resetAt: timestamp, limit }`. Creates a new window if none exists or the previous window expired.
+- `getIpKey(request)` — extracts the real client IP from `X-Forwarded-For`, respecting `TRUSTED_PROXY_COUNT` (default 1 for Render) to prevent IP spoofing. Falls back to `request.socket.remoteAddress`. Returns a string in the form `ip:<address>`.
+- `getActorKey(actor)` — returns `actor:<actor>` as the rate-limit key for per-actor mutation limiting.
+- `resetForTests()` — clears all in-memory state. **Test-only.** Called between test cases in `server.test.js` to avoid cross-test rate-limit state bleed.
+
+**Window cleanup:** A `setInterval` with `.unref()` runs every 5 minutes to evict expired window entries and prevent unbounded memory growth.
+
+**Consumed by:** `server.js` — `applyRateLimit()` calls `checkLimit` for every incoming request.

@@ -7,43 +7,61 @@ Anchors:
 - `backend/src/server.js`
 - `backend/src/domains/`
 
-This document records the four domain services that are fully implemented in the backend but have no HTTP routes exposed through `server.js`. It documents what each service does, its public methods, and the explicit decision that these services are intentionally routeless at this stage — accessed internally by orchestration only. Exposing them via HTTP is flagged as planned P1 work.
+This document describes the four domain services and their current HTTP route exposure. All four were initially deployed without direct HTTP routes (documented as "routeless" in the original decision). Direct routes were added on 2026-05-15 once identity and authentication infrastructure matured. The original "routeless" rationale is preserved below for historical context.
 
 ---
 
 ## Current HTTP Route Inventory (server.js)
 
-For reference, these are the routes that currently exist:
+All 26 routes are versioned under `/v1/`. Legacy unversioned paths redirect 301 with `Deprecation: true`.
 
 | Method | Path | Description |
 |---|---|---|
-| GET | `/health` | Backend health, module activation state |
-| GET | `/ready` | Readiness check |
-| GET | `/modules` | Module catalog listing |
-| POST | `/run/default` | Run all default-active modules |
-| POST | `/run/activation-aware` | Run with activation overrides |
-| POST | `/modules/:moduleKey/run` | Run a single module by key |
-| GET | `/execution/recommendations` | List recommendations |
-| POST | `/execution/recommendations` | Create recommendation |
-| PATCH | `/execution/recommendations/:id/status` | Update recommendation status |
-| POST | `/execution/recommendations/:id/tasks` | Create task from recommendation |
-| GET | `/execution/tasks` | List tasks |
-| GET | `/execution/tasks/:id` | Get task by ID |
-| PATCH | `/execution/tasks/:id/status` | Update task status |
-| GET | `/execution/tasks/:id/history` | Get task status history |
-| GET | `/execution/audit-logs` | List audit log entries |
-
-The four domain services below are not represented in this list.
+| GET | `/v1/health` | Backend health, module activation state |
+| GET | `/v1/ready` | Readiness check |
+| GET | `/v1/modules` | Module catalog listing |
+| POST | `/v1/run/default` | Run all default-active modules |
+| POST | `/v1/run/activation-aware` | Run with activation overrides |
+| POST | `/v1/modules/:moduleKey/run` | Run a single module by key |
+| GET | `/v1/execution/recommendations` | List recommendations |
+| POST | `/v1/execution/recommendations` | Create recommendation |
+| PATCH | `/v1/execution/recommendations/:id/status` | Update recommendation status |
+| POST | `/v1/execution/recommendations/:id/tasks` | Create task from recommendation |
+| GET | `/v1/execution/tasks` | List tasks |
+| GET | `/v1/execution/tasks/:id` | Get task by ID |
+| PATCH | `/v1/execution/tasks/:id/status` | Update task status |
+| GET | `/v1/execution/tasks/:id/history` | Get task status history |
+| GET | `/v1/execution/audit-logs` | List audit log entries |
+| GET | `/v1/measurement/metrics` | Metric source registry |
+| POST | `/v1/measurement/snapshots` | Record baseline / post-change snapshot |
+| POST | `/v1/measurement/attributions` | Record attribution link |
+| GET | `/v1/measurement/attributions/:id` | Measurement summary by attribution ID |
+| POST | `/v1/technical-operations/audit` | Source HTML technical SEO audit |
+| POST | `/v1/search-intelligence/classify` | Intent classification |
+| POST | `/v1/search-intelligence/analyze` | Full SERP query analysis |
+| GET | `/v1/business-intelligence/profiles` | List business profiles |
+| POST | `/v1/business-intelligence/profiles` | Create business profile |
+| GET | `/v1/openapi.json` | OpenAPI 3.1 spec |
+| GET | `/v1/docs` | Swagger UI |
 
 ---
 
-## Domain Services Without HTTP Routes
+## Domain Services With HTTP Routes
 
 ### 1. Measurement Service
 
 **Location:** `backend/src/domains/measurement/service.js`
 **Contract key:** `measurementService`
 **Domain key:** `measurement`
+
+**Current HTTP routes:**
+
+| Method | Path | Handler |
+|---|---|---|
+| `GET` | `/v1/measurement/metrics` | `handleMeasurementMetrics` |
+| `POST` | `/v1/measurement/snapshots` | `handleMeasurementSnapshots` |
+| `POST` | `/v1/measurement/attributions` | `handleMeasurementAttributions` |
+| `GET` | `/v1/measurement/attributions/:id` | `handleMeasurementAttributions` |
 
 **What it does:** Owns baseline and post-change metric snapshot contracts, metric source registry management, and attribution link records. Its core purpose is to separate observed metric movement from confirmed causal impact — a change can be attributed to a recommendation or task without claiming confirmed impact until evidence supports that classification.
 
@@ -58,18 +76,7 @@ The four domain services below are not represented in this list.
 | `recordAttributionLink` | `(input, context)` | Creates an attribution record linking a metric, snapshots, and an impact classification (`unknown`, `observed_correlation`, `confirmed_impact`). |
 | `getMeasurementSummary` | `(attributionId, context)` | Fetches an attribution record plus its related snapshots and metric source, returns a built measurement summary object. |
 
-**Repository:** Falls back to an in-memory repository if no Postgres query function is in context. A `createPostgresMeasurementRepository` is also available for production use.
-
-**Why no HTTP route yet:** The measurement service is consumed internally by the execution domain and by orchestration flows that track recommendation outcomes. Exposing it via HTTP requires designing authentication and scoping rules for snapshot creation (a POST endpoint for baseline snapshots could be misused without proper guarding). This is deferred until the recommendation-outcome tracking flow is productized.
-
-**Planned future route shape:**
-```
-GET  /measurement/metric-sources
-POST /measurement/snapshots/baseline
-POST /measurement/snapshots/post-change
-POST /measurement/attributions
-GET  /measurement/attributions/:attributionId/summary
-```
+**Repository:** Falls back to an in-memory repository if no Postgres query function is in context.
 
 ---
 
@@ -79,21 +86,20 @@ GET  /measurement/attributions/:attributionId/summary
 **Contract key:** `technicalOperationsService`
 **Domain key:** `technical_operations`
 
-**What it does:** Owns source HTML technical SEO analysis contracts. Runs a set of source HTML analyzers against provided HTML input, classifies findings by severity, and returns structured findings with severity, evidence, recommended action, governance risk, and confidence. Deliberately keeps source HTML analysis separate from rendered DOM analysis (rendered DOM is represented as a placeholder pending future headless browser integration).
+**Current HTTP routes:**
+
+| Method | Path | Handler |
+|---|---|---|
+| `POST` | `/v1/technical-operations/audit` | `handleTechnicalOperationsAudit` |
+
+**What it does:** Owns source HTML technical SEO analysis contracts. Runs a set of source HTML analyzers against provided HTML input, classifies findings by severity, and returns structured findings with severity, evidence, recommended action, governance risk, and confidence.
 
 **Public methods (from `createTechnicalOperationsService()`):**
 
 | Method | Signature | Description |
 |---|---|---|
-| `auditSourceHtml` | `(input)` | Runs `runSourceHtmlAnalyzers(input)` against the provided HTML, summarizes findings by severity count (total, critical, high, medium, low), and returns findings plus a rendered DOM placeholder. |
+| `auditSourceHtml` | `(input)` | Runs `runSourceHtmlAnalyzers(input)` against the provided HTML; summarizes findings by severity count; returns findings plus rendered DOM placeholder. |
 | `auditTechnicalSeo` | `(input)` | Alias for `auditSourceHtml` — provided for semantic clarity at call sites. |
-
-**Why no HTTP route yet:** The technical-operations domain is consumed internally by the `technical_seo_audit` module, which calls it as part of the module's analysis phase. Exposing it directly via HTTP creates a question about whether callers should go through the module (which persists results and applies the full `INPUT -> ANALYSIS -> INSIGHT -> PRIORITY -> ACTION` flow) or through the domain service (which returns raw findings only). That interface boundary decision is deferred to P1.
-
-**Planned future route shape:**
-```
-POST /domains/technical-operations/audit/source-html
-```
 
 ---
 
@@ -103,24 +109,23 @@ POST /domains/technical-operations/audit/source-html
 **Contract key:** `searchIntelligenceService`
 **Domain key:** `search_intelligence`
 
-**What it does:** Coordinates keyword analysis, rank tracking, and competitor analysis intelligence through a unified provider-based query interface. Classifies search query intent, fetches SERP data via a pluggable provider interface, computes opportunity scores, and models SERP volatility. Provides compatibility adapters for three legacy module keys: `keyword_analysis`, `rank_tracking`, `competitor_analysis`.
+**Current HTTP routes:**
+
+| Method | Path | Handler |
+|---|---|---|
+| `POST` | `/v1/search-intelligence/classify` | `handleSearchIntelligenceClassify` |
+| `POST` | `/v1/search-intelligence/analyze` | `handleSearchIntelligenceAnalyze` |
+
+**What it does:** Coordinates keyword analysis, rank tracking, and competitor analysis intelligence through a unified provider-based query interface. Classifies search query intent, fetches SERP data via a pluggable provider interface, computes opportunity scores, and models SERP volatility.
 
 **Public methods (from `createSearchIntelligenceService()`):**
 
 | Method | Signature | Description |
 |---|---|---|
 | `classifyIntent` | `(input)` | Creates a query record and classifies its intent, returning `{ query, intent }`. |
-| `analyzeQuery` | `(input, context)` | Full query analysis: classifies intent, fetches SERP data from the resolved provider, detects SERP features and competitor results, computes an opportunity score (0–100), and models volatility status. Returns `{ contract, query, intent, serp, competitorResults, opportunity, volatility, providerStatus }`. |
+| `analyzeQuery` | `(input, context)` | Full query analysis: classifies intent, fetches SERP data, detects SERP features and competitor results, computes opportunity score (0–100), derives volatility. Returns `{ contract, query, intent, serp, competitorResults, opportunity, volatility, providerStatus }`. |
 
-**Compatibility adapters:** `keyword_analysis`, `rank_tracking`, `competitor_analysis` — these adapters allow the domain service to be invoked from orchestration flows that reference legacy module keys.
-
-**Why no HTTP route yet:** The search intelligence domain has the most complex dependency surface of the four routeless services. It requires a configured SERP provider in context to return live data, and its `analyzeQuery` method is designed for orchestration-internal use where context already carries provider credentials. Exposing it via HTTP requires a separate auth-aware credential injection strategy for the SERP provider. Deferred to P1.
-
-**Planned future route shape:**
-```
-POST /domains/search-intelligence/classify-intent
-POST /domains/search-intelligence/analyze-query
-```
+**Compatibility adapters:** `keyword_analysis`, `rank_tracking`, `competitor_analysis`.
 
 ---
 
@@ -130,38 +135,36 @@ POST /domains/search-intelligence/analyze-query
 **Contract key:** `businessIntelligenceService`
 **Domain key:** `business_intelligence`
 
-**What it does:** Owns manual-input business objective contracts. Stores business profiles containing target page value, funnel stage, lead/revenue relevance, and content ROI scores. Provides a priority extension method that enriches recommendation scoring with business value evidence — but only when evidence-backed business values exist. Unknown business values remain as `null` rather than being invented.
+**Current HTTP routes:**
+
+| Method | Path | Handler |
+|---|---|---|
+| `GET` | `/v1/business-intelligence/profiles` | `handleBusinessIntelligenceProfiles` |
+| `POST` | `/v1/business-intelligence/profiles` | `handleBusinessIntelligenceProfiles` |
+
+**What it does:** Owns manual-input business objective contracts. Stores business profiles containing target page value, funnel stage, lead/revenue relevance, and content ROI scores. Provides a priority extension method that enriches recommendation scoring with business value evidence.
 
 **Public methods (from `createBusinessIntelligenceService()`):**
 
 | Method | Signature | Description |
 |---|---|---|
-| `createBusinessProfile` | `(input, context)` | Creates and persists a business profile record (target URL, funnel stage, value scores, etc.). |
+| `createBusinessProfile` | `(input, context)` | Creates and persists a business profile record. |
 | `listBusinessProfiles` | `(context)` | Returns all business profiles from the repository. |
-| `extendPriorityWithBusinessValue` | `(priorityInput, businessProfile)` | Merges available business value fields from a profile into a priority scoring input, creating a `businessPriorityExtension`. Returns `null` business value if no evidence-backed value is present. |
+| `extendPriorityWithBusinessValue` | `(priorityInput, businessProfile)` | Merges available business value fields from a profile into a priority scoring input. Returns `null` business value if no evidence-backed value is present. |
 
 **Repository:** Falls back to an in-memory repository if no Postgres query function is in context.
 
-**Why no HTTP route yet:** Business profile creation is a user-driven manual input flow that belongs in a frontend-facing API layer with proper user identity scoping. The in-memory fallback used in current orchestration is adequate while the frontend is being built. A production route requires user/workspace identity binding that is not yet wired into the server. Deferred to P1.
-
-**Planned future route shape:**
-```
-GET  /domains/business-intelligence/profiles
-POST /domains/business-intelligence/profiles
-```
-
 ---
 
-## Decision Record: Routeless Domain Services
+## Historical Decision Record: Originally Routeless Domain Services
 
-**Decision:** The four domain services above are intentionally routeless at this stage.
+**Original decision (pre-2026-05-15):** The four domain services above were intentionally routeless — accessible only via internal orchestration.
 
-**Rationale:**
-1. All four are fully implemented and callable internally. Lack of HTTP routes does not indicate incomplete implementation.
-2. Each service has a specific reason for deferral that involves a dependency outside the current backend scope: credential injection strategies (search intelligence), user identity scoping (business intelligence, measurement), or interface boundary decisions (technical operations).
-3. Exposing them prematurely as HTTP routes without addressing these dependencies would create routes that either do not work in production or create security surface without proper guarding.
-4. The execution domain (recommendations, tasks, audit logs) was prioritized first because it has a clearer, self-contained auth surface that the existing `extractRequestIdentity` / `requireMutationIdentity` infrastructure already covers.
+**Original rationale:**
+1. All four were fully implemented and callable internally. Lack of HTTP routes did not indicate incomplete implementation.
+2. Each service had a specific reason for deferral: credential injection strategies (search intelligence), user identity scoping (business intelligence, measurement), or interface boundary decisions (technical operations).
+3. Exposing them prematurely without addressing these dependencies would create routes that either did not work in production or created security surface without proper guarding.
 
-**Status:** Flagged as planned P1 work to expose these four services via HTTP routes as the frontend integration layer matures and credential/identity infrastructure is extended.
+**Route addition (2026-05-15):** Direct routes were added once the `resolveRequestIdentity` / `requireIdentity` infrastructure matured and the frontend integration layer required direct domain service access. See CHANGELOG.md entry for 2026-05-15 for the full list of routes added.
 
-**Owner:** Backend architecture — no action required from module owners or integration adapters.
+**Current status:** All four domain services have dedicated HTTP routes. The original "routeless" classification no longer applies.

@@ -963,7 +963,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `/v1/run/default` returns 202 immediately; result available at `/v1/jobs/:jobId`.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -981,7 +981,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Single `/v1/run/default` call produces a waterfall trace in Grafana.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -998,7 +998,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `GET /v1/metrics` returns valid Prometheus text; Grafana dashboard shows live data.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1017,7 +1017,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Rate limit state survives restarts; works correctly across multiple instances.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1035,7 +1035,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Second identical module run returns `X-Cache: HIT` in < 5ms.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1055,7 +1055,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `docker-compose up` produces a running API with no manual steps.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1074,7 +1074,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** ESLint error blocks commit; failing test blocks push.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1092,7 +1092,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Every PR deploys to staging; smoke test must pass before production promotion.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1110,7 +1110,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Pool stats visible in `/v1/health`; 6 concurrent DB requests handled without errors.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1128,7 +1128,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `npm run scaffold -- local_seo_v2 "Local SEO v2"` produces 6 files that pass `npm run ci` immediately.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1147,7 +1147,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Clients receive 304 on unchanged lists; ETag changes when list changes.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1169,7 +1169,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Release build communicates with Render backend; MockRepository retained for debug/test.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1209,7 +1209,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Adding a new cross-cutting concern (e.g., a new header) requires changing one middleware, not every handler.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1229,7 +1229,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `resetExecutionServiceState()` calls are no longer needed in tests; each test creates a fresh container.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1249,7 +1249,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Load test script runs and produces a pass/fail against defined thresholds; baseline numbers documented.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1270,7 +1270,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `ui/` directory removed; `app/` contains all screens; no `MockRepository` calls in production build.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1289,7 +1289,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Missing a migration file causes `npm run test:integration` to fail with a clear error.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1311,7 +1311,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `SLO.md` committed; Grafana alerts configured for each SLO breach threshold.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1332,7 +1332,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** App shows as "Neural Rank" on device; no "seosync" references remain in any tracked file.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1356,7 +1356,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `analyzeQuery()` returns a meaningful volatility classification based on available signals; "unknown" is only returned when no signals are present, not by default.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1376,7 +1376,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** An unhandled exception in a widget shows a friendly error screen in release builds; crash is reported to the monitoring service.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1401,7 +1401,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** All Flutter dependencies are exact-version pinned; `pubspec.lock` is committed; Dependabot creates update PRs weekly.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1421,7 +1421,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** All 18 modules return signal-driven results; `integration_incomplete` no longer appears in any module run on a fully-configured instance.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1444,7 +1444,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** All insight cards in the app display evidence, explanation, and a next-step action; no insight renders with empty evidence section.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1464,7 +1464,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** App icon appears on device home screen; splash screen shows on launch; privacy policy URL is live and linked in Play Console.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -1483,7 +1483,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `README.md` and `RUNBOOK.md` document the manual backup procedure with exact commands; `npm run db:dump` runs the export.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1524,7 +1524,7 @@ The SERP (`SERP_PROVIDER`, `SERP_API_KEY`) and renderer (`RENDERER_ENDPOINT`) ad
 
 **Definition of done:** `.env.example` documents all adapter env vars; README table includes all of them; render.yaml includes all 8 as `sync: false` entries.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1543,7 +1543,7 @@ The SERP (`SERP_PROVIDER`, `SERP_API_KEY`) and renderer (`RENDERER_ENDPOINT`) ad
 
 **Definition of done:** Doc accurately reflects current server.js routing; no stale "routeless" claim without qualification.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1617,7 +1617,7 @@ Item was added based on doc description of fields as "planned" — code was ahea
 
 **Definition of done:** Audit doc covers all 24 routes; no route is missing; Hardening Summary no longer says "placeholder" for implemented features.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1639,7 +1639,7 @@ Both are shared infrastructure used across the codebase with no documented inter
 
 **Definition of done:** BACKEND_CORE_UTILITIES.md covers all 11 non-activation core utilities; opening sentence count is correct.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1691,40 +1691,40 @@ Both are shared infrastructure used across the codebase with no documented inter
 | T2-24 | Renderer endpoint configuration (owner action) | 2 | `owner-pending` | M |
 | T2-25 | Supabase database keep-alive | 2 | `resolved` | S |
 | T2-26 | Module catalog integrity reverse check | 2 | `resolved` | S |
-| T3-01 | Async module execution + queue | 3 | `open` | XL |
-| T3-02 | OpenTelemetry tracing | 3 | `open` | L |
-| T3-03 | Prometheus metrics endpoint | 3 | `open` | L |
-| T3-04 | Redis rate limiter | 3 | `open` | M |
-| T3-05 | Response caching | 3 | `open` | L |
-| T3-06 | Docker + docker-compose | 3 | `open` | M |
-| T3-07 | Pre-commit hooks (Husky) | 3 | `open` | S |
-| T3-08 | Staging environment + smoke tests | 3 | `open` | M |
-| T3-09 | Connection pool tuning | 3 | `open` | S |
-| T3-10 | Module scaffolding generator | 3 | `open` | M |
-| T3-11 | ETag / conditional requests | 3 | `open` | M |
-| T3-12 | Flutter ApiRepository | 3 | `open` | XL |
+| T3-01 | Async module execution + queue | 3 | `owner-pending` | XL |
+| T3-02 | OpenTelemetry tracing | 3 | `owner-pending` | L |
+| T3-03 | Prometheus metrics endpoint | 3 | `resolved` | L |
+| T3-04 | Redis rate limiter | 3 | `owner-pending` | M |
+| T3-05 | Response caching | 3 | `owner-pending` | L |
+| T3-06 | Docker + docker-compose | 3 | `resolved` | M |
+| T3-07 | Pre-commit hooks (Husky) | 3 | `resolved` | S |
+| T3-08 | Staging environment + smoke tests | 3 | `owner-pending` | M |
+| T3-09 | Connection pool tuning | 3 | `resolved` | S |
+| T3-10 | Module scaffolding generator | 3 | `resolved` | M |
+| T3-11 | ETag / conditional requests | 3 | `resolved` | M |
+| T3-12 | Flutter ApiRepository | 3 | `owner-pending` | XL |
 | T3-13 | Router refactoring (map-based dispatcher) | 3 | `open` | M |
-| T3-14 | Composable middleware stack | 3 | `open` | L |
-| T3-15 | Domain service DI pattern | 3 | `open` | L |
-| T3-16 | Load and performance tests | 3 | `open` | M |
-| T3-17 | Flutter screen consolidation (ui/ → app/) | 3 | `open` | XL |
-| T3-18 | Automated DB migration CI check | 3 | `open` | M |
-| T3-19 | SLO definition and error budget | 3 | `open` | M |
-| T3-20 | Flutter app name consistency (seosync → neural-rank) | 3 | `open` | S |
-| T3-21 | Volatility analysis implementation | 3 | `open` | L |
-| T3-22 | Flutter error boundary and crash resilience | 3 | `open` | M |
-| T3-23 | Flutter dependency version pinning | 3 | `open` | S |
-| T3-24 | Wire real provider integrations — 13 stub adapters | 3 | `open` | XL |
-| T3-25 | Flutter Insight model — add evidence/explanation/nextStep | 3 | `open` | M |
-| T3-26 | Play Store submission assets | 3 | `open` | M |
-| T3-27 | DB backup strategy documentation | 3 | `open` | S |
-| T3-28 | Adapter env vars missing from .env.example | 3 | `open` | S |
-| T3-29 | Fix BACKEND_DOMAIN_SERVICE_ROUTES.md drift | 3 | `open` | S |
+| T3-14 | Composable middleware stack | 3 | `owner-pending` | L |
+| T3-15 | Domain service DI pattern | 3 | `owner-pending` | L |
+| T3-16 | Load and performance tests | 3 | `owner-pending` | M |
+| T3-17 | Flutter screen consolidation (ui/ → app/) | 3 | `owner-pending` | XL |
+| T3-18 | Automated DB migration CI check | 3 | `resolved` | M |
+| T3-19 | SLO definition and error budget | 3 | `resolved` | M |
+| T3-20 | Flutter app name consistency (seosync → neural-rank) | 3 | `resolved` | S |
+| T3-21 | Volatility analysis implementation | 3 | `resolved` | L |
+| T3-22 | Flutter error boundary and crash resilience | 3 | `owner-pending` | M |
+| T3-23 | Flutter dependency version pinning | 3 | `resolved` | S |
+| T3-24 | Wire real provider integrations — 13 stub adapters | 3 | `owner-pending` | XL |
+| T3-25 | Flutter Insight model — add evidence/explanation/nextStep | 3 | `owner-pending` | M |
+| T3-26 | Play Store submission assets | 3 | `owner-pending` | M |
+| T3-27 | DB backup strategy documentation | 3 | `resolved` | S |
+| T3-28 | Adapter env vars missing from .env.example | 3 | `resolved` | S |
+| T3-29 | Fix BACKEND_DOMAIN_SERVICE_ROUTES.md drift | 3 | `resolved` | S |
 | T3-30 | ~~REMOVED — Phase 2 signals already implemented in code~~ | — | — | — |
 | T3-31 | Frontend capability audit — 17 remaining modules | 3 | `open` | L |
 | T3-32 | Extend FRONTEND_CONTENT_FULL_SYSTEM.md to Phase 2 | 3 | `open` | M |
-| T3-33 | Update BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md — 14→24 routes | 3 | `open` | S |
-| T3-34 | Document prioritization.js + rateLimiter.js in BACKEND_CORE_UTILITIES.md | 3 | `open` | S |
+| T3-33 | Update BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md — 14→24 routes | 3 | `resolved` | S |
+| T3-34 | Document prioritization.js + rateLimiter.js in BACKEND_CORE_UTILITIES.md | 3 | `resolved` | S |
 
 **Total: 77 items** — 18 × Tier 1 (all resolved 2026-05-19) · 26 × Tier 2 · 33 × Tier 3
 *(T3-30 removed after full code audit confirmed Phase 2 signals already implemented)*

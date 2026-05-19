@@ -814,6 +814,19 @@ const SPEC = {
         },
       },
     },
+    "/metrics": {
+      get: {
+        operationId: "getPrometheusMetrics",
+        summary: "Prometheus-compatible metrics",
+        description: "Returns in-process metrics in Prometheus text format (counters and histograms for HTTP requests, durations, errors, and rate limit hits). State resets on server restart.",
+        security: [],
+        tags: ["Infra"],
+        responses: {
+          200: { description: "Prometheus text format metrics.", content: { "text/plain": { schema: { type: "string" } } } },
+          405: { $ref: "#/components/responses/MethodNotAllowed" },
+        },
+      },
+    },
   },
   tags: [
     { name: "Infra", description: "Health, readiness, and API documentation endpoints." },

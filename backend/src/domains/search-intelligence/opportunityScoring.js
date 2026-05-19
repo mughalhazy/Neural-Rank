@@ -51,6 +51,78 @@ function calculateOpportunityScore({
   };
 }
 
+// Derives SERP volatility from available signals — no external provider required.
+// Returns { status, confidence, rationale, signals }.
+// "unknown" is returned only when no signals are present, never by default.
+function deriveVolatility(serpData = {}, historicalPositions = []) {
+  const signals = [];
+
+  const hasHistory = Array.isArray(historicalPositions) && historicalPositions.length >= 2;
+  if (hasHistory) {
+    const positions = historicalPositions.map((p) => Number(p)).filter(Number.isFinite);
+    const min = Math.min(...positions);
+    const max = Math.max(...positions);
+    const variance = max - min;
+    signals.push({ name: "position_variance", value: variance });
+
+    if (variance > 10) {
+      return {
+        status: "high",
+        confidence: 0.82,
+        rationale: `Position variance of ${variance} positions across ${positions.length} observations indicates high SERP volatility.`,
+        signals,
+      };
+    }
+    if (variance >= 5) {
+      return {
+        status: "medium",
+        confidence: 0.75,
+        rationale: `Position variance of ${variance} positions across ${positions.length} observations indicates moderate SERP volatility.`,
+        signals,
+      };
+    }
+    return {
+      status: "low",
+      confidence: 0.80,
+      rationale: `Position variance of ${variance} positions across ${positions.length} observations indicates stable rankings.`,
+      signals,
+    };
+  }
+
+  // Use SERP feature presence as a proxy for volatility when no history is available.
+  const hasFeatureOwnership = Array.isArray(serpData.featureOwnership) && serpData.featureOwnership.length > 0;
+  const hasFeaturedSnippet = serpData.featuredSnippetDetected === true;
+  const hasAiOverview = serpData.aiOverviewDetected === true;
+
+  if (hasFeaturedSnippet || hasAiOverview) {
+    signals.push({ name: "serp_features_detected", value: true });
+    return {
+      status: "high",
+      confidence: 0.60,
+      rationale: "Featured snippets and AI overviews frequently reshuffle — indicates elevated volatility risk.",
+      signals,
+    };
+  }
+
+  if (hasFeatureOwnership) {
+    signals.push({ name: "serp_feature_ownership", value: serpData.featureOwnership.length });
+    return {
+      status: "medium",
+      confidence: 0.55,
+      rationale: "SERP feature presence indicates moderate volatility; ownership may shift as Google experiments.",
+      signals,
+    };
+  }
+
+  return {
+    status: "unknown",
+    confidence: 0.30,
+    rationale: "Insufficient signals to classify volatility — no historical position data and no SERP feature observations.",
+    signals,
+  };
+}
+
 module.exports = {
   calculateOpportunityScore,
+  deriveVolatility,
 };

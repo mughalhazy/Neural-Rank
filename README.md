@@ -128,6 +128,20 @@ All requests are rate-limited by IP address: **120 req/min** default, **30 req/m
 
 ---
 
+## Operations
+
+### Database backup
+
+Supabase free tier does not include PITR. Manual export procedure:
+
+```bash
+npm run db:dump   # runs: supabase db dump --project-ref bvujfwwwwzlpsxbshxyn -f backup_$(date +%Y%m%d).sql
+```
+
+Store backup files outside the repo. See `RUNBOOK.md` for the full restore procedure. Supabase Pro ($25/month) enables daily automated PITR.
+
+---
+
 ## Key docs
 
 | Doc | Purpose |
@@ -147,7 +161,9 @@ All requests are rate-limited by IP address: **120 req/min** default, **30 req/m
 
 ## Environment variables
 
-All 6 vars are documented in `.env.example`. Copy it to `.env` for local dev. Production values live in the Render dashboard only — `render.yaml` uses `sync: false` and contains no plaintext secrets.
+All vars are documented in `.env.example`. Copy it to `.env` for local dev. Production values live in the Render dashboard only — `render.yaml` uses `sync: false` and contains no plaintext secrets.
+
+**Core vars:**
 
 | Variable | Purpose |
 |---|---|
@@ -158,3 +174,20 @@ All 6 vars are documented in `.env.example`. Copy it to `.env` for local dev. Pr
 | `RENDERER_ENDPOINT` | URL of a headless renderer service (optional) |
 | `DATABASE_URL` | PostgreSQL connection string for persistent execution data |
 | `PORT` | Server port (default 10000 on Render) |
+| `ALLOWED_ORIGIN` | CORS allowed origin (`*` for dev) |
+| `TRUSTED_PROXY_COUNT` | Proxy hops in front of server (default 1 for Render) |
+| `MODULE_TIMEOUT_MS` | Per-module execution timeout ms (default 10000) |
+| `SENTRY_DSN` | Sentry DSN for error tracking (optional) |
+
+**Integration adapter credentials (optional — modules degrade gracefully when absent):**
+
+| Variable | Module(s) |
+|---|---|
+| `GSC_ACCESS_TOKEN` | rank_tracking, topical_authority |
+| `GSC_SITE_URL` | rank_tracking, topical_authority |
+| `GA4_ACCESS_TOKEN` | analytics_integration |
+| `GA4_PROPERTY_ID` | analytics_integration |
+| `PAGESPEED_API_KEY` | technical_seo_audit |
+| `BACKLINK_PROVIDER` | backlink_intelligence |
+| `BACKLINK_API_KEY` | backlink_intelligence |
+| `BACKLINK_TARGET` | backlink_intelligence |

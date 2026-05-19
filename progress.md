@@ -6,12 +6,51 @@
 - backend deploy status: live on Render free tier
 - Render health URL: `https://neural-rank-backend.onrender.com/health`
 - backend modules: 18 total — 17 default-active, 1 opt-in (`local_seo`)
-- backend QC: Phase 1 `10/10` · Phase 2 `60/60 PASS` · tests `29/29`
+- backend QC: Phase 1 `10/10` · Phase 2 `60/60 PASS` · tests `30/30` · coverage 85%
 - backend freeze status: Phase 1 (8 modules) FROZEN — Phase 2 (10 modules) DEPLOYED
-- doc health status: CLEAN — 5 passes completed 2026-05-17 · 81 docs (3 added 2026-05-18)
+- doc health status: CLEAN — T3 doc sync complete 2026-05-19 · 90+ docs
 - workspace structure: restructured 2026-05-18 — 4 folder renames applied
+- REBUILD_PLAN: T1 complete (18/18) · T2 complete (23/26, 3 owner-pending) · T3 in progress (16/33 resolved, 14 owner-pending, 3 open)
 
 ## Core Milestones Achieved
+
+### 15. Tier 3 — Production Hardening (2026-05-19) — 16/33 resolved
+
+| T3 Item | Status |
+|---|---|
+| T3-03 Prometheus metrics (`GET /v1/metrics`) | resolved |
+| T3-06 Docker + docker-compose | resolved |
+| T3-07 Husky pre-commit + pre-push hooks | resolved |
+| T3-09 Pool stats in `/v1/health` | resolved |
+| T3-10 Module scaffolding generator | resolved |
+| T3-11 ETag + 304 on list endpoints | resolved |
+| T3-18 Migration CI check script | resolved |
+| T3-19 SLO.md created | resolved |
+| T3-20 Flutter app name seosync→neural_rank | resolved |
+| T3-21 Volatility analysis implemented | resolved |
+| T3-23 Flutter dep version pinning | resolved |
+| T3-27 DB backup docs (RUNBOOK + README) | resolved |
+| T3-28 Adapter env vars documented | resolved |
+| T3-29 BACKEND_DOMAIN_SERVICE_ROUTES.md rewritten | resolved |
+| T3-33 API hardening report updated to 26 routes | resolved (prior session) |
+| T3-34 prioritization.js + rateLimiter.js docs | resolved |
+| T3-01 Async queue | owner-pending (Redis) |
+| T3-02 OpenTelemetry | owner-pending (Grafana Cloud) |
+| T3-04 Redis rate limiter | owner-pending (Redis) |
+| T3-05 Response caching | owner-pending (T3-04) |
+| T3-08 Staging environment | owner-pending (Render) |
+| T3-12 Flutter ApiRepository | owner-pending (XL) |
+| T3-14 Composable middleware | owner-pending (L refactor) |
+| T3-15 Domain service DI | owner-pending (T3-14) |
+| T3-16 Load tests | owner-pending (k6) |
+| T3-17 Flutter screen consolidation | owner-pending (T3-12) |
+| T3-22 Flutter error boundary | owner-pending (T3-12) |
+| T3-24 13 stub adapter integrations | owner-pending (API keys) |
+| T3-25 Flutter Insight model fields | owner-pending (T3-12) |
+| T3-26 Play Store assets | owner-pending (design) |
+| T3-13 Router refactoring | open |
+| T3-31 Frontend capability audit | open |
+| T3-32 Frontend content system Phase 2 | open |
 
 ### 1. Backend documentation set created
 Anchors:

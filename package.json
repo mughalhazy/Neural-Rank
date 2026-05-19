@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node backend/src/server.js",
     "check": "node scripts/check-syntax.js",
@@ -11,10 +14,15 @@
     "test:backend": "node backend/src/full-backend-validation.test.js",
     "test:backend:ci": "c8 --threshold 80 node backend/src/full-backend-validation.test.js",
     "test:integration": "node scripts/check-activation-sync.js && node backend/src/integration-tests/index.js",
-    "ci": "npm run check && npm run check:secrets && npm run lint && npm run test:backend:ci"
+    "ci": "npm run check && npm run check:secrets && npm run lint && npm run test:backend:ci",
+    "db:dump": "supabase db dump --project-ref bvujfwwwwzlpsxbshxyn -f backup_$(date +%Y%m%d).sql",
+    "scaffold": "node scripts/scaffold-module.js",
+    "check:migrations": "node scripts/check-migrations.js",
+    "prepare": "husky"
   },
   "devDependencies": {
     "c8": "^11.0.0",
-    "eslint": "^8.57.0"
+    "eslint": "^8.57.0",
+    "husky": "^9.1.7"
   }
 }

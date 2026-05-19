@@ -18,7 +18,7 @@ const {
   createVolatilityRecord,
 } = require("./models");
 const { classifyQueryIntent } = require("./intentClassifier");
-const { calculateOpportunityScore } = require("./opportunityScoring");
+const { calculateOpportunityScore, deriveVolatility } = require("./opportunityScoring");
 const { resolveSerpProvider } = require("./providerInterface");
 
 async function classifyIntent(input = {}) {
@@ -84,13 +84,15 @@ async function analyzeQuery(input = {}, context = {}) {
     }),
   );
 
+  const historicalPositions = input.historicalPositions || input.positionHistory || [];
+  const derivedVolatility = providerResult.status === "available"
+    ? deriveVolatility(serpPattern, historicalPositions)
+    : { status: "provider_unavailable", confidence: 0.95, rationale: "Volatility is unavailable because no compliant SERP provider is connected.", signals: [] };
+
   const volatility = createVolatilityRecord({
-    status: providerResult.status === "available" ? "unknown" : "provider_unavailable",
-    confidence: providerResult.status === "available" ? 0.4 : 0.95,
-    rationale:
-      providerResult.status === "available"
-        ? "Volatility requires historical provider observations and is not yet fully modeled."
-        : "Volatility is unavailable because no compliant SERP provider is connected.",
+    status: derivedVolatility.status,
+    confidence: derivedVolatility.confidence,
+    rationale: derivedVolatility.rationale,
   });
 
   return {

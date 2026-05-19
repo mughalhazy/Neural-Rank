@@ -30,3 +30,19 @@ services:
         sync: false
       - key: MODULE_TIMEOUT_MS
         sync: false
+      - key: GSC_ACCESS_TOKEN
+        sync: false
+      - key: GSC_SITE_URL
+        sync: false
+      - key: GA4_ACCESS_TOKEN
+        sync: false
+      - key: GA4_PROPERTY_ID
+        sync: false
+      - key: PAGESPEED_API_KEY
+        sync: false
+      - key: BACKLINK_PROVIDER
+        sync: false
+      - key: BACKLINK_API_KEY
+        sync: false
+      - key: BACKLINK_TARGET
+        sync: false
