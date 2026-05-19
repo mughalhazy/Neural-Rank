@@ -41,6 +41,9 @@ app/.flutter-plugins-dependencies
 flutter_*.log
 flutter-build-*.log
 
+# Coverage reports
+coverage/
+
 # OS
 .DS_Store
 Thumbs.db

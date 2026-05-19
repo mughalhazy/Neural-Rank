@@ -72,7 +72,7 @@ async function withServer(run) {
 
 async function testHealthRoute() {
   await withServer(async (server) => {
-    const response = await request(server, "GET", "/health");
+    const response = await request(server, "GET", "/v1/health");
     assert.equal(response.statusCode, 200);
     assert.equal(response.body.ok, true);
     assert.equal(response.body.data.status, "ok");
@@ -84,7 +84,7 @@ async function testHealthRoute() {
 
 async function testReadinessRoute() {
   await withServer(async (server) => {
-    const response = await request(server, "GET", "/ready");
+    const response = await request(server, "GET", "/v1/ready");
     assert.equal(response.statusCode, 200);
     assert.equal(response.body.ok, true);
     assert.equal(response.body.data.status, "ready");
@@ -94,7 +94,7 @@ async function testReadinessRoute() {
 
 async function testModulesRoute() {
   await withServer(async (server) => {
-    const response = await request(server, "GET", "/modules");
+    const response = await request(server, "GET", "/v1/modules");
     assert.equal(response.statusCode, 200);
     assert.equal(response.body.ok, true);
     assert.equal(response.body.data.modules.length, 18);
@@ -103,7 +103,7 @@ async function testModulesRoute() {
 
 async function testDefaultRunRoute() {
   await withServer(async (server) => {
-    const response = await request(server, "POST", "/run/default", {
+    const response = await request(server, "POST", "/v1/run/default", {
       moduleInputs: {
         review_analysis: {
           websiteUrl: "https://example.com",
@@ -121,7 +121,7 @@ async function testDefaultRunRoute() {
 
 async function testSingleModuleRoute() {
   await withServer(async (server) => {
-    const response = await request(server, "POST", "/modules/keyword_analysis/run", {
+    const response = await request(server, "POST", "/v1/modules/keyword_analysis/run", {
       moduleInput: {
         websiteUrl: "https://example.com",
         keywords: [{ keyword: "seo platform", position: 22, difficulty: 20, volume: 800 }],
@@ -138,7 +138,7 @@ async function testSingleModuleRoute() {
 
 async function testExecutionLifecycleRoutes() {
   await withServer(async (server) => {
-    const createdRecommendation = await request(server, "POST", "/execution/recommendations", {
+    const createdRecommendation = await request(server, "POST", "/v1/execution/recommendations", {
       sourceModuleKey: "review_analysis",
       title: "Queue billing issue review",
       summary: "Manual follow-up is required before any safe change is considered.",
@@ -158,7 +158,7 @@ async function testExecutionLifecycleRoutes() {
 
     const recommendationId = createdRecommendation.body.data.id;
 
-    const recommendationList = await request(server, "GET", "/execution/recommendations");
+    const recommendationList = await request(server, "GET", "/v1/execution/recommendations");
     assert.equal(recommendationList.statusCode, 200);
     assert.equal(recommendationList.body.ok, true);
     assert.equal(recommendationList.body.data.count, 1);
@@ -166,7 +166,7 @@ async function testExecutionLifecycleRoutes() {
     const approvedRecommendation = await request(
       server,
       "PATCH",
-      `/execution/recommendations/${recommendationId}/status`,
+      `/v1/execution/recommendations/${recommendationId}/status`,
       {
         nextStatus: "approved",
         actor: "reviewer",
@@ -182,7 +182,7 @@ async function testExecutionLifecycleRoutes() {
     const createdTask = await request(
       server,
       "POST",
-      `/execution/recommendations/${recommendationId}/tasks`,
+      `/v1/execution/recommendations/${recommendationId}/tasks`,
       {
         actor: "reviewer",
         rollbackMetadata: {
@@ -199,17 +199,17 @@ async function testExecutionLifecycleRoutes() {
 
     const taskId = createdTask.body.data.id;
 
-    const listedTasks = await request(server, "GET", "/execution/tasks");
+    const listedTasks = await request(server, "GET", "/v1/execution/tasks");
     assert.equal(listedTasks.statusCode, 200);
     assert.equal(listedTasks.body.ok, true);
     assert.equal(listedTasks.body.data.count, 1);
 
-    const loadedTask = await request(server, "GET", `/execution/tasks/${taskId}`);
+    const loadedTask = await request(server, "GET", `/v1/execution/tasks/${taskId}`);
     assert.equal(loadedTask.statusCode, 200);
     assert.equal(loadedTask.body.ok, true);
     assert.equal(loadedTask.body.data.id, taskId);
 
-    const executedTask = await request(server, "PATCH", `/execution/tasks/${taskId}/status`, {
+    const executedTask = await request(server, "PATCH", `/v1/execution/tasks/${taskId}/status`, {
       nextStatus: "executed",
       actor: "seo_ops",
       reason: "Manual work completed.",
@@ -222,7 +222,7 @@ async function testExecutionLifecycleRoutes() {
     assert.equal(executedTask.body.ok, true);
     assert.equal(executedTask.body.data.currentStatus, "executed");
 
-    const taskHistory = await request(server, "GET", `/execution/tasks/${taskId}/history`);
+    const taskHistory = await request(server, "GET", `/v1/execution/tasks/${taskId}/history`);
     assert.equal(taskHistory.statusCode, 200);
     assert.equal(taskHistory.body.ok, true);
     assert.equal(taskHistory.body.data.count, 2);
@@ -231,7 +231,7 @@ async function testExecutionLifecycleRoutes() {
       ["queued", "executed"],
     );
 
-    const auditLogs = await request(server, "GET", "/execution/audit-logs");
+    const auditLogs = await request(server, "GET", "/v1/execution/audit-logs");
     assert.equal(auditLogs.statusCode, 200);
     assert.equal(auditLogs.body.ok, true);
     assert.ok(auditLogs.body.data.count >= 5);
@@ -242,7 +242,7 @@ async function testBlockedGovernanceRoute() {
   // T1-17: blocked recommendations must be rejected at creation time — never persisted.
   // T1-16: requiresApproval must be false for blocked classifications.
   await withServer(async (server) => {
-    const blockAttempt = await request(server, "POST", "/execution/recommendations", {
+    const blockAttempt = await request(server, "POST", "/v1/execution/recommendations", {
       sourceModuleKey: "technical_operations",
       title: "Hidden text and sitewide redirects",
       summary: "Add hidden text and mass redirect unrelated pages.",
@@ -262,7 +262,7 @@ async function testBlockedGovernanceRoute() {
     assert.ok(blockAttempt.body.error.code.startsWith("governance_blocks_"));
 
     // Confirm nothing was stored — list should have 0 recommendations in this fresh server.
-    const listAfterBlock = await request(server, "GET", "/execution/recommendations");
+    const listAfterBlock = await request(server, "GET", "/v1/execution/recommendations");
     assert.equal(listAfterBlock.statusCode, 200);
     assert.equal(listAfterBlock.body.data.count, 0);
   });
@@ -270,7 +270,7 @@ async function testBlockedGovernanceRoute() {
 
 async function testMutationValidationAndIdentityRequirements() {
   await withServer(async (server) => {
-    const noActorResponse = await request(server, "POST", "/execution/recommendations", {
+    const noActorResponse = await request(server, "POST", "/v1/execution/recommendations", {
       sourceModuleKey: "review_analysis",
       title: "Missing actor",
       actionType: "review_cluster_remediation",
@@ -283,7 +283,7 @@ async function testMutationValidationAndIdentityRequirements() {
     const invalidBodyResponse = await request(
       server,
       "POST",
-      "/execution/recommendations",
+      "/v1/execution/recommendations",
       {
         sourceModuleKey: "",
         title: "",
@@ -298,6 +298,47 @@ async function testMutationValidationAndIdentityRequirements() {
   });
 }
 
+async function testOpenApiRoutes() {
+  const server = createServer();
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  try {
+    // /v1/openapi.json should return valid OpenAPI spec
+    const specResponse = await request(server, "GET", "/v1/openapi.json");
+    assert.equal(specResponse.statusCode, 200);
+    assert.equal(specResponse.body.openapi, "3.1.0");
+    assert.ok(typeof specResponse.body.paths === "object", "spec should have paths");
+
+    // every entry in AVAILABLE_ROUTES (excluding openapi/docs meta-routes) should appear in spec
+    const { AVAILABLE_ROUTES } = require("./server");
+    const { SPEC } = require("./api/openapi");
+    const metaRoutes = new Set(["GET /v1/openapi.json", "GET /v1/docs"]);
+    for (const route of AVAILABLE_ROUTES) {
+      if (metaRoutes.has(route)) continue;
+      const [, rawPath] = route.split(" ");
+      // convert /v1/foo/:param/bar → /foo/{param}/bar
+      const specPath = rawPath.slice(3).replace(/:([^/]+)/g, "{$1}");
+      assert.ok(
+        Object.prototype.hasOwnProperty.call(SPEC.paths, specPath),
+        `AVAILABLE_ROUTES entry '${route}' has no spec path '${specPath}'`,
+      );
+    }
+
+    // /v1/docs should return HTML with swagger-ui (raw — not JSON)
+    const docsStatusCode = await new Promise((resolve, reject) => {
+      const address = server.address();
+      const req = http.request({ hostname: "127.0.0.1", port: address.port, path: "/v1/docs", method: "GET" }, (res) => {
+        res.resume();
+        res.on("end", () => resolve(res.statusCode));
+      });
+      req.on("error", reject);
+      req.end();
+    });
+    assert.equal(docsStatusCode, 200);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
+}
+
 async function run() {
   await testHealthRoute();
   await testReadinessRoute();
@@ -307,6 +348,7 @@ async function run() {
   await testExecutionLifecycleRoutes();
   await testBlockedGovernanceRoute();
   await testMutationValidationAndIdentityRequirements();
+  await testOpenApiRoutes();
   console.log("server tests passed");
 }
 

@@ -1,6 +1,7 @@
 const http = require("node:http");
 const { URL } = require("node:url");
 const { initDb, probeDb } = require("./db");
+const { reportError } = require("./core/errorReporter");
 
 const {
   getDefaultActivationState,
@@ -17,9 +18,14 @@ const { createTechnicalOperationsService } = require("./domains/technical-operat
 const { createSearchIntelligenceService } = require("./domains/search-intelligence/service");
 const { createBusinessIntelligenceService } = require("./domains/business-intelligence/service");
 const { normalizeError } = require("./api/errors");
+const { SPEC_JSON, SWAGGER_UI_HTML } = require("./api/openapi");
 const { resolveRequestIdentity, requireIdentity } = require("./api/auth");
 const {
+  applyPagination,
+  parseFilterParams,
+  parsePaginationParams,
   validateFlowRunBody,
+  validateModuleInput,
   validateModuleRunBody,
   validateRecommendationCreateBody,
   validateRecommendationStatusBody,
@@ -118,14 +124,19 @@ function sendTooManyRequests(response, rateLimitInfo) {
 function readJsonBody(request) {
   return new Promise((resolve, reject) => {
     let body = "";
+    let oversized = false;
     request.on("data", (chunk) => {
+      if (oversized) return;
       body += chunk;
       if (body.length > 1024 * 1024) {
+        oversized = true;
         reject(new Error("payload_too_large"));
-        request.destroy();
+        // Pause reading but do NOT destroy the socket — allows the 413 response to be sent.
+        request.pause();
       }
     });
     request.on("end", () => {
+      if (oversized) return;
       if (!body.trim()) { resolve({}); return; }
       try { resolve(JSON.parse(body)); } catch { reject(new Error("invalid_json")); }
     });
@@ -236,6 +247,7 @@ async function handleSingleModuleRun(request, response, pathname) {
 
   const body = await readJsonBody(request);
   validateModuleRunBody(body);
+  validateModuleInput(moduleKey, body.moduleInput || {});
   const result = await service.run(body.moduleInput || {}, body.context || {});
   sendEnvelope(response, 200, { ok: true, data: result, meta: { moduleKey } }, rl);
 }
@@ -269,8 +281,17 @@ async function handleExecutionRecommendations(request, response, baseContext, id
   if (!rl) return;
 
   if (request.method === "GET") {
-    const recommendations = await executionService.listRecommendations(baseContext);
-    sendEnvelope(response, 200, { ok: true, data: buildExecutionPayloadList(recommendations, "recommendations"), meta: {} }, rl);
+    const url = new URL(request.url, "http://127.0.0.1");
+    const pagination = parsePaginationParams(url);
+    const filters = parseFilterParams(url, ["status", "sourceModuleKey"]);
+    const all = await executionService.listRecommendations(baseContext);
+    const filtered = all.filter((r) => {
+      if (filters.status && r.currentStatus !== filters.status) return false;
+      if (filters.sourceModuleKey && r.sourceModuleKey !== filters.sourceModuleKey) return false;
+      return true;
+    });
+    const { items, count, nextCursor } = applyPagination(filtered, pagination);
+    sendEnvelope(response, 200, { ok: true, data: { recommendations: items, count, nextCursor }, meta: {} }, rl);
     return;
   }
 
@@ -347,8 +368,16 @@ async function handleExecutionTasks(request, response, baseContext) {
   if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
   const rl = applyRateLimit(request, response);
   if (!rl) return;
-  const tasks = await getExecutionService().listTasks(baseContext);
-  sendEnvelope(response, 200, { ok: true, data: buildExecutionPayloadList(tasks, "tasks"), meta: {} }, rl);
+  const url = new URL(request.url, "http://127.0.0.1");
+  const pagination = parsePaginationParams(url);
+  const filters = parseFilterParams(url, ["status"]);
+  const all = await getExecutionService().listTasks(baseContext);
+  const filtered = all.filter((t) => {
+    if (filters.status && t.currentStatus !== filters.status) return false;
+    return true;
+  });
+  const { items, count, nextCursor } = applyPagination(filtered, pagination);
+  sendEnvelope(response, 200, { ok: true, data: { tasks: items, count, nextCursor }, meta: {} }, rl);
 }
 
 async function handleExecutionTask(request, response, pathname, baseContext) {
@@ -407,8 +436,17 @@ async function handleExecutionAuditLogs(request, response, baseContext) {
   if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
   const rl = applyRateLimit(request, response);
   if (!rl) return;
-  const auditLogs = await getExecutionService().listAuditLogs(baseContext);
-  sendEnvelope(response, 200, { ok: true, data: buildExecutionPayloadList(auditLogs, "auditLogs"), meta: {} }, rl);
+  const url = new URL(request.url, "http://127.0.0.1");
+  const pagination = parsePaginationParams(url);
+  const filters = parseFilterParams(url, ["entityType", "from"]);
+  const all = await getExecutionService().listAuditLogs(baseContext);
+  const filtered = all.filter((log) => {
+    if (filters.entityType && log.entityType !== filters.entityType) return false;
+    if (filters.from && log.createdAt < filters.from) return false;
+    return true;
+  });
+  const { items, count, nextCursor } = applyPagination(filtered, pagination);
+  sendEnvelope(response, 200, { ok: true, data: { auditLogs: items, count, nextCursor }, meta: {} }, rl);
 }
 
 // ── Measurement domain handlers ───────────────────────────────────────────────
@@ -537,36 +575,38 @@ function logRequestEvent(kind, payload = {}) {
 // ── Main request handler ──────────────────────────────────────────────────────
 
 const AVAILABLE_ROUTES = [
-  "GET /health",
-  "GET /ready",
-  "GET /modules",
-  "POST /run/default",
-  "POST /run/activation-aware",
-  "POST /modules/:moduleKey/run",
-  "GET /execution/recommendations",
-  "POST /execution/recommendations",
-  "PATCH /execution/recommendations/:recommendationId/status",
-  "POST /execution/recommendations/:recommendationId/tasks",
-  "GET /execution/tasks",
-  "GET /execution/tasks/:taskId",
-  "PATCH /execution/tasks/:taskId/status",
-  "GET /execution/tasks/:taskId/history",
-  "GET /execution/audit-logs",
-  "GET /measurement/metrics",
-  "POST /measurement/snapshots",
-  "POST /measurement/attributions",
-  "GET /measurement/attributions/:attributionId",
-  "POST /technical-operations/audit",
-  "POST /search-intelligence/classify",
-  "POST /search-intelligence/analyze",
-  "GET /business-intelligence/profiles",
-  "POST /business-intelligence/profiles",
+  "GET /v1/health",
+  "GET /v1/ready",
+  "GET /v1/modules",
+  "POST /v1/run/default",
+  "POST /v1/run/activation-aware",
+  "POST /v1/modules/:moduleKey/run",
+  "GET /v1/execution/recommendations",
+  "POST /v1/execution/recommendations",
+  "PATCH /v1/execution/recommendations/:recommendationId/status",
+  "POST /v1/execution/recommendations/:recommendationId/tasks",
+  "GET /v1/execution/tasks",
+  "GET /v1/execution/tasks/:taskId",
+  "PATCH /v1/execution/tasks/:taskId/status",
+  "GET /v1/execution/tasks/:taskId/history",
+  "GET /v1/execution/audit-logs",
+  "GET /v1/measurement/metrics",
+  "POST /v1/measurement/snapshots",
+  "POST /v1/measurement/attributions",
+  "GET /v1/measurement/attributions/:attributionId",
+  "POST /v1/technical-operations/audit",
+  "POST /v1/search-intelligence/classify",
+  "POST /v1/search-intelligence/analyze",
+  "GET /v1/business-intelligence/profiles",
+  "POST /v1/business-intelligence/profiles",
+  "GET /v1/openapi.json",
+  "GET /v1/docs",
 ];
 
 function createRequestHandler(baseContext = {}) {
   return async function requestHandler(request, response) {
     const url = new URL(request.url, "http://127.0.0.1");
-    const { pathname } = url;
+    const rawPathname = url.pathname;
 
     const startedAt = Date.now();
     const correlationId = request.headers["x-request-id"] || require("node:crypto").randomUUID();
@@ -575,7 +615,7 @@ function createRequestHandler(baseContext = {}) {
     response.on("finish", () => {
       logRequestEvent("request", {
         method: request.method,
-        path: new URL(request.url, "http://127.0.0.1").pathname,
+        path: rawPathname,
         status: response.statusCode,
         durationMs: Date.now() - startedAt,
         correlationId,
@@ -591,6 +631,19 @@ function createRequestHandler(baseContext = {}) {
         response.end();
         return;
       }
+
+      // Redirect legacy unversioned paths → /v1/<path> (301 permanent)
+      if (!rawPathname.startsWith("/v1")) {
+        const target = `/v1${rawPathname}${url.search}`;
+        const redirectHeaders = { Location: target, Deprecation: "true" };
+        addSecurityHeaders(redirectHeaders);
+        response.writeHead(301, redirectHeaders);
+        response.end();
+        return;
+      }
+
+      // Strip /v1 prefix — all route matching below uses the unversioned pathname.
+      const pathname = rawPathname.slice(3) || "/";
 
       // Resolve identity once per request (async JWT verification)
       const identity = await resolveRequestIdentity(request);
@@ -721,6 +774,26 @@ function createRequestHandler(baseContext = {}) {
         return;
       }
 
+      // ── OpenAPI spec + Swagger UI ─────────────────────────────────────────
+
+      if (pathname === "/openapi.json") {
+        if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
+        const headers = { "Content-Type": "application/json; charset=utf-8", "Content-Length": Buffer.byteLength(SPEC_JSON) };
+        addSecurityHeaders(headers);
+        response.writeHead(200, headers);
+        response.end(SPEC_JSON);
+        return;
+      }
+
+      if (pathname === "/docs") {
+        if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
+        const headers = { "Content-Type": "text/html; charset=utf-8", "Content-Length": Buffer.byteLength(SWAGGER_UI_HTML) };
+        addSecurityHeaders(headers);
+        response.writeHead(200, headers);
+        response.end(SWAGGER_UI_HTML);
+        return;
+      }
+
       // ── 404 ───────────────────────────────────────────────────────────────
 
       sendEnvelope(response, 404, {
@@ -732,11 +805,14 @@ function createRequestHandler(baseContext = {}) {
       const normalizedError = normalizeError(error);
       logRequestEvent("api_error", {
         method: request.method,
-        path: pathname,
+        path: rawPathname,
         code: normalizedError.code,
         statusCode: normalizedError.statusCode,
         headers: request.headers,
       });
+      if (normalizedError.statusCode >= 500) {
+        reportError(error, { tags: { route: rawPathname, method: request.method } });
+      }
       sendEnvelope(response, normalizedError.statusCode, {
         ok: false,
         error: { code: normalizedError.code, message: normalizedError.message },
@@ -765,6 +841,7 @@ async function startServer({ port = Number(process.env.PORT) || 10000, host = "0
 }
 
 module.exports = {
+  AVAILABLE_ROUTES,
   buildHealthPayload,
   buildReadinessPayload,
   buildModulesPayload,
@@ -775,9 +852,12 @@ module.exports = {
 };
 
 process.on('unhandledRejection', (reason) => {
+  const err = reason instanceof Error ? reason : new Error(String(reason));
+  reportError(err, { tags: { kind: 'unhandled_rejection' } });
   console.log(JSON.stringify({ kind: 'unhandled_rejection', reason: String(reason) }));
 });
 process.on('uncaughtException', (error) => {
+  reportError(error, { tags: { kind: 'uncaught_exception' } });
   console.log(JSON.stringify({ kind: 'uncaught_exception', reason: String(error) }));
   process.exit(1);
 });

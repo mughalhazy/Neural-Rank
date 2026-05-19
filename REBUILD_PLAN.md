@@ -428,7 +428,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Definition of done:** Every response carries `X-Request-ID`; every log line for that request carries the same ID.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -447,7 +447,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Definition of done:** All 24 routes accessible at `/v1/<path>`; old paths redirect cleanly.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -469,7 +469,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Definition of done:** All list endpoints accept `?limit=N&cursor=X&sort=Y&status=Z`; response includes `nextCursor`.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -488,7 +488,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Definition of done:** Intentionally failing audit log write rolls back the recommendation create; no orphan exists.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -508,7 +508,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Definition of done:** `npm run test:integration` passes against real Postgres; schema drift causes test failure.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -527,7 +527,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Definition of done:** `GET /v1/openapi.json` returns valid OpenAPI 3.1; `GET /v1/docs` renders Swagger UI.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -546,7 +546,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Definition of done:** `npm run ci` fails when line coverage drops below 80%.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -564,7 +564,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Definition of done:** 600-character title returns 400 `invalid_recommendation_title`.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -582,7 +582,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Definition of done:** Three ADR files committed; each cites specific tradeoffs and alternatives.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -598,7 +598,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** Runbook covers all six scenarios with explicit steps.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -618,7 +618,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** Every PR shows a green/red CI status; merge is blocked on failure.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -649,7 +649,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** A hanging or throwing module does not abort the orchestration; all other modules run and the response includes the failed module with status flagged.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -677,7 +677,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** Dependabot creates weekly PRs for outdated devDependencies; `npm audit` runs in CI.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -696,7 +696,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** Zero reliance on string suffix matching for known error codes; unknown codes log a warning.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -718,7 +718,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** Negative-path suite passes; all error branches have at least one test.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -740,7 +740,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** An unhandled exception in production triggers a Sentry alert within 60 seconds.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -759,7 +759,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** UptimeRobot dashboard shows monitor online; test alert email received.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -778,7 +778,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** Module run with empty input returns 400 with a specific field-level error; module run with valid input continues normally.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -798,7 +798,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** `check-activation-sync.js` passes in CI; divergence between JS catalog and DB causes a test failure.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -819,7 +819,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** Zero duplication of `clone`, `normalizeRows`, `upsertProductTarget` across repository files; `clone()` handles Date correctly.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -841,7 +841,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** UPDATE and DELETE on `audit_logs` raise DB exceptions; `seq` column is present and monotonically increasing.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -860,7 +860,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** Adding a new test suite to `TEST_SUITES` requires no changes to any assertion or CONTRIBUTING.md; CONTRIBUTING.md no longer contains a hardcoded count.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -879,7 +879,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** `serp_feature_analyzer` module returns live SERP data; `integration_not_connected` no longer appears in default run results.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -900,7 +900,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** `POST /technical-operations/audit` returns rendered DOM analysis data; `renderer_not_configured` no longer appears.
 
-**Status:** `open`
+**Status:** `owner-pending`
 
 ---
 
@@ -918,7 +918,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** Supabase DB has not paused after 14 days of UptimeRobot active; documented in RUNBOOK.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -936,7 +936,7 @@ Write `RUNBOOK.md` covering: cold-start latency, DB unreachable, SERP provider r
 
 **Definition of done:** `assertModuleCatalogIntegrity()` throws on a serviceRegistry key absent from both activation sets; test confirms the forward and reverse checks both work.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1665,32 +1665,32 @@ Both are shared infrastructure used across the codebase with no documented inter
 | T1-16 | Fix governance resultModel classification bug | 1 | `resolved` | S |
 | T1-17 | Pre-persist governance block gate | 1 | `resolved` | S |
 | T1-18 | Auth on all 6 domain POST endpoints | 1 | `resolved` | S |
-| T2-01 | Correlation IDs | 2 | `open` | S |
-| T2-02 | API versioning /v1/ | 2 | `open` | M |
-| T2-03 | Pagination + filtering + sorting | 2 | `open` | L |
-| T2-04 | Transaction wrapper | 2 | `open` | M |
-| T2-05 | Real DB integration tests | 2 | `open` | L |
-| T2-06 | OpenAPI specification | 2 | `open` | L |
-| T2-07 | Coverage gate in CI | 2 | `open` | S |
-| T2-08 | Input string length limits | 2 | `open` | S |
-| T2-09 | Architecture decision records | 2 | `open` | M |
-| T2-10 | Operational runbook | 2 | `open` | M |
-| T2-11 | GitHub Actions CI workflow | 2 | `open` | S |
-| T2-12 | Per-module execution timeout | 2 | `open` | M |
-| T2-13 | Dependabot configuration | 2 | `open` | S |
-| T2-14 | normalizeError registry refactor | 2 | `open` | S |
-| T2-15 | Negative-path test suite | 2 | `open` | M |
-| T2-16 | Sentry error tracking | 2 | `open` | S |
-| T2-17 | UptimeRobot monitor (owner action) | 2 | `open` | S |
-| T2-18 | Module run input validation | 2 | `open` | M |
-| T2-19 | Single source of truth — module activation state | 2 | `open` | M |
-| T2-20 | Shared database utility extraction | 2 | `open` | M |
-| T2-21 | Audit log immutability enforcement | 2 | `open` | M |
-| T2-22 | Fix hardcoded test suite count assertion | 2 | `open` | S |
-| T2-23 | SERP provider configuration (owner action) | 2 | `open` | S |
-| T2-24 | Renderer endpoint configuration (owner action) | 2 | `open` | M |
-| T2-25 | Supabase database keep-alive | 2 | `open` | S |
-| T2-26 | Module catalog integrity reverse check | 2 | `open` | S |
+| T2-01 | Correlation IDs | 2 | `resolved` | S |
+| T2-02 | API versioning /v1/ | 2 | `resolved` | M |
+| T2-03 | Pagination + filtering + sorting | 2 | `resolved` | L |
+| T2-04 | Transaction wrapper | 2 | `resolved` | M |
+| T2-05 | Real DB integration tests | 2 | `resolved` | L |
+| T2-06 | OpenAPI specification | 2 | `resolved` | L |
+| T2-07 | Coverage gate in CI | 2 | `resolved` | S |
+| T2-08 | Input string length limits | 2 | `resolved` | S |
+| T2-09 | Architecture decision records | 2 | `resolved` | M |
+| T2-10 | Operational runbook | 2 | `resolved` | M |
+| T2-11 | GitHub Actions CI workflow | 2 | `resolved` | S |
+| T2-12 | Per-module execution timeout | 2 | `resolved` | M |
+| T2-13 | Dependabot configuration | 2 | `resolved` | S |
+| T2-14 | normalizeError registry refactor | 2 | `resolved` | S |
+| T2-15 | Negative-path test suite | 2 | `resolved` | M |
+| T2-16 | Sentry error tracking | 2 | `resolved` | S |
+| T2-17 | UptimeRobot monitor (owner action) | 2 | `owner-pending` | S |
+| T2-18 | Module run input validation | 2 | `resolved` | M |
+| T2-19 | Single source of truth — module activation state | 2 | `resolved` | M |
+| T2-20 | Shared database utility extraction | 2 | `resolved` | M |
+| T2-21 | Audit log immutability enforcement | 2 | `resolved` | M |
+| T2-22 | Fix hardcoded test suite count assertion | 2 | `resolved` | S |
+| T2-23 | SERP provider configuration (owner action) | 2 | `owner-pending` | S |
+| T2-24 | Renderer endpoint configuration (owner action) | 2 | `owner-pending` | M |
+| T2-25 | Supabase database keep-alive | 2 | `resolved` | S |
+| T2-26 | Module catalog integrity reverse check | 2 | `resolved` | S |
 | T3-01 | Async module execution + queue | 3 | `open` | XL |
 | T3-02 | OpenTelemetry tracing | 3 | `open` | L |
 | T3-03 | Prometheus metrics endpoint | 3 | `open` | L |

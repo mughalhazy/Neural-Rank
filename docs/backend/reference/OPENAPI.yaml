@@ -1,0 +1,726 @@
+openapi: "3.1.0"
+
+info:
+  title: Neural Rank Backend API
+  version: "1.0.0"
+  description: >
+    SEO OS — 18-module analysis pipeline, execution lifecycle, measurement &
+    attribution, governance engine.
+  contact:
+    name: Neural Rank
+    url: https://github.com/mughalhazy/neural-rank
+  license:
+    name: MIT
+
+servers:
+  - url: /v1
+    description: Current version
+
+security:
+  - bearerAuth: []
+
+# ── Security ────────────────────────────────────────────────────────────────────
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  # ── Common headers ─────────────────────────────────────────────────────────────
+  headers:
+    XNeuralRankActor:
+      schema: { type: string, maxLength: 255 }
+      description: Identifier of the human or service making the mutation.
+    XNeuralRankClientId:
+      schema: { type: string }
+      description: Calling client identifier.
+    XNeuralRankWorkspaceId:
+      schema: { type: string }
+      description: Workspace scope for multi-tenant isolation.
+
+  # ── Reusable query parameters ──────────────────────────────────────────────────
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+      description: Page size.
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+      description: Opaque cursor returned in nextCursor for the next page.
+    Sort:
+      name: sort
+      in: query
+      schema:
+        type: string
+        enum: [createdAt, updatedAt, priority]
+        default: createdAt
+    Order:
+      name: order
+      in: query
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+
+  # ── Schemas ────────────────────────────────────────────────────────────────────
+  schemas:
+    ApiError:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, example: recommendation_not_found }
+        message: { type: string, example: Recommendation was not found. }
+
+    ApiEnvelope:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+        data: { nullable: true }
+        error: { $ref: "#/components/schemas/ApiError", nullable: true }
+        meta: { type: object, additionalProperties: true }
+
+    ProductTarget:
+      type: object
+      properties:
+        websiteUrl: { type: string, format: uri }
+        appId: { type: string }
+        appStoreUrl: { type: string, format: uri }
+        playStoreUrl: { type: string, format: uri }
+
+    GovernanceResult:
+      type: object
+      properties:
+        allowed: { type: boolean }
+        actionType: { type: string }
+        riskLevel: { type: string, enum: [low, medium, high, critical] }
+        requiresApproval: { type: boolean }
+        reasons: { type: array, items: { type: string } }
+
+    RecommendationScore:
+      type: object
+      properties:
+        derivedPriority: { type: string, enum: [critical, high, medium, low] }
+        impact: { type: number }
+        confidence: { type: number }
+        effort: { type: number }
+        composite: { type: number }
+
+    Recommendation:
+      type: object
+      required: [id, sourceModuleKey, title, actionType, currentStatus, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        sourceModuleKey: { type: string, example: review_analysis }
+        title: { type: string, maxLength: 500 }
+        summary: { type: string, maxLength: 5000, nullable: true }
+        actionType: { type: string, maxLength: 100, example: content_update }
+        currentStatus: { type: string, example: recommended }
+        approvalStatus: { type: string, nullable: true }
+        target: { $ref: "#/components/schemas/ProductTarget", nullable: true }
+        payload: { type: object, additionalProperties: true, nullable: true }
+        governanceResult: { $ref: "#/components/schemas/GovernanceResult", nullable: true }
+        score: { $ref: "#/components/schemas/RecommendationScore", nullable: true }
+        workspaceId: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time, nullable: true }
+
+    Task:
+      type: object
+      required: [id, recommendationId, currentStatus, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        recommendationId: { type: string, format: uuid }
+        currentStatus: { type: string, example: queued }
+        actor: { type: string, nullable: true }
+        workspaceId: { type: string, nullable: true }
+        rollbackMetadata: { type: object, additionalProperties: true, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time, nullable: true }
+
+    TaskStatusHistoryEntry:
+      type: object
+      required: [taskId, nextStatus, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        taskId: { type: string, format: uuid }
+        previousStatus: { type: string, nullable: true }
+        nextStatus: { type: string }
+        actor: { type: string, nullable: true }
+        reason: { type: string, nullable: true }
+        metadata: { type: object, additionalProperties: true, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    AuditLog:
+      type: object
+      required: [entityType, entityId, action, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        seq: { type: integer }
+        entityType: { type: string, example: recommendation }
+        entityId: { type: string, format: uuid }
+        action: { type: string, example: status_changed }
+        actor: { type: string, nullable: true }
+        payload: { type: object, additionalProperties: true, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    MetricSource:
+      type: object
+      required: [metricId, displayName, sourceStatus]
+      properties:
+        metricId: { type: string, example: organic_traffic }
+        displayName: { type: string }
+        sourceStatus: { type: string, enum: [active, inactive, pending] }
+        supportsNumericValue: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    Snapshot:
+      type: object
+      required: [id, snapshotKind, metricId, observedAt]
+      properties:
+        id: { type: string, format: uuid }
+        snapshotKind: { type: string, enum: [baseline, post_change] }
+        metricId: { type: string }
+        targetId: { type: string, format: uuid, nullable: true }
+        metricValue: { type: number, nullable: true }
+        rawValue: { type: object, nullable: true }
+        valueStatus: { type: string }
+        observedAt: { type: string, format: date-time }
+        sourceRef: { type: string, nullable: true }
+        notes: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    Attribution:
+      type: object
+      required: [id, metricId, impactClassification, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        recommendationId: { type: string, format: uuid, nullable: true }
+        taskId: { type: string, format: uuid, nullable: true }
+        changeId: { type: string, nullable: true }
+        metricId: { type: string }
+        baselineSnapshotId: { type: string, format: uuid, nullable: true }
+        postChangeSnapshotId: { type: string, format: uuid, nullable: true }
+        confidence: { type: number, nullable: true }
+        impactClassification: { type: string, enum: [positive, neutral, negative, unknown] }
+        rationale: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    BusinessProfile:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        businessName: { type: string }
+        industry: { type: string, nullable: true }
+        websiteUrl: { type: string, format: uri, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+  # ── Reusable responses ─────────────────────────────────────────────────────────
+  responses:
+    BadRequest:
+      description: Validation error.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiEnvelope" }
+    Unauthorized:
+      description: Missing or invalid actor identity.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiEnvelope" }
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiEnvelope" }
+    Conflict:
+      description: Conflict — e.g. task already exists for recommendation.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiEnvelope" }
+    TooManyRequests:
+      description: Rate limit exceeded.
+      headers:
+        X-RateLimit-Limit: { schema: { type: integer } }
+        X-RateLimit-Remaining: { schema: { type: integer } }
+        X-RateLimit-Reset: { schema: { type: integer } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ApiEnvelope" }
+
+# ── Paths ────────────────────────────────────────────────────────────────────────
+paths:
+
+  /health:
+    get:
+      operationId: getHealth
+      summary: Liveness / health check
+      security: []
+      tags: [Infra]
+      responses:
+        "200": { description: Service healthy., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "503": { description: Database unreachable — service degraded., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+
+  /ready:
+    get:
+      operationId: getReady
+      summary: Readiness probe
+      security: []
+      tags: [Infra]
+      responses:
+        "200": { description: Service ready., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+
+  /modules:
+    get:
+      operationId: listModules
+      summary: List all registered modules
+      security: []
+      tags: [Modules]
+      responses:
+        "200": { description: Module catalog., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+
+  /run/default:
+    post:
+      operationId: runDefault
+      summary: Run all active modules with default settings
+      tags: [Modules]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                moduleInputs: { type: object, additionalProperties: true }
+                context: { type: object, additionalProperties: true }
+      responses:
+        "200": { description: Flow result., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /run/activation-aware:
+    post:
+      operationId: runActivationAware
+      summary: Run modules with activation overrides
+      tags: [Modules]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                moduleInputs: { type: object, additionalProperties: true }
+                context: { type: object, additionalProperties: true }
+                activationOverrides: { type: object, additionalProperties: true }
+                options: { type: object, additionalProperties: true }
+      responses:
+        "200": { description: Flow result., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /modules/{moduleKey}/run:
+    post:
+      operationId: runModule
+      summary: Run a single module by key
+      tags: [Modules]
+      parameters:
+        - name: moduleKey
+          in: path
+          required: true
+          schema: { type: string }
+          example: review_analysis
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                moduleInput: { type: object, additionalProperties: true }
+                context: { type: object, additionalProperties: true }
+      responses:
+        "200": { description: Module run result., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /execution/recommendations:
+    get:
+      operationId: listRecommendations
+      summary: List recommendations
+      tags: [Execution]
+      parameters:
+        - { $ref: "#/components/parameters/Limit" }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Sort" }
+        - { $ref: "#/components/parameters/Order" }
+        - { name: status, in: query, schema: { type: string }, description: Filter by currentStatus. }
+        - { name: sourceModuleKey, in: query, schema: { type: string }, description: Filter by source module. }
+      responses:
+        "200": { description: Paginated recommendation list., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+    post:
+      operationId: createRecommendation
+      summary: Create a recommendation
+      tags: [Execution]
+      parameters:
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string, maxLength: 255 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sourceModuleKey, title, actionType]
+              properties:
+                sourceModuleKey: { type: string }
+                title: { type: string, maxLength: 500 }
+                summary: { type: string, maxLength: 5000 }
+                actionType: { type: string, maxLength: 100 }
+                target: { $ref: "#/components/schemas/ProductTarget" }
+                payload: { type: object, additionalProperties: true }
+                score: { $ref: "#/components/schemas/RecommendationScore" }
+      responses:
+        "201": { description: Recommendation created., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /execution/recommendations/{recommendationId}/status:
+    patch:
+      operationId: updateRecommendationStatus
+      summary: Update recommendation status
+      tags: [Execution]
+      parameters:
+        - { name: recommendationId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string, maxLength: 255 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nextStatus]
+              properties:
+                nextStatus: { type: string, maxLength: 50 }
+                reason: { type: string, nullable: true }
+      responses:
+        "200": { description: Status updated., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /execution/recommendations/{recommendationId}/tasks:
+    post:
+      operationId: createTaskFromRecommendation
+      summary: Create an execution task from a recommendation
+      tags: [Execution]
+      parameters:
+        - { name: recommendationId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string, maxLength: 255 } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rollbackMetadata: { type: object, additionalProperties: true }
+                context: { type: object, additionalProperties: true }
+      responses:
+        "201": { description: Task created., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /execution/tasks:
+    get:
+      operationId: listTasks
+      summary: List execution tasks
+      tags: [Execution]
+      parameters:
+        - { $ref: "#/components/parameters/Limit" }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Sort" }
+        - { $ref: "#/components/parameters/Order" }
+        - { name: status, in: query, schema: { type: string }, description: Filter by currentStatus. }
+      responses:
+        "200": { description: Paginated task list., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /execution/tasks/{taskId}:
+    get:
+      operationId: getTask
+      summary: Get an execution task by ID
+      tags: [Execution]
+      parameters:
+        - { name: taskId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200": { description: Task detail., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /execution/tasks/{taskId}/status:
+    patch:
+      operationId: updateTaskStatus
+      summary: Update task status
+      tags: [Execution]
+      parameters:
+        - { name: taskId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string, maxLength: 255 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nextStatus]
+              properties:
+                nextStatus: { type: string, maxLength: 50 }
+                metadata: { type: object, additionalProperties: true }
+                rollbackMetadata: { type: object, additionalProperties: true }
+      responses:
+        "200": { description: Task status updated., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /execution/tasks/{taskId}/history:
+    get:
+      operationId: getTaskHistory
+      summary: Get task status history
+      tags: [Execution]
+      parameters:
+        - { name: taskId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200": { description: History entries., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /execution/audit-logs:
+    get:
+      operationId: listAuditLogs
+      summary: List immutable audit log entries
+      tags: [Execution]
+      parameters:
+        - { $ref: "#/components/parameters/Limit" }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Sort" }
+        - { $ref: "#/components/parameters/Order" }
+        - { name: entityType, in: query, schema: { type: string } }
+        - { name: from, in: query, schema: { type: string, format: date-time }, description: "Filter entries created at or after this ISO 8601 timestamp." }
+      responses:
+        "200": { description: Paginated audit log., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /measurement/metrics:
+    get:
+      operationId: listMetrics
+      summary: List metric source definitions
+      tags: [Measurement]
+      responses:
+        "200": { description: Metric sources., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /measurement/snapshots:
+    post:
+      operationId: createSnapshot
+      summary: Record a metric snapshot (baseline or post-change)
+      tags: [Measurement]
+      parameters:
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [metricId, observedAt]
+              properties:
+                snapshotKind: { type: string, enum: [baseline, post_change], default: baseline }
+                metricId: { type: string }
+                metricValue: { type: number, nullable: true }
+                rawValue: { type: object, additionalProperties: true, nullable: true }
+                valueStatus: { type: string }
+                observedAt: { type: string, format: date-time }
+                target: { $ref: "#/components/schemas/ProductTarget" }
+      responses:
+        "201": { description: Snapshot recorded., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /measurement/attributions:
+    post:
+      operationId: createAttribution
+      summary: Record a measurement attribution link
+      tags: [Measurement]
+      parameters:
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [metricId, impactClassification]
+              properties:
+                metricId: { type: string }
+                recommendationId: { type: string, format: uuid, nullable: true }
+                taskId: { type: string, format: uuid, nullable: true }
+                baselineSnapshotId: { type: string, format: uuid, nullable: true }
+                postChangeSnapshotId: { type: string, format: uuid, nullable: true }
+                confidence: { type: number, nullable: true }
+                impactClassification: { type: string, enum: [positive, neutral, negative, unknown] }
+                rationale: { type: string }
+      responses:
+        "201": { description: Attribution recorded., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /measurement/attributions/{attributionId}:
+    get:
+      operationId: getMeasurementSummary
+      summary: Get measurement summary for an attribution
+      tags: [Measurement]
+      parameters:
+        - { name: attributionId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200": { description: Measurement summary., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /technical-operations/audit:
+    post:
+      operationId: technicalAudit
+      summary: Run a technical SEO audit
+      tags: [Technical Operations]
+      parameters:
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                websiteUrl: { type: string, format: uri }
+                target: { $ref: "#/components/schemas/ProductTarget" }
+      responses:
+        "200": { description: Technical audit result., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /search-intelligence/classify:
+    post:
+      operationId: classifySearchIntent
+      summary: Classify search intent for a query
+      tags: [Search Intelligence]
+      parameters:
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query: { type: string }
+                keywords: { type: array, items: { type: string } }
+      responses:
+        "200": { description: Intent classification., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /search-intelligence/analyze:
+    post:
+      operationId: analyzeSearchQuery
+      summary: Deep analysis of a search query
+      tags: [Search Intelligence]
+      parameters:
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query: { type: string }
+                websiteUrl: { type: string, format: uri }
+                context: { type: object, additionalProperties: true }
+      responses:
+        "200": { description: Query analysis result., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /business-intelligence/profiles:
+    get:
+      operationId: listBusinessProfiles
+      summary: List business profiles
+      tags: [Business Intelligence]
+      responses:
+        "200": { description: Business profile list., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+    post:
+      operationId: createBusinessProfile
+      summary: Create a business profile
+      tags: [Business Intelligence]
+      parameters:
+        - { name: X-Neural-Rank-Actor, in: header, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [businessName]
+              properties:
+                businessName: { type: string }
+                industry: { type: string, nullable: true }
+                websiteUrl: { type: string, format: uri, nullable: true }
+      responses:
+        "201": { description: Profile created., content: { application/json: { schema: { $ref: "#/components/schemas/ApiEnvelope" } } } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /openapi.json:
+    get:
+      operationId: getOpenApiSpec
+      summary: OpenAPI 3.1 specification (JSON)
+      security: []
+      tags: [Infra]
+      responses:
+        "200": { description: OpenAPI spec., content: { application/json: { schema: { type: object } } } }
+
+  /docs:
+    get:
+      operationId: getSwaggerUi
+      summary: Swagger UI — interactive API documentation
+      security: []
+      tags: [Infra]
+      responses:
+        "200": { description: Swagger UI HTML., content: { text/html: { schema: { type: string } } } }
+
+# ── Tags ─────────────────────────────────────────────────────────────────────────
+tags:
+  - name: Infra
+    description: Health, readiness, and API documentation endpoints.
+  - name: Modules
+    description: SEO analysis module execution.
+  - name: Execution
+    description: Recommendation and task lifecycle management.
+  - name: Measurement
+    description: Metric snapshots and attribution links.
+  - name: Technical Operations
+    description: Technical SEO audit.
+  - name: Search Intelligence
+    description: Search intent classification and query analysis.
+  - name: Business Intelligence
+    description: Business profile management.

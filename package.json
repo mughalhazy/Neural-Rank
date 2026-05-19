@@ -9,10 +9,12 @@
     "check:secrets": "node scripts/check-secrets.js",
     "lint": "eslint backend/src --ext .js",
     "test:backend": "node backend/src/full-backend-validation.test.js",
-    "test:backend:ci": "node backend/src/full-backend-validation.test.js",
+    "test:backend:ci": "c8 --threshold 80 node backend/src/full-backend-validation.test.js",
+    "test:integration": "node scripts/check-activation-sync.js && node backend/src/integration-tests/index.js",
     "ci": "npm run check && npm run check:secrets && npm run lint && npm run test:backend:ci"
   },
   "devDependencies": {
+    "c8": "^11.0.0",
     "eslint": "^8.57.0"
   }
 }

@@ -1,10 +1,10 @@
 # Neural Rank — Production Readiness Gap Register
 
 **Audit date:** 2026-05-17
-**Last updated:** 2026-05-19 (Tier 1 resolution — P0-2, P0-3, P1-5, P1-6, P1-7, P1-9, P1-11, P2-1 resolved)
+**Last updated:** 2026-05-19 (Tier 2 resolution — P1-8, P2-3, P2-5, P2-9, P2-10 resolved)
 **Method:** 4-agent parallel audit (backend runtime · data/persistence · frontend/API · infra/ops) + full manual line-by-line verification of all critical files
 **Anchor:** `DOC_CATALOGUE.md`
-**Status:** 8 of 29 items resolved — P0-1 (code resolved, owner rotation pending), P0-2, P0-3 resolved; P1-5, P1-6, P1-7, P1-9, P1-11 resolved; P2-1 resolved
+**Status:** 14 of 29 items resolved — P0-1 (code resolved, owner rotation pending), P0-2, P0-3 resolved; P1-5, P1-6, P1-7, P1-8, P1-9, P1-11 resolved; P2-1, P2-3, P2-5, P2-9, P2-10 resolved
 
 ---
 
@@ -208,11 +208,11 @@ When `SUPABASE_URL` is null, `resolveRequestIdentity()` accepts any `x-neural-ra
 Render free tier spins down after 15 minutes of no requests. Supabase free tier pauses the database after 7 days of no activity. No scheduled ping, cron job, or health-check exists to keep either alive.
 
 **Fix required:**
-1. Add an external uptime monitor (UptimeRobot free tier) pinging `https://neural-rank-backend.onrender.com/health` every 5 minutes — prevents Render spindown
-2. Add a weekly scheduled task that queries the Supabase database — prevents Supabase pause
-3. Document keep-alive strategy in `README.md`
+1. Add an external uptime monitor (UptimeRobot free tier) pinging `https://neural-rank-backend.onrender.com/v1/health` every 5 minutes — prevents Render spindown
+2. The `/v1/health` route already includes a Supabase `SELECT 1` probe on every request — 5-min pings keep the DB from pausing
+3. Keep-alive strategy documented in `README.md`
 
-**Status:** Open
+**Status:** RESOLVED (2026-05-19) — `/v1/health` probes Supabase DB on every request (T2-25); keep-alive documented in README; UptimeRobot setup is owner-pending (T2-17).
 
 ---
 
@@ -318,14 +318,14 @@ These do not block launch but must be resolved before public scale.
 |----|---------|---------|-----|
 | P2-1 | ~~No `.env.example`~~ **RESOLVED (2026-05-18)** — `.env.example` created documenting all env vars; expanded 2026-05-19 with `NODE_ENV`, `ALLOWED_ORIGIN`, `TRUSTED_PROXY_COUNT` (T1-04, T1-09, T1-10, T1-14) | root | ✅ |
 | P2-2 | No database backup strategy | none | Document backup schedule in `README.md`; enable Supabase PITR when upgrading tier |
-| P2-3 | No API versioning strategy | `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` | Document versioning strategy (e.g. `Accept-Version` header or `/v1/` prefix) before any external consumers are onboarded |
+| P2-3 | ~~No API versioning strategy~~ **RESOLVED (2026-05-19)** — all 26 routes under `/v1/`; legacy paths redirect 301 with `Deprecation: true`; `/v1/openapi.json` + `/v1/docs` added (T2-02, T2-06) | `server.js` | ✅ |
 | P2-4 | Dual intent classifiers undocumented for future integrators | `docs/backend/decisions/BACKEND_DUAL_CLASSIFIER_DECISION.md` | Already has a decision doc — add explicit warning about not exposing both in a single aggregated response |
-| P2-5 | `assertModuleCatalogIntegrity()` is unidirectional | `backend/src/core/activation.js` | Add check: every module in `serviceRegistry` must appear in `DEFAULT_ACTIVE_MODULES` or `BUILT_BUT_INACTIVE_MODULES` |
+| P2-5 | ~~`assertModuleCatalogIntegrity()` is unidirectional~~ **RESOLVED (2026-05-19)** — reverse check added: registry keys not in either activation set raise an error (T2-26) | `core/activation.js` | ✅ |
 | P2-6 | No Play Store assets | `app/` | Create branded app icon (1024×1024), splash screen, and privacy policy URL before submission |
 | P2-7 | No request body size limit | `backend/src/server.js` | The 1MB limit in `readJsonBody()` (line 104) is already implemented — this P2 was a false alarm from the audit |
 | P2-8 | Cross-workspace contamination at domain service singleton layer | `backend/src/server.js` | Domain service singletons created without workspace context — address as part of P0-3 workspace isolation work |
-| P2-9 | No monitoring or error aggregation | `render.yaml` | Add Sentry DSN env var + `@sentry/node` to backend; add UptimeRobot monitor on `/health` |
-| P2-10 | No API documentation for external consumers | none | Generate OpenAPI spec from `BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` route table |
+| P2-9 | ~~No monitoring or error aggregation~~ **RESOLVED (2026-05-19)** — `core/errorReporter.js` zero-dep Sentry reporter wired in; `SENTRY_DSN` in `render.yaml` + `.env.example`; `unhandledRejection` + `uncaughtException` + 5xx route errors reported (T2-16) | `core/errorReporter.js`, `render.yaml` | ✅ |
+| P2-10 | ~~No API documentation for external consumers~~ **RESOLVED (2026-05-19)** — `GET /v1/openapi.json` returns OpenAPI 3.1 spec; `GET /v1/docs` renders Swagger UI; contract test in `server.test.js` (T2-06) | `api/openapi.js`, `docs/backend/reference/OPENAPI.yaml` | ✅ |
 
 ---
 

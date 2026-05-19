@@ -10,6 +10,29 @@ const {
   getModuleService,
 } = require("./serviceRegistry");
 
+const MODULE_TIMEOUT_MS = Number(process.env.MODULE_TIMEOUT_MS) || 10_000;
+
+function timeoutReject(ms, moduleKey) {
+  return new Promise((_, reject) => {
+    const timer = setTimeout(() => {
+      const err = new Error("module_timeout");
+      err.code = "module_timeout";
+      err.moduleKey = moduleKey;
+      reject(err);
+    }, ms);
+    // Allow Node to exit even if this timer is pending.
+    if (timer.unref) timer.unref();
+  });
+}
+
+async function runModuleSafe(service, input, ctx, moduleKey) {
+  try {
+    return await Promise.race([service.run(input, ctx), timeoutReject(MODULE_TIMEOUT_MS, moduleKey)]);
+  } catch (err) {
+    return { status: err.code === "module_timeout" ? "timeout" : "error", moduleKey, reason: String(err) };
+  }
+}
+
 async function runDefaultMvpFlow(moduleInputs = {}, context = {}) {
   assertModuleCatalogIntegrity();
 
@@ -43,7 +66,7 @@ async function runDefaultMvpFlow(moduleInputs = {}, context = {}) {
       repositories,
     });
 
-    results[moduleKey] = await service.run(moduleInput, moduleContext);
+    results[moduleKey] = await runModuleSafe(service, moduleInput, moduleContext, moduleKey);
     moduleResults.push(results[moduleKey]);
   }
 
@@ -58,4 +81,5 @@ async function runDefaultMvpFlow(moduleInputs = {}, context = {}) {
 module.exports = {
   runDefaultBackendFlow: runDefaultMvpFlow,
   runDefaultMvpFlow,
+  runModuleSafe,
 };

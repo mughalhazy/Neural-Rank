@@ -1,0 +1,5 @@
+{
+  "exclude": ["**/*.test.js", "scripts/**", "ui/**", "app/**", "design/**"],
+  "reporter": ["text", "lcov"],
+  "threshold": 80
+}

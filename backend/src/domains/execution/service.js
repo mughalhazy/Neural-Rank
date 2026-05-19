@@ -21,6 +21,7 @@ const {
 const { writeAuditLog } = require("./auditLogWriter");
 const { createGovernanceService } = require("../governance/service");
 const { createRecommendationScore } = require("../../core/recommendationScoring");
+const { withTransaction } = require("../../db");
 
 const defaultExecutionRepository = createInMemoryExecutionRepository();
 const governanceService = createGovernanceService();
@@ -52,7 +53,7 @@ function assertTaskStatus(nextStatus) {
 }
 
 async function createRecommendation(input = {}, context = {}) {
-  const repository = resolveRepository(context);
+  // Governance evaluation is pure computation — runs outside the transaction.
   const governanceResult = governanceService.evaluateActionGovernance(input);
 
   if (governanceResult.overallClassification === "block") {
@@ -71,24 +72,30 @@ async function createRecommendation(input = {}, context = {}) {
     score,
     workspaceId: context.workspaceId || null,
   });
-  const created = await repository.createRecommendation(recommendation);
 
-  await writeAuditLog(repository, {
-    entityType: "recommendation",
-    entityId: created.id,
-    action: "recommendation_created",
-    actor: created.createdBy,
-    payload: {
-      currentStatus: created.currentStatus,
-      sourceModuleKey: created.sourceModuleKey,
-      governanceClassification: created.governanceResult?.overallClassification || "allow",
-      score: created.score,
-      derivedPriority: created.score?.derivedPriority || "low",
-    },
-    createdAt: new Date().toISOString(),
+  return withTransaction(async ({ transactionalQuery }) => {
+    const txContext = transactionalQuery ? { ...context, query: transactionalQuery } : context;
+    const repository = resolveRepository(txContext);
+
+    const created = await repository.createRecommendation(recommendation);
+
+    await writeAuditLog(repository, {
+      entityType: "recommendation",
+      entityId: created.id,
+      action: "recommendation_created",
+      actor: created.createdBy,
+      payload: {
+        currentStatus: created.currentStatus,
+        sourceModuleKey: created.sourceModuleKey,
+        governanceClassification: created.governanceResult?.overallClassification || "allow",
+        score: created.score,
+        derivedPriority: created.score?.derivedPriority || "low",
+      },
+      createdAt: new Date().toISOString(),
+    });
+
+    return created;
   });
-
-  return created;
 }
 
 async function listRecommendations(context = {}) {
@@ -102,46 +109,50 @@ async function updateRecommendationStatus(
   context = {},
 ) {
   assertRecommendationStatus(nextStatus);
-  const repository = resolveRepository(context);
-  const recommendation = await repository.getRecommendation(recommendationId);
 
-  if (!recommendation) {
-    throw new Error("recommendation_not_found");
-  }
+  return withTransaction(async ({ transactionalQuery }) => {
+    const txContext = transactionalQuery ? { ...context, query: transactionalQuery } : context;
+    const repository = resolveRepository(txContext);
+    const recommendation = await repository.getRecommendation(recommendationId);
 
-  if (nextStatus === "approved") {
-    governanceService.assertGovernanceAllowsApproval(recommendation.governanceResult);
-  }
+    if (!recommendation) {
+      throw new Error("recommendation_not_found");
+    }
 
-  assertRecommendationTransition(recommendation.currentStatus, nextStatus);
+    if (nextStatus === "approved") {
+      governanceService.assertGovernanceAllowsApproval(recommendation.governanceResult);
+    }
 
-  const updated = await repository.updateRecommendation(recommendationId, {
-    currentStatus: nextStatus,
-    approvalStatus:
-      nextStatus === "approved" || nextStatus === "rejected"
-        ? nextStatus
-        : recommendation.approvalStatus,
-    updatedAt: new Date().toISOString(),
+    assertRecommendationTransition(recommendation.currentStatus, nextStatus);
+
+    const updated = await repository.updateRecommendation(recommendationId, {
+      currentStatus: nextStatus,
+      approvalStatus:
+        nextStatus === "approved" || nextStatus === "rejected"
+          ? nextStatus
+          : recommendation.approvalStatus,
+      updatedAt: new Date().toISOString(),
+    });
+
+    await writeAuditLog(repository, {
+      entityType: "recommendation",
+      entityId: recommendationId,
+      action: "recommendation_status_changed",
+      actor,
+      payload: {
+        previousStatus: recommendation.currentStatus,
+        nextStatus,
+        reason,
+        metadata,
+        governanceClassification:
+          recommendation.governanceResult?.overallClassification || "allow",
+        score: recommendation.score,
+      },
+      createdAt: new Date().toISOString(),
+    });
+
+    return updated;
   });
-
-  await writeAuditLog(repository, {
-    entityType: "recommendation",
-    entityId: recommendationId,
-    action: "recommendation_status_changed",
-    actor,
-    payload: {
-      previousStatus: recommendation.currentStatus,
-      nextStatus,
-      reason,
-      metadata,
-      governanceClassification:
-        recommendation.governanceResult?.overallClassification || "allow",
-      score: recommendation.score,
-    },
-    createdAt: new Date().toISOString(),
-  });
-
-  return updated;
 }
 
 async function createTaskFromRecommendation(
@@ -149,81 +160,84 @@ async function createTaskFromRecommendation(
   { actor = "system", rollbackMetadata = {}, reason = "" } = {},
   context = {},
 ) {
-  const repository = resolveRepository(context);
-  const recommendation = await repository.getRecommendation(recommendationId);
+  return withTransaction(async ({ transactionalQuery }) => {
+    const txContext = transactionalQuery ? { ...context, query: transactionalQuery } : context;
+    const repository = resolveRepository(txContext);
+    const recommendation = await repository.getRecommendation(recommendationId);
 
-  if (!recommendation) {
-    throw new Error("recommendation_not_found");
-  }
+    if (!recommendation) {
+      throw new Error("recommendation_not_found");
+    }
 
-  if (recommendation.currentStatus !== "approved") {
-    throw new Error("recommendation_requires_approval");
-  }
+    if (recommendation.currentStatus !== "approved") {
+      throw new Error("recommendation_requires_approval");
+    }
 
-  if (recommendation.taskId) {
-    throw new Error("task_already_exists_for_recommendation");
-  }
+    if (recommendation.taskId) {
+      throw new Error("task_already_exists_for_recommendation");
+    }
 
-  governanceService.assertGovernanceAllowsTaskCreation(recommendation.governanceResult);
+    governanceService.assertGovernanceAllowsTaskCreation(recommendation.governanceResult);
 
-  const task = createTaskRecord({
-    recommendation,
-    actor,
-    rollbackMetadata,
-  });
-  const createdTask = await repository.createTask(task);
+    const task = createTaskRecord({
+      recommendation,
+      actor,
+      rollbackMetadata,
+    });
+    const createdTask = await repository.createTask(task);
 
-  await repository.updateRecommendation(recommendationId, {
-    currentStatus: "queued",
-    approvalStatus: recommendation.approvalStatus,
-    executionStatus: "queued",
-    taskId: createdTask.id,
-    updatedAt: new Date().toISOString(),
-  });
-
-  await repository.appendTaskStatusHistory({
-    taskId: createdTask.id,
-    previousStatus: null,
-    nextStatus: "queued",
-    actor,
-    reason: reason || "task_created_from_recommendation",
-    metadata: {},
-    createdAt: new Date().toISOString(),
-  });
-
-  await writeAuditLog(repository, {
-    entityType: "task",
-    entityId: createdTask.id,
-    action: "task_created",
-    actor,
-    payload: {
-      recommendationId,
-      currentStatus: createdTask.currentStatus,
-      governanceClassification:
-        createdTask.governanceResult?.overallClassification || "allow",
-      score: createdTask.score,
-    },
-    createdAt: new Date().toISOString(),
-  });
-
-  await writeAuditLog(repository, {
-    entityType: "recommendation",
-    entityId: recommendationId,
-    action: "recommendation_status_changed",
-    actor,
-    payload: {
-      previousStatus: "approved",
-      nextStatus: "queued",
-      reason: reason || "task_created_from_recommendation",
+    await repository.updateRecommendation(recommendationId, {
+      currentStatus: "queued",
+      approvalStatus: recommendation.approvalStatus,
+      executionStatus: "queued",
       taskId: createdTask.id,
-      governanceClassification:
-        createdTask.governanceResult?.overallClassification || "allow",
-      score: createdTask.score,
-    },
-    createdAt: new Date().toISOString(),
-  });
+      updatedAt: new Date().toISOString(),
+    });
 
-  return createdTask;
+    await repository.appendTaskStatusHistory({
+      taskId: createdTask.id,
+      previousStatus: null,
+      nextStatus: "queued",
+      actor,
+      reason: reason || "task_created_from_recommendation",
+      metadata: {},
+      createdAt: new Date().toISOString(),
+    });
+
+    await writeAuditLog(repository, {
+      entityType: "task",
+      entityId: createdTask.id,
+      action: "task_created",
+      actor,
+      payload: {
+        recommendationId,
+        currentStatus: createdTask.currentStatus,
+        governanceClassification:
+          createdTask.governanceResult?.overallClassification || "allow",
+        score: createdTask.score,
+      },
+      createdAt: new Date().toISOString(),
+    });
+
+    await writeAuditLog(repository, {
+      entityType: "recommendation",
+      entityId: recommendationId,
+      action: "recommendation_status_changed",
+      actor,
+      payload: {
+        previousStatus: "approved",
+        nextStatus: "queued",
+        reason: reason || "task_created_from_recommendation",
+        taskId: createdTask.id,
+        governanceClassification:
+          createdTask.governanceResult?.overallClassification || "allow",
+        score: createdTask.score,
+      },
+      createdAt: new Date().toISOString(),
+    });
+
+    return createdTask;
+  });
 }
 
 async function listTasks(context = {}) {
@@ -253,51 +267,55 @@ async function updateTaskStatus(
   context = {},
 ) {
   assertTaskStatus(nextStatus);
-  const repository = resolveRepository(context);
-  const task = await repository.getTask(taskId);
 
-  if (!task) {
-    throw new Error("task_not_found");
-  }
+  return withTransaction(async ({ transactionalQuery }) => {
+    const txContext = transactionalQuery ? { ...context, query: transactionalQuery } : context;
+    const repository = resolveRepository(txContext);
+    const task = await repository.getTask(taskId);
 
-  governanceService.assertGovernanceAllowsExecution(task.governanceResult, nextStatus);
-  assertTaskTransition(task.currentStatus, nextStatus);
+    if (!task) {
+      throw new Error("task_not_found");
+    }
 
-  const derivedState = deriveTaskState(task, nextStatus, rollbackMetadata);
-  const updated = await repository.updateTask(taskId, {
-    ...derivedState,
-    updatedAt: new Date().toISOString(),
-  });
+    governanceService.assertGovernanceAllowsExecution(task.governanceResult, nextStatus);
+    assertTaskTransition(task.currentStatus, nextStatus);
 
-  await repository.appendTaskStatusHistory({
-    taskId,
-    previousStatus: task.currentStatus,
-    nextStatus,
-    actor,
-    reason,
-    metadata,
-    createdAt: new Date().toISOString(),
-  });
+    const derivedState = deriveTaskState(task, nextStatus, rollbackMetadata);
+    const updated = await repository.updateTask(taskId, {
+      ...derivedState,
+      updatedAt: new Date().toISOString(),
+    });
 
-  await writeAuditLog(repository, {
-    entityType: "task",
-    entityId: taskId,
-    action: "task_status_changed",
-    actor,
-    payload: {
+    await repository.appendTaskStatusHistory({
+      taskId,
       previousStatus: task.currentStatus,
       nextStatus,
+      actor,
       reason,
       metadata,
-      rollbackMetadata,
-      governanceClassification:
-        task.governanceResult?.overallClassification || "allow",
-      score: task.score,
-    },
-    createdAt: new Date().toISOString(),
-  });
+      createdAt: new Date().toISOString(),
+    });
 
-  return updated;
+    await writeAuditLog(repository, {
+      entityType: "task",
+      entityId: taskId,
+      action: "task_status_changed",
+      actor,
+      payload: {
+        previousStatus: task.currentStatus,
+        nextStatus,
+        reason,
+        metadata,
+        rollbackMetadata,
+        governanceClassification:
+          task.governanceResult?.overallClassification || "allow",
+        score: task.score,
+      },
+      createdAt: new Date().toISOString(),
+    });
+
+    return updated;
+  });
 }
 
 async function listAuditLogs(context = {}) {

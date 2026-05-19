@@ -5,6 +5,57 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-05-19] — Tier 2 Adoption Requirements — 23/26 Resolved (3 Owner-Pending)
+
+### Added
+- `backend/src/api/openapi.js` — OpenAPI 3.1 specification as JS object; served at `GET /v1/openapi.json`; Swagger UI at `GET /v1/docs` (CDN, zero npm dep) (T2-06)
+- `docs/backend/reference/OPENAPI.yaml` — human-readable OpenAPI 3.1 YAML; 26 paths, full schemas, error codes, Bearer JWT auth (T2-06)
+- `backend/src/integration-tests/execution-postgres.test.js` — real Postgres integration test for execution lifecycle domain (T2-05)
+- `backend/src/integration-tests/persistence-postgres.test.js` — real Postgres integration test for all 18 module `saveRun` / `persistXxxRun` functions (T2-05)
+- `backend/src/integration-tests/index.js` — sequential integration test runner (T2-05)
+- `docker-compose.test.yml` — postgres:16-alpine on port 5433 with healthcheck (T2-05)
+- `backend/src/core/errorReporter.js` — zero-dep Sentry reporter via `node:https`; no-op when `SENTRY_DSN` absent (T2-16)
+- `backend/src/core/dbUtils.js` — `clone()`, `normalizeRows()`, `upsertProductTarget()` extracted from domain repos (T2-20)
+- `backend/src/core/moduleInputRequirements.js` — required-field map for all 18 modules (T2-18)
+- `backend/src/negative-path.test.js` — 13 negative-path cases: 404, 301, 405, 400 invalid JSON, 400 missing field, 400 over-limit string, 401 no identity, 409 governance block, 413 too large, security headers, CORS OPTIONS 204, 400 missing module input, 404 unknown module (T2-15)
+- `.github/workflows/ci.yml` — GitHub Actions CI: syntax + secrets + lint + coverage gate on every push/PR (T2-11)
+- `.github/dependabot.yml` — weekly npm dependency updates, 5 open PR limit (T2-13)
+- `.c8rc` — c8 coverage config: 80% threshold, lcov + text reporters, excludes test/scripts/ui (T2-07)
+- `docs/backend/decisions/ADR_001_ZERO_RUNTIME_DEPENDENCIES.md` — decision record (T2-09)
+- `docs/backend/decisions/ADR_002_PURE_NODE_HTTP.md` — decision record (T2-09)
+- `docs/backend/decisions/ADR_003_IN_MEMORY_DEFAULT_REPOSITORY.md` — decision record (T2-09)
+- `docs/backend/reference/RUNBOOK.md` — 6 operational scenarios with remediation steps (T2-10)
+- `supabase/migrations/20260519000001_audit_log_immutability.sql` — `seq BIGSERIAL`, BEFORE UPDATE/DELETE triggers raising exceptions on `audit_logs` (T2-21)
+- `supabase/migrations/20260519000002_sync_activation_from_js.sql` — drops `is_active` from `backend_module_activation_defaults`; JS catalog is now authoritative (T2-19)
+- `scripts/check-activation-sync.js` — verifies JS activation catalog matches DB `backend_module_catalog` (T2-19)
+
+### Changed
+- `backend/src/server.js` — API versioning `/v1/` prefix on all 26 routes; 301 redirect for legacy unversioned paths with `Deprecation: true` header; `GET /v1/openapi.json` + `GET /v1/docs` routes added; `reportError` on 5xx; `validateModuleInput` on module run; pagination wired into recommendations, tasks, and audit-logs (T2-02, T2-03, T2-06, T2-15, T2-16, T2-18, T2-25)
+- `backend/src/api/validation.js` — `assertStringMaxLength()`, `parsePaginationParams()`, `parseFilterParams()`, `applyPagination()` with cursor-based paging added; `validateModuleInput()` added (T2-03, T2-08, T2-18)
+- `backend/src/api/errors.js` — `ERROR_REGISTRY` maps all known codes to HTTP status; `normalizeError()` uses registry; unknown codes log a warning (T2-14)
+- `backend/src/db.js` — `withTransaction(callback)` wraps BEGIN/COMMIT/ROLLBACK; no-op for in-memory path (T2-04)
+- `backend/src/domains/execution/service.js` — 4 mutations wrapped in `withTransaction` (T2-04)
+- `backend/src/domains/measurement/repository.js`, `business-intelligence/repository.js`, `execution/repository.js` — migrated to shared `core/dbUtils` helpers (T2-20)
+- `backend/src/orchestration/defaultMvpOrchestrator.js`, `activationAwareOrchestrator.js` — `runModuleSafe()` wraps each module in `Promise.race` with 10s timeout (T2-12)
+- `backend/src/core/activation.js` — `assertModuleCatalogIntegrity()` reverse check: registry keys must appear in activation catalog (T2-26)
+- `backend/src/full-backend-validation.test.js` — `assert.ok(length >= 29)` replaces `assert.equal(length, 29)`; 30 suites (T2-22)
+- `backend/src/server.test.js` — all 24 routes updated to `/v1/` prefix; `testOpenApiRoutes` contract test added (T2-02, T2-06)
+- `render.yaml` — `healthCheckPath: /v1/health`; `SENTRY_DSN`, `MODULE_TIMEOUT_MS` env vars (T2-02, T2-16)
+- `package.json` — `test:backend:ci` runs c8 coverage gate at 80%; `test:integration` runs activation sync + integration tests; `c8` + `eslint` devDependencies (T2-07)
+- `.env.example` — `MODULE_TIMEOUT_MS`, `SENTRY_DSN` documented (T2-12, T2-16)
+- `README.md` — CI badge; `/v1/health` health URL; routes table updated; Supabase keep-alive explanation (T2-11, T2-02, T2-25)
+- `CONTRIBUTING.md` — "All 29 test suites" → "All test suites" (T2-22)
+- `.gitignore` — `coverage/` added (T2-07)
+
+### Owner-pending (3 items requiring credentials/accounts)
+- **T2-17** — UptimeRobot monitor: create HTTP monitor for `https://neural-rank-backend.onrender.com/v1/health` at 5-min interval.
+- **T2-23** — SERP provider: set `SERP_PROVIDER` + `SERP_API_KEY` in Render dashboard (SerpApi free tier: 100 searches/month).
+- **T2-24** — Renderer endpoint: deploy headless browser service and set `RENDERER_ENDPOINT` in Render dashboard.
+
+### Projected score after Tier 2: **91/100** (was 85/100)
+
+---
+
 ## [2026-05-19] — Tier 1 Production Blockers — All 18 Resolved
 
 ### Added

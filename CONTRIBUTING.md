@@ -23,7 +23,7 @@ Examples:
 npm run ci
 ```
 
-All 29 test suites must pass and lint must be clean.
+All test suites must pass and lint must be clean.
 
 ## Doc update rules
 

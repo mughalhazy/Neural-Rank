@@ -237,13 +237,13 @@ Use these first in a new session:
 
 ## Current Operational Facts
 - backend: 18 modules live on Render free tier — 17 default-active, 1 opt-in (`local_seo`)
-- tests: 29/29 passing (`npm run ci` = syntax check + lint + full suite)
+- tests: 30/30 passing (`npm run ci` = syntax check + secrets + lint + c8 80% coverage gate + full suite)
 - lint: ESLint clean — 0 errors (`eslint@8`, `no-unused-vars`, `no-undef`)
-- API: 24 routes — health, modules, run, execution lifecycle, measurement, technical-ops, search-intelligence, business-intelligence
-- database: Supabase `neural-rank` — 9 migrations applied, 33 tables in `app_public`; no DB connection wired at startup (P0-2)
+- API: 26 routes — all under `/v1/`; `GET /v1/openapi.json` + `GET /v1/docs` added; legacy paths redirect 301
+- database: Supabase `neural-rank` — 12 migrations applied, 33 tables in `app_public`; DB wired at startup via `db.js`
 - Flutter apps: `app/` (BLoC architecture — canonical production app) + `ui/` (UI prototype — pending consolidation into `app/`)
-- docs: 81 `.md` files — structurally clean, fully linked, all 18 modules covered in all LIVE docs
-- production gaps: 5 P0 (P0-1 code resolved, owner action pending) + 13 P1 (P1-9 resolved) + 10 P2 — see [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
+- docs: 86 `.md` files — includes ADRs, RUNBOOK, OPENAPI.yaml
+- REBUILD_PLAN: Tier 1 complete (18/18) · Tier 2 complete (23/26 code, 3 owner-pending) · Tier 3 open (0/33)
 - workspace: fully restructured — `app/`, `ui/`, `design/library/`, `design/mockups/archetypes/`
 - npm cache and global prefix: on D: — project does not leak to C:
 
@@ -463,6 +463,58 @@ All 18 Tier 1 items from REBUILD_PLAN.md resolved in a single session. CI green 
 - `governance-engine.test.js:testBlockedUnsafeRecommendationsCannotAdvance` — now asserts rejects + requiresApproval=false (T1-16 + T1-17)
 
 ### Projected score after Tier 1: 85/100 (was 76/100)
+
+---
+
+## Milestone #14 — Tier 2 Adoption Requirements — 23/26 Resolved
+> Completed: 2026-05-19
+
+All programmatically-executable Tier 2 items from REBUILD_PLAN.md resolved in a single session. 3 items require owner accounts/credentials (`owner-pending`).
+
+**Resume anchor:** REBUILD_PLAN.md — Tier 3 begins at T3-01. All 33 Tier 3 items are `open`.
+
+### Items resolved (23)
+
+| ID | Item | Key file(s) |
+|---|---|---|
+| T2-01 | Correlation IDs | Already done in T1-06 — `X-Request-ID` on every response |
+| T2-02 | API versioning `/v1/` | `server.js` — all 26 routes, 301 redirect for legacy paths |
+| T2-03 | Pagination + filtering + sorting | `api/validation.js` — `parsePaginationParams`, `applyPagination`, cursor paging |
+| T2-04 | Transaction wrapper | `db.js:withTransaction`, `domains/execution/service.js` — 4 mutations wrapped |
+| T2-05 | Real DB integration tests | `integration-tests/execution-postgres.test.js`, `integration-tests/persistence-postgres.test.js`, `docker-compose.test.yml` |
+| T2-06 | OpenAPI specification | `api/openapi.js`, `docs/backend/reference/OPENAPI.yaml`, `/v1/openapi.json`, `/v1/docs` Swagger UI |
+| T2-07 | Coverage gate in CI | `package.json:test:backend:ci` — c8 80% threshold; `.c8rc`; `coverage/` in `.gitignore` |
+| T2-08 | Input string length limits | `api/validation.js:assertStringMaxLength` — title≤500, summary≤5000, actionType≤100, nextStatus≤50, actor≤255 |
+| T2-09 | Architecture decision records | `docs/backend/decisions/ADR_001/002/003` |
+| T2-10 | Operational runbook | `docs/backend/reference/RUNBOOK.md` — 6 scenarios |
+| T2-11 | GitHub Actions CI workflow | `.github/workflows/ci.yml` — syntax + secrets + lint + coverage gate |
+| T2-12 | Per-module execution timeout | `orchestration/defaultMvpOrchestrator.js:runModuleSafe` — 10s `Promise.race` |
+| T2-13 | Dependabot configuration | `.github/dependabot.yml` — weekly npm, 5 PR limit |
+| T2-14 | normalizeError registry refactor | `api/errors.js:ERROR_REGISTRY` — all known codes mapped |
+| T2-15 | Negative-path test suite | `negative-path.test.js` — 13 cases |
+| T2-16 | Sentry error tracking | `core/errorReporter.js` — zero-dep `node:https` POST to Sentry store API |
+| T2-18 | Module run input validation | `api/validation.js:validateModuleInput`, `core/moduleInputRequirements.js` |
+| T2-19 | Single source of truth — activation | `supabase/migrations/20260519000002_sync_activation_from_js.sql`, `scripts/check-activation-sync.js` |
+| T2-20 | Shared DB utility extraction | `core/dbUtils.js` — `clone`, `normalizeRows`, `upsertProductTarget` |
+| T2-21 | Audit log immutability | `supabase/migrations/20260519000001_audit_log_immutability.sql` — seq BIGSERIAL, BEFORE UPDATE/DELETE triggers |
+| T2-22 | Fix hardcoded test suite count | `full-backend-validation.test.js` — `assert.ok(>=29)`; `CONTRIBUTING.md` updated |
+| T2-25 | Supabase database keep-alive | `/v1/health` SELECT 1 probe on every UptimeRobot ping; documented in README |
+| T2-26 | Module catalog integrity reverse check | `core/activation.js:assertModuleCatalogIntegrity` — orphaned registry keys detected |
+
+### Items owner-pending (3)
+
+| ID | Item | Action required |
+|---|---|---|
+| T2-17 | UptimeRobot monitor | Create HTTP monitor for `https://neural-rank-backend.onrender.com/v1/health` at 5-min interval |
+| T2-23 | SERP provider configuration | Set `SERP_PROVIDER` + `SERP_API_KEY` in Render dashboard (SerpApi free: 100 searches/month) |
+| T2-24 | Renderer endpoint configuration | Deploy headless browser service (Browserless.io free tier or Render docker) and set `RENDERER_ENDPOINT` |
+
+### Tests
+- 30 suites PASS (was 29 — `negative-path.test.js` added)
+- `testOpenApiRoutes` contract test in `server.test.js` verifies every `AVAILABLE_ROUTES` entry has a spec path
+- Integration tests skip automatically when `DATABASE_URL` is not set
+
+### Projected score after Tier 2: 91/100 (was 85/100)
 
 ---
 

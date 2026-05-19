@@ -10,6 +10,7 @@ const {
   getRegisteredModuleKeys,
   getModuleService,
 } = require("./serviceRegistry");
+const { runModuleSafe } = require("./defaultMvpOrchestrator");
 
 async function runActivationAwareFlow(
   moduleInputs = {},
@@ -53,7 +54,7 @@ async function runActivationAwareFlow(
       repositories,
     });
 
-    results[moduleKey] = await service.run(moduleInput, moduleContext);
+    results[moduleKey] = await runModuleSafe(service, moduleInput, moduleContext, moduleKey);
     moduleResults.push(results[moduleKey]);
   }
 

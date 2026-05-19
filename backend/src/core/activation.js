@@ -56,6 +56,18 @@ function assertModuleCatalogIntegrity() {
         .join(" "),
     );
   }
+
+  // Reverse check: every key registered in serviceRegistry must appear in one activation set.
+  const { getRegisteredModuleKeys } = require("../orchestration/serviceRegistry");
+  const registeredKeys = getRegisteredModuleKeys();
+  const orphanedKeys = registeredKeys.filter(
+    (moduleKey) => !DEFAULT_ACTIVE_MODULES.has(moduleKey) && !BUILT_BUT_INACTIVE_MODULES.has(moduleKey),
+  );
+  if (orphanedKeys.length > 0) {
+    throw new Error(
+      `Module '${orphanedKeys[0]}' is registered in serviceRegistry but absent from both DEFAULT_ACTIVE_MODULES and BUILT_BUT_INACTIVE_MODULES — add it to one.`,
+    );
+  }
 }
 
 function getDefaultActivationState() {

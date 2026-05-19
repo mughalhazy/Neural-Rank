@@ -27,7 +27,7 @@ Future audits: scan this file first. If a doc's status or description is wrong, 
 | [CHANGELOG.md](CHANGELOG.md) | `LOG` | All notable changes — keepachangelog.com format; append on every significant milestone |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | `LIVE` | Branch naming, commit style, pre-push checklist, doc update rules, backend module contract |
 | [SECURITY.md](SECURITY.md) | `LIVE` | Responsible disclosure policy — contact, scope, SLA; in-scope: backend API, auth, schema, governance |
-| [REBUILD_PLAN.md](REBUILD_PLAN.md) | `LIVE` | Enterprise rebuild plan — 77-item gap register across Tier 1 (18 resolved 2026-05-19), Tier 2 (26 open), Tier 3 (33 open); grade 85/100 after Tier 1, target A+ (98/100); all items verified against source code |
+| [REBUILD_PLAN.md](REBUILD_PLAN.md) | `LIVE` | Enterprise rebuild plan — 77-item gap register across Tier 1 (18 resolved), Tier 2 (23 resolved + 3 owner-pending), Tier 3 (33 open); grade 91/100 after Tier 2, target A+ (98/100) |
 
 ---
 
@@ -44,8 +44,10 @@ Actively consulted specs. These are the source of truth for how the backend is d
 | [BACKEND_DATA_AND_PERSISTENCE.md](docs/backend/reference/BACKEND_DATA_AND_PERSISTENCE.md) | `LIVE` | Persistence architecture — ownership table for all 18 modules, 9 migration file inventory, schema conventions |
 | [BACKEND_CORE_UTILITIES.md](docs/backend/reference/BACKEND_CORE_UTILITIES.md) | `LIVE` | Catalogue of 9 core utility modules — runtimeContext, createProviderAdapter, seoScorer, intentClassifier, recommendationScoring and more, with signatures and purpose |
 | [BACKEND_INTEGRATION_BOUNDARIES.md](docs/backend/reference/BACKEND_INTEGRATION_BOUNDARIES.md) | `LIVE` | 18 integration boundary catalogue — 5 implemented adapters (GSC, GA4, PageSpeed, backlink-provider, serp-provider), boundary contracts, fallback rules |
-| [BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md](docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md) | `LIVE` | Audit of all 24 API routes — envelope format, input validation, actor identity, rate-limit headers, safe logging compliance |
+| [BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md](docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md) | `LIVE` | Audit of all 26 API routes — envelope format, input validation, actor identity, rate-limit headers, safe logging compliance |
 | [BACKEND_DOMAIN_BOUNDARIES.md](docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md) | `LIVE` | All 18 modules mapped to 8 bounded contexts — site-intelligence, search-intelligence, content-operations, technical-operations, execution, measurement, governance, business-intelligence; includes domain layer rationale and compatibility mapping. Supersedes BACKEND_DOMAIN_BOUNDARY_MAP.md and BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md *(created 2026-05-17)* |
+| [OPENAPI.yaml](docs/backend/reference/OPENAPI.yaml) | `LIVE` | OpenAPI 3.1 specification — 26 paths, full schemas (Recommendation, Task, AuditLog, Snapshot, Attribution, BusinessProfile), error responses, Bearer JWT auth *(created 2026-05-19, T2-06)* |
+| [RUNBOOK.md](docs/backend/reference/RUNBOOK.md) | `LIVE` | Operational runbook — 6 scenarios: cold-start latency, DB unreachable, SERP rate-limited, Supabase outage, force restart, credential rotation + audit log correction procedure *(created 2026-05-19, T2-10)* |
 
 ---
 
@@ -57,6 +59,9 @@ One-time decisions captured for future reference. These explain WHY things are t
 |------|--------|-------------|
 | [BACKEND_DOMAIN_SERVICE_ROUTES.md](docs/backend/decisions/BACKEND_DOMAIN_SERVICE_ROUTES.md) | `DECISION` | Records the deliberate choice to keep 4 domain services (measurement, technical-ops, search-intelligence, business-intelligence) without HTTP routes — explains rationale and planned future route shapes |
 | [BACKEND_DUAL_CLASSIFIER_DECISION.md](docs/backend/decisions/BACKEND_DUAL_CLASSIFIER_DECISION.md) | `DECISION` | Records the intentional existence of two separate intent classifiers: core/intentClassifier.js (4-intent heuristic for module layer) vs search-intelligence domain (7-intent semantic) — prevents future consolidation attempts |
+| [ADR_001_ZERO_RUNTIME_DEPENDENCIES.md](docs/backend/decisions/ADR_001_ZERO_RUNTIME_DEPENDENCIES.md) | `DECISION` | Zero runtime npm dependencies — rationale, alternatives considered, review trigger *(created 2026-05-19, T2-09)* |
+| [ADR_002_PURE_NODE_HTTP.md](docs/backend/decisions/ADR_002_PURE_NODE_HTTP.md) | `DECISION` | Pure node:http (no Express/Fastify) — rationale, consequences *(created 2026-05-19, T2-09)* |
+| [ADR_003_IN_MEMORY_DEFAULT_REPOSITORY.md](docs/backend/decisions/ADR_003_IN_MEMORY_DEFAULT_REPOSITORY.md) | `DECISION` | In-memory default repository for CI/dev — dual-path pattern with context.query detection *(created 2026-05-19, T2-09)* |
 
 ---
 

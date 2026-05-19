@@ -8,6 +8,7 @@ services:
     buildCommand: npm install
     startCommand: npm start
     autoDeploy: true
+    healthCheckPath: /v1/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -24,4 +25,8 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: ALLOWED_ORIGIN
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: MODULE_TIMEOUT_MS
         sync: false

@@ -1,5 +1,6 @@
 # Neural Rank
 
+[![CI](https://github.com/mughalhazy/Neural-Rank/actions/workflows/ci.yml/badge.svg)](https://github.com/mughalhazy/Neural-Rank/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Neural Rank is a unified SEO intelligence platform — a 18-module backend SEO OS powering keyword analysis, rank tracking, technical audits, backlink intelligence, content scoring, and more.
@@ -54,7 +55,7 @@ Neural Rank/
 
 | | |
 |---|---|
-| Health endpoint | `https://neural-rank-backend.onrender.com/health` |
+| Health endpoint | `https://neural-rank-backend.onrender.com/v1/health` |
 | Entry point | `backend/src/server.js` |
 | Start | `npm start` |
 | Test | `npm run test:backend` |
@@ -84,31 +85,33 @@ Neural Rank/
 | Unified Workflow Layer | ✅ |
 | Local SEO | opt-in |
 
-### API surface (24 routes)
+### API surface (24 routes — all under `/v1/`)
+
+All routes are versioned under `/v1/`. Legacy unversioned paths (e.g. `/health`) redirect 301 → `/v1/health`.
 
 | Route | Purpose |
 |---|---|
-| `GET /health` | Health + active module count |
-| `GET /ready` | Readiness check |
-| `GET /modules` | Full module catalog |
-| `POST /run/default` | Run all 17 active modules |
-| `POST /run/activation-aware` | Run with activation overrides |
-| `POST /modules/:key/run` | Run a single module |
-| `GET/POST /execution/recommendations` | Recommendation lifecycle |
-| `PATCH /execution/recommendations/:id/status` | Approve / reject |
-| `POST /execution/recommendations/:id/tasks` | Create task from recommendation |
-| `GET /execution/tasks` | List tasks |
-| `GET /execution/tasks/:id` | Get task |
-| `PATCH /execution/tasks/:id/status` | Update task status |
-| `GET /execution/tasks/:id/history` | Task status history |
-| `GET /execution/audit-logs` | Audit log |
-| `GET /measurement/metrics` | Metric source registry |
-| `POST /measurement/snapshots` | Record baseline / post-change snapshot |
-| `POST/GET /measurement/attributions` | Attribution links |
-| `POST /technical-operations/audit` | Source HTML audit |
-| `POST /search-intelligence/classify` | Intent classification |
-| `POST /search-intelligence/analyze` | Full SERP query analysis |
-| `GET/POST /business-intelligence/profiles` | Business profiles |
+| `GET /v1/health` | Health + active module count |
+| `GET /v1/ready` | Readiness check |
+| `GET /v1/modules` | Full module catalog |
+| `POST /v1/run/default` | Run all 17 active modules |
+| `POST /v1/run/activation-aware` | Run with activation overrides |
+| `POST /v1/modules/:key/run` | Run a single module |
+| `GET/POST /v1/execution/recommendations` | Recommendation lifecycle |
+| `PATCH /v1/execution/recommendations/:id/status` | Approve / reject |
+| `POST /v1/execution/recommendations/:id/tasks` | Create task from recommendation |
+| `GET /v1/execution/tasks` | List tasks |
+| `GET /v1/execution/tasks/:id` | Get task |
+| `PATCH /v1/execution/tasks/:id/status` | Update task status |
+| `GET /v1/execution/tasks/:id/history` | Task status history |
+| `GET /v1/execution/audit-logs` | Audit log |
+| `GET /v1/measurement/metrics` | Metric source registry |
+| `POST /v1/measurement/snapshots` | Record baseline / post-change snapshot |
+| `POST/GET /v1/measurement/attributions` | Attribution links |
+| `POST /v1/technical-operations/audit` | Source HTML audit |
+| `POST /v1/search-intelligence/classify` | Intent classification |
+| `POST /v1/search-intelligence/analyze` | Full SERP query analysis |
+| `GET/POST /v1/business-intelligence/profiles` | Business profiles |
 
 ### Rate limiting
 
@@ -118,7 +121,8 @@ All requests are rate-limited by IP address: **120 req/min** default, **30 req/m
 
 - Project: `neural-rank` · ref `bvujfwwwwzlpsxbshxyn` · `us-east-1` · free tier
 - Dashboard: `https://supabase.com/dashboard/project/bvujfwwwwzlpsxbshxyn`
-- Migrations: 9 applied · 33 tables in `app_public`
+- Migrations: 10 applied · 33 tables in `app_public`
+- **Keep-alive:** The `/health` probe runs `SELECT 1` on every call. UptimeRobot (T2-17) pings `/health` every 5 minutes, preventing Supabase from pausing after 7 days of inactivity. **Do not disable the UptimeRobot monitor.**
 
 ---
 

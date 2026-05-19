@@ -51,4 +51,26 @@ function getQuery() {
   return (sql, params) => pool.query(sql, params);
 }
 
-module.exports = { initDb, probeDb, getQuery };
+// Wraps callback in a Postgres transaction (BEGIN/COMMIT/ROLLBACK).
+// When no pool is configured (in-memory path), callback receives null transactionalQuery
+// and runs without transaction semantics — acceptable for in-memory repositories.
+async function withTransaction(callback) {
+  if (!pool) {
+    return callback({ transactionalQuery: null });
+  }
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const transactionalQuery = (sql, params) => client.query(sql, params);
+    const result = await callback({ transactionalQuery });
+    await client.query("COMMIT");
+    return result;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = { initDb, probeDb, getQuery, withTransaction };
