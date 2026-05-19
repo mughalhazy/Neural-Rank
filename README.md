@@ -1,5 +1,7 @@
 # Neural Rank
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Neural Rank is a unified SEO intelligence platform — a 18-module backend SEO OS powering keyword analysis, rank tracking, technical audits, backlink intelligence, content scoring, and more.
 
 ---
@@ -107,6 +109,10 @@ Neural Rank/
 | `POST /search-intelligence/classify` | Intent classification |
 | `POST /search-intelligence/analyze` | Full SERP query analysis |
 | `GET/POST /business-intelligence/profiles` | Business profiles |
+
+### Rate limiting
+
+All requests are rate-limited by IP address: **120 req/min** default, **30 req/min** for mutation endpoints (POST/PATCH with identity). Limits are enforced in-process and reset on restart (persistent Redis limiter is a Tier 3 item). Rate limit state is exposed via `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` response headers.
 
 ### Database (Supabase)
 

@@ -5,6 +5,48 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-05-19] — Tier 1 Production Blockers — All 18 Resolved
+
+### Added
+- `backend/src/db.js` — PostgreSQL pool (`pg.Pool`, max 5, free tier safe); `initDb()` called at startup, `probeDb()` used by `/health`; graceful no-op when `DATABASE_URL` absent
+- `backend/src/server.js` — OPTIONS preflight handler (CORS), `addSecurityHeaders()` (T1-04, T1-05), request access log with `X-Request-ID` correlation IDs on every response (T1-06), workspace-safe `buildRequestContext` allowlist (T1-02)
+- `backend/src/core/rateLimiter.js` — `TRUSTED_PROXY_COUNT`-aware `X-Forwarded-For` parsing with IP validation regex (T1-10)
+- `backend/src/api/auth.js` — production auth hardening: 503 on Supabase network error (T1-15), production rejection when `SUPABASE_URL` absent (T1-09)
+- `backend/src/domains/governance/resultModel.js` — fixed `requiresApproval` bug: block → `false`, require_approval → `true` (T1-16)
+- `backend/src/domains/execution/service.js` — pre-persist governance block gate: throws `governance_blocks_*` before any DB write (T1-17); `workspaceId` propagated into `createRecommendationRecord` and list queries (T1-03)
+- `backend/src/domains/execution/models.js` — `workspaceId` field in `createRecommendationRecord` and `createTaskRecord` (T1-03)
+- `backend/src/domains/execution/repository.js` — `listRecommendations(workspaceId)` and `listTasks(workspaceId)` workspace filter in both Postgres and in-memory repositories; `workspace_id` in Postgres INSERT queries (T1-03)
+- `supabase/migrations/20260519000000_workspace_isolation.sql` — adds `workspace_id` columns to 6 tables, enables RLS on all 33 `app_public` tables, workspace-scoped policies for execution/measurement tables (T1-03)
+- `scripts/check-secrets.js` — secrets scanner (JWT, API key, password, DATABASE_URL patterns); 471 files scanned; wired into `npm run ci` (T1-11)
+- `LICENSE` — MIT license, `package.json` `"license": "MIT"` (T1-13)
+- `render.yaml` — `NODE_ENV=production`, `ALLOWED_ORIGIN` (T1-14, T1-04)
+- `.env.example` — `NODE_ENV`, `ALLOWED_ORIGIN`, `TRUSTED_PROXY_COUNT` documented (T1-04, T1-09, T1-10, T1-14)
+
+### Changed
+- `/health` — now async; returns `checks: { http, db }` and `deployable: true/false`; HTTP 503 when DB check fails (T1-08)
+- `buildHealthPayload` — async, calls `probeDb()` (T1-08)
+- `startServer()` — now async; calls `initDb()` and threads `{ query }` into `baseContext` (T1-01)
+- 6 domain POST handlers now enforce `requireIdentity` and mutation rate limit: `handleMeasurementSnapshots`, `handleMeasurementAttributions` (POST), `handleTechnicalOperationsAudit`, `handleSearchIntelligenceClassify`, `handleSearchIntelligenceAnalyze`, `handleBusinessIntelligenceProfiles` (POST) (T1-18)
+- `README.md` — added rate limiting section (120 req/min, 30 mutations), MIT badge (T1-07, T1-13)
+- `CHANGELOG.md` — corrected `60 req/min` → `120 req/min` (T1-07)
+- `server.test.js` — `testBlockedGovernanceRoute` updated: expects 409 on creation of blocked recommendation (correct T1-17 behavior)
+- `governance-engine.test.js` — `testBlockedUnsafeRecommendationsCannotAdvance` updated: asserts `rejects` on creation, verifies `requiresApproval=false` for block (T1-16, T1-17)
+- `package.json` — added `check:secrets` script; `ci` now runs syntax + secrets + lint + tests; added `version` and `license` fields
+
+### Security
+- Prototype pollution in `buildRequestContext` — allowlist copy replaces spread of user `body.context` (T1-02)
+- CORS headers on all responses; OPTIONS preflight returns 204 (T1-04)
+- Security headers on all responses: `X-Content-Type-Options`, `X-Frame-Options`, `HSTS`, `Referrer-Policy`, `X-XSS-Protection`, `Permissions-Policy` (T1-05)
+- Auth bypass hardening: production rejects all requests when `SUPABASE_URL` absent; startup warning logged (T1-09)
+- Supabase network error returns 503 (not 401) — clients can distinguish outage from invalid token (T1-15)
+- Governance block gate pre-persist: blocked actions (keyword stuffing, hidden text, mass deindexing) never reach the DB (T1-17)
+- RLS enabled on all 33 `app_public` tables (T1-03)
+- Secrets scanning in CI — committed secrets cause `npm run ci` to fail (T1-11)
+
+### Projected score after Tier 1: **85/100** (was 76/100)
+
+---
+
 ## [2026-05-18] — Enterprise Grading Audit + Gap Register Finalized
 
 ### Added
@@ -103,7 +145,7 @@ Three-pass audit: (1) enterprise grading of all 18 modules and infrastructure; (
 
 ### Added
 - Auth middleware: JWT verification via Supabase, workspace isolation headers
-- Rate limiting: 60 req/min default, 30 req/min mutations, RFC-compliant headers
+- Rate limiting: 120 req/min default, 30 req/min mutations, RFC-compliant headers
 - Domain service routes: technical-operations, search-intelligence, measurement, business-intelligence
 - `DOC_CATALOGUE.md` — living index of all .md files in the repo
 - `render.yaml` — Render free-tier deployment blueprint

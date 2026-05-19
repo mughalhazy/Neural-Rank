@@ -32,42 +32,37 @@ async function testPolicyRegistryAndBlockedReasons() {
 }
 
 async function testBlockedUnsafeRecommendationsCannotAdvance() {
+  // T1-17: blocked recommendations must be rejected at creation — never stored.
   resetExecutionServiceState();
   const executionService = getExecutionService();
 
-  const recommendation = await executionService.createRecommendation({
-    sourceModuleKey: "technical_operations",
-    title: "Sitewide noindex and doorway redirects",
-    summary: "Noindex all pages and redirect unrelated pages to a ranking doorway.",
+  await assert.rejects(
+    executionService.createRecommendation({
+      sourceModuleKey: "technical_operations",
+      title: "Sitewide noindex and doorway redirects",
+      summary: "Noindex all pages and redirect unrelated pages to a ranking doorway.",
+      actionType: "sitewide_redirect_rewrite",
+      payload: {
+        robotsDirective: "noindex all",
+        redirectPlan: "mass redirect unrelated pages",
+      },
+      actor: "governance_test",
+      target: {
+        websiteUrl: "https://example.com",
+      },
+    }),
+    /governance_blocks_/,
+  );
+
+  // T1-16: evaluateActionGovernance correctly sets requiresApproval=false for block classifications.
+  const { createGovernanceService } = require("./domains/governance/service");
+  const govService = createGovernanceService();
+  const result = govService.evaluateActionGovernance({
     actionType: "sitewide_redirect_rewrite",
-    payload: {
-      robotsDirective: "noindex all",
-      redirectPlan: "mass redirect unrelated pages",
-    },
-    actor: "governance_test",
-    target: {
-      websiteUrl: "https://example.com",
-    },
+    payload: { redirectPlan: "mass redirect unrelated pages" },
   });
-
-  assert.equal(recommendation.governanceResult.isBlocked, true);
-  assert.ok(recommendation.governanceResult.blockedReasons.length >= 1);
-
-  await assert.rejects(
-    executionService.updateRecommendationStatus(recommendation.id, {
-      nextStatus: "approved",
-      actor: "reviewer",
-      reason: "Attempted approval should fail.",
-    }),
-    /governance_blocks_approval/,
-  );
-
-  await assert.rejects(
-    executionService.createTaskFromRecommendation(recommendation.id, {
-      actor: "reviewer",
-    }),
-    /recommendation_requires_approval/,
-  );
+  assert.equal(result.isBlocked, true);
+  assert.equal(result.requiresApproval, false);
 }
 
 async function run() {

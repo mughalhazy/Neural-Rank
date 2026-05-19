@@ -11,6 +11,7 @@ function createRecommendationRecord({
   target = {},
   governanceResult = null,
   score = null,
+  workspaceId = null,
 }) {
   const createdAt = new Date().toISOString();
 
@@ -22,6 +23,7 @@ function createRecommendationRecord({
     actionType: normalizeText(actionType) || "unspecified_action",
     payload,
     target: normalizeProductTarget(target),
+    workspaceId: workspaceId || randomUUID(),
     currentStatus: "recommended",
     approvalStatus: "recommended",
     executionStatus: null,
@@ -52,6 +54,7 @@ function createTaskRecord({
     actionType: recommendation.actionType,
     payload: recommendation.payload,
     target: recommendation.target,
+    workspaceId: recommendation.workspaceId || null,
     currentStatus: "queued",
     approvalStatus: "approved",
     executionStatus: "queued",

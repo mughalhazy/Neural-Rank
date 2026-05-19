@@ -426,6 +426,46 @@ Ordered by PRODUCTION_READINESS_GAPS.md priority:
 
 ---
 
+---
+
+## Milestone #13 — Tier 1 Production Blockers Resolved
+> Completed: 2026-05-19
+
+All 18 Tier 1 items from REBUILD_PLAN.md resolved in a single session. CI green throughout.
+
+**Resume anchor:** REBUILD_PLAN.md — Tier 2 begins at T2-01. All 26 Tier 2 items are `open`.
+
+### Items resolved
+
+| ID | Item | Key file(s) |
+|---|---|---|
+| T1-01 | PostgreSQL connection wired at startup | `backend/src/db.js` (new), `server.js:startServer()` |
+| T1-02 | Prototype pollution fixed — allowlist in buildRequestContext | `server.js:buildRequestContext` |
+| T1-03 | Workspace isolation + RLS on all 33 tables | `supabase/migrations/20260519000000_workspace_isolation.sql`, `execution/repository.js`, `execution/models.js`, `execution/service.js` |
+| T1-04 | CORS headers + OPTIONS preflight | `server.js:addSecurityHeaders`, `server.js:createRequestHandler` |
+| T1-05 | Security response headers (6 headers) | `server.js:addSecurityHeaders` |
+| T1-06 | Request access log with correlation IDs | `server.js:createRequestHandler` response.on('finish') |
+| T1-07 | Rate limit doc fix (60→120 req/min) | `CHANGELOG.md`, `README.md` |
+| T1-08 | /health hardened — real DB probe, 503 on fail | `db.js:probeDb`, `server.js:buildHealthPayload` (now async) |
+| T1-09 | Auth bypass hardening — production rejects when SUPABASE_URL absent | `api/auth.js:resolveRequestIdentity` |
+| T1-10 | X-Forwarded-For TRUSTED_PROXY_COUNT validation | `core/rateLimiter.js:getIpKey` |
+| T1-11 | Secrets scanning script in CI | `scripts/check-secrets.js` (new), `package.json` |
+| T1-12 | README HTTPS discrepancy | No-op — already correct |
+| T1-13 | LICENSE file (MIT) | `LICENSE` (new), `package.json` |
+| T1-14 | NODE_ENV=production in render.yaml | `render.yaml`, `.env.example` |
+| T1-15 | verifySupabaseToken: network error → 503, 5xx → 503, 401/403 → null | `api/auth.js:verifySupabaseToken` |
+| T1-16 | Governance resultModel bug: block → requiresApproval=false | `domains/governance/resultModel.js:42` |
+| T1-17 | Pre-persist governance block gate — blocked actions never reach DB | `domains/execution/service.js:createRecommendation` |
+| T1-18 | Auth on 6 domain POST endpoints (requireIdentity + mutation rate limit) | `server.js` — 6 handlers updated |
+
+### Tests updated
+- `server.test.js:testBlockedGovernanceRoute` — now expects 409 on blocked creation (correct T1-17 behavior)
+- `governance-engine.test.js:testBlockedUnsafeRecommendationsCannotAdvance` — now asserts rejects + requiresApproval=false (T1-16 + T1-17)
+
+### Projected score after Tier 1: 85/100 (was 76/100)
+
+---
+
 ## Session Notes
 - keep work confined to `D:\Neural Rank` unless external deployment or repo actions are explicitly requested
 - frontend MVP exposure must not be confused with backend inactivity

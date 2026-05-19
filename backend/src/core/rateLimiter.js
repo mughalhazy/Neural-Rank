@@ -1,6 +1,8 @@
 const WINDOW_MS = 60_000;
 const DEFAULT_LIMIT = 120;
 const MUTATION_LIMIT = 30;
+const TRUSTED_PROXY_COUNT = Number(process.env.TRUSTED_PROXY_COUNT) || 1;
+const IP_PATTERN = /^[\d.:a-fA-F]+$/;
 
 const store = new Map();
 
@@ -36,8 +38,15 @@ function checkLimit(key, limit = DEFAULT_LIMIT) {
 
 function getIpKey(request) {
   const forwarded = request.headers["x-forwarded-for"];
-  const ip = forwarded ? forwarded.split(",")[0].trim() : (request.socket?.remoteAddress || "unknown");
-  return `ip:${ip}`;
+  if (forwarded) {
+    const parts = forwarded.split(",").map((s) => s.trim());
+    const candidateIndex = Math.max(0, parts.length - TRUSTED_PROXY_COUNT);
+    const candidate = parts[candidateIndex];
+    if (candidate && IP_PATTERN.test(candidate)) {
+      return `ip:${candidate}`;
+    }
+  }
+  return `ip:${request.socket?.remoteAddress || "unknown"}`;
 }
 
 function getActorKey(actor) {

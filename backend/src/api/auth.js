@@ -2,6 +2,15 @@ const { createApiError } = require("./errors");
 
 const SUPABASE_URL = process.env.SUPABASE_URL || null;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || null;
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+// Warn at startup if production is running without Supabase auth configured.
+if (IS_PRODUCTION && !SUPABASE_URL) {
+  console.log(JSON.stringify({
+    kind: "auth_degraded",
+    reason: "SUPABASE_URL not set — all mutation requests will be rejected in production",
+  }));
+}
 
 // When SUPABASE_URL is set, all mutation callers must provide a valid Supabase
 // session JWT via Authorization: Bearer <token>. When it is not set (local dev
@@ -11,19 +20,25 @@ const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || null;
 async function verifySupabaseToken(token) {
   if (!SUPABASE_URL || !token) return null;
 
+  let res;
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
         ...(SUPABASE_ANON_KEY ? { apikey: SUPABASE_ANON_KEY } : {}),
       },
     });
-
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
+  } catch (networkErr) {
+    throw createApiError("auth_service_unavailable", "Authentication service is temporarily unavailable. Retry shortly.", 503);
   }
+
+  if (res.status === 401 || res.status === 403) return null;
+
+  if (!res.ok) {
+    throw createApiError("auth_service_unavailable", "Authentication service returned an error. Retry shortly.", 503);
+  }
+
+  return await res.json();
 }
 
 async function resolveRequestIdentity(request) {
@@ -49,9 +64,11 @@ async function resolveRequestIdentity(request) {
     return null;
   }
 
-  // No Authorization header: fall back to actor header only when Supabase is
-  // not configured (non-production environments).
+  // No Authorization header: in production without SUPABASE_URL, reject all
+  // requests rather than silently degrading to no-auth.
   if (!SUPABASE_URL) {
+    if (IS_PRODUCTION) return null;
+
     const actor = request.headers["x-neural-rank-actor"];
     if (typeof actor === "string" && actor.trim()) {
       return {

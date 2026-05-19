@@ -9,6 +9,8 @@ services:
     startCommand: npm start
     autoDeploy: true
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
@@ -20,4 +22,6 @@ services:
       - key: RENDERER_ENDPOINT
         sync: false
       - key: DATABASE_URL
+        sync: false
+      - key: ALLOWED_ORIGIN
         sync: false

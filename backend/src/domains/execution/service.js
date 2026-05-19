@@ -54,6 +54,11 @@ function assertTaskStatus(nextStatus) {
 async function createRecommendation(input = {}, context = {}) {
   const repository = resolveRepository(context);
   const governanceResult = governanceService.evaluateActionGovernance(input);
+
+  if (governanceResult.overallClassification === "block") {
+    throw new Error(`governance_blocks_${input.actionType || "action"}`);
+  }
+
   const score = createRecommendationScore({
     ...(input.score || {}),
     governanceRisk: input.score?.governanceRisk,
@@ -64,6 +69,7 @@ async function createRecommendation(input = {}, context = {}) {
     ...input,
     governanceResult,
     score,
+    workspaceId: context.workspaceId || null,
   });
   const created = await repository.createRecommendation(recommendation);
 
@@ -87,7 +93,7 @@ async function createRecommendation(input = {}, context = {}) {
 
 async function listRecommendations(context = {}) {
   const repository = resolveRepository(context);
-  return repository.listRecommendations();
+  return repository.listRecommendations(context.workspaceId || null);
 }
 
 async function updateRecommendationStatus(
@@ -222,7 +228,7 @@ async function createTaskFromRecommendation(
 
 async function listTasks(context = {}) {
   const repository = resolveRepository(context);
-  return repository.listTasks();
+  return repository.listTasks(context.workspaceId || null);
 }
 
 async function getTask(taskId, context = {}) {

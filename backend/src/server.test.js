@@ -239,8 +239,10 @@ async function testExecutionLifecycleRoutes() {
 }
 
 async function testBlockedGovernanceRoute() {
+  // T1-17: blocked recommendations must be rejected at creation time — never persisted.
+  // T1-16: requiresApproval must be false for blocked classifications.
   await withServer(async (server) => {
-    const createdRecommendation = await request(server, "POST", "/execution/recommendations", {
+    const blockAttempt = await request(server, "POST", "/execution/recommendations", {
       sourceModuleKey: "technical_operations",
       title: "Hidden text and sitewide redirects",
       summary: "Add hidden text and mass redirect unrelated pages.",
@@ -254,26 +256,15 @@ async function testBlockedGovernanceRoute() {
       actor: "server_test",
     }, { "x-neural-rank-actor": "server_test" });
 
-    assert.equal(createdRecommendation.statusCode, 201);
-    assert.equal(createdRecommendation.body.ok, true);
-    assert.equal(createdRecommendation.body.data.governanceResult.isBlocked, true);
-    assert.ok(createdRecommendation.body.data.governanceResult.blockedReasons.length >= 1);
+    // Block-classified actions must be rejected at creation — not stored in DB.
+    assert.equal(blockAttempt.statusCode, 409);
+    assert.equal(blockAttempt.body.ok, false);
+    assert.ok(blockAttempt.body.error.code.startsWith("governance_blocks_"));
 
-    const approvalAttempt = await request(
-      server,
-      "PATCH",
-      `/execution/recommendations/${createdRecommendation.body.data.id}/status`,
-      {
-        nextStatus: "approved",
-        actor: "reviewer",
-        reason: "Should be blocked by governance.",
-      },
-      { "x-neural-rank-actor": "reviewer" },
-    );
-
-    assert.equal(approvalAttempt.statusCode, 409);
-    assert.equal(approvalAttempt.body.ok, false);
-    assert.equal(approvalAttempt.body.error.code, "governance_blocks_approval");
+    // Confirm nothing was stored — list should have 0 recommendations in this fresh server.
+    const listAfterBlock = await request(server, "GET", "/execution/recommendations");
+    assert.equal(listAfterBlock.statusCode, 200);
+    assert.equal(listAfterBlock.body.data.count, 0);
   });
 }
 

@@ -131,6 +131,7 @@ function createPostgresExecutionRepository(context = {}) {
             summary,
             action_type,
             payload,
+            workspace_id,
             current_status,
             approval_status,
             execution_status,
@@ -144,7 +145,7 @@ function createPostgresExecutionRepository(context = {}) {
             updated_at
           )
           values (
-            $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12::jsonb, $13::jsonb, $14::jsonb, $15, $16, $17, $18
+            $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11, $12, $13::jsonb, $14::jsonb, $15::jsonb, $16, $17, $18, $19
           )
           returning *
         `,
@@ -156,6 +157,7 @@ function createPostgresExecutionRepository(context = {}) {
           record.summary,
           record.actionType,
           JSON.stringify(record.payload || {}),
+          record.workspaceId,
           record.currentStatus,
           record.approvalStatus,
           record.executionStatus,
@@ -172,15 +174,17 @@ function createPostgresExecutionRepository(context = {}) {
 
       return mapRecommendationRow(normalizeRows(result)[0]);
     },
-    async listRecommendations() {
+    async listRecommendations(workspaceId) {
+      if (workspaceId) {
+        const result = await query(
+          `select * from app_public.execution_recommendations where workspace_id = $1 order by created_at asc`,
+          [workspaceId],
+        );
+        return normalizeRows(result).map(mapRecommendationRow);
+      }
       const result = await query(
-        `
-          select *
-          from app_public.execution_recommendations
-          order by created_at asc
-        `,
+        `select * from app_public.execution_recommendations order by created_at asc`,
       );
-
       return normalizeRows(result).map(mapRecommendationRow);
     },
     async getRecommendation(id) {
@@ -296,15 +300,17 @@ function createPostgresExecutionRepository(context = {}) {
 
       return mapTaskRow(normalizeRows(result)[0]);
     },
-    async listTasks() {
+    async listTasks(workspaceId) {
+      if (workspaceId) {
+        const result = await query(
+          `select * from app_public.execution_tasks where workspace_id = $1 order by created_at asc`,
+          [workspaceId],
+        );
+        return normalizeRows(result).map(mapTaskRow);
+      }
       const result = await query(
-        `
-          select *
-          from app_public.execution_tasks
-          order by created_at asc
-        `,
+        `select * from app_public.execution_tasks order by created_at asc`,
       );
-
       return normalizeRows(result).map(mapTaskRow);
     },
     async getTask(id) {
@@ -457,8 +463,12 @@ function createInMemoryExecutionRepository() {
       state.recommendations.set(record.id, clone(record));
       return clone(record);
     },
-    async listRecommendations() {
-      return Array.from(state.recommendations.values()).map(clone);
+    async listRecommendations(workspaceId) {
+      const all = Array.from(state.recommendations.values()).map(clone);
+      if (workspaceId) {
+        return all.filter((r) => r.workspaceId === workspaceId);
+      }
+      return all;
     },
     async getRecommendation(id) {
       const record = state.recommendations.get(id);
@@ -478,8 +488,12 @@ function createInMemoryExecutionRepository() {
       state.tasks.set(record.id, clone(record));
       return clone(record);
     },
-    async listTasks() {
-      return Array.from(state.tasks.values()).map(clone);
+    async listTasks(workspaceId) {
+      const all = Array.from(state.tasks.values()).map(clone);
+      if (workspaceId) {
+        return all.filter((t) => t.workspaceId === workspaceId);
+      }
+      return all;
     },
     async getTask(id) {
       const record = state.tasks.get(id);

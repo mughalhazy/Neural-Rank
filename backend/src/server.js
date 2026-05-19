@@ -1,5 +1,6 @@
 const http = require("node:http");
 const { URL } = require("node:url");
+const { initDb, probeDb } = require("./db");
 
 const {
   getDefaultActivationState,
@@ -42,12 +43,30 @@ const businessIntelligenceService = createBusinessIntelligenceService();
 
 // ── Response helpers ──────────────────────────────────────────────────────────
 
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
+
+function addSecurityHeaders(headers) {
+  headers["X-Content-Type-Options"] = "nosniff";
+  headers["X-Frame-Options"] = "DENY";
+  headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+  headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload";
+  headers["X-XSS-Protection"] = "0";
+  headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()";
+  headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGIN;
+  headers["Access-Control-Allow-Methods"] = "GET, POST, PATCH, OPTIONS";
+  headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Neural-Rank-Actor, X-Neural-Rank-Client-Id, X-Neural-Rank-Workspace-Id, X-Request-ID";
+  headers["Access-Control-Max-Age"] = "86400";
+  return headers;
+}
+
 function sendEnvelope(response, statusCode, { ok, data = null, error = null, meta = {} }, rateLimitInfo = null) {
   const body = JSON.stringify({ ok, data, error, meta }, null, 2);
   const headers = {
     "Content-Type": "application/json; charset=utf-8",
     "Content-Length": Buffer.byteLength(body),
   };
+
+  addSecurityHeaders(headers);
 
   if (rateLimitInfo) {
     headers["X-RateLimit-Limit"] = String(rateLimitInfo.limit);
@@ -138,13 +157,16 @@ function applyRateLimit(request, response, { actor = null, isMutation = false } 
 
 // ── Health & info payloads ────────────────────────────────────────────────────
 
-function buildHealthPayload() {
+async function buildHealthPayload() {
   const activationState = getDefaultActivationState();
   const grouped = listModulesByActivation();
+  const db = await probeDb();
+  const deployable = db.status !== "fail";
   return {
-    status: "ok",
+    status: deployable ? "ok" : "degraded",
     service: "neural-rank-backend",
-    deployable: true,
+    deployable,
+    checks: { http: "pass", db: db.status },
     activeModuleCount: grouped.active.length,
     activeModules: grouped.active,
     inactiveModules: grouped.inactive,
@@ -224,12 +246,20 @@ function buildExecutionPayloadList(items = [], key) {
   return { [key]: items, count: items.length };
 }
 
+const SAFE_BODY_CONTEXT_KEYS = ["workspaceId", "clientId", "targetRef", "websiteUrl", "appId"];
+
 function buildRequestContext(baseContext = {}, bodyContext = {}, identity = {}) {
+  const safeBodyContext = {};
+  for (const key of SAFE_BODY_CONTEXT_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(bodyContext, key)) {
+      safeBodyContext[key] = bodyContext[key];
+    }
+  }
   return {
     ...baseContext,
-    ...bodyContext,
+    ...safeBodyContext,
     requestIdentity: identity,
-    workspaceId: identity.workspaceId || null,
+    workspaceId: identity.workspaceId || safeBodyContext.workspaceId || null,
   };
 }
 
@@ -391,9 +421,10 @@ async function handleMeasurementMetrics(request, response) {
   sendEnvelope(response, 200, { ok: true, data: { metrics: sources, count: sources.length }, meta: {} }, rl);
 }
 
-async function handleMeasurementSnapshots(request, response) {
+async function handleMeasurementSnapshots(request, response, identity) {
   if (request.method !== "POST") { sendMethodNotAllowed(response, ["POST"]); return; }
-  const rl = applyRateLimit(request, response);
+  requireIdentity(identity);
+  const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
   if (!rl) return;
   const body = await readJsonBody(request);
   const kind = body.snapshotKind || body.kind || "baseline";
@@ -403,14 +434,17 @@ async function handleMeasurementSnapshots(request, response) {
   sendEnvelope(response, 201, { ok: true, data: result, meta: { snapshotKind: kind } }, rl);
 }
 
-async function handleMeasurementAttributions(request, response, pathname) {
+async function handleMeasurementAttributions(request, response, pathname, identity) {
   const rl = applyRateLimit(request, response);
   if (!rl) return;
 
   if (request.method === "POST" && pathname === "/measurement/attributions") {
+    requireIdentity(identity);
+    const mutRl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
+    if (!mutRl) return;
     const body = await readJsonBody(request);
     const result = await measurementService.recordAttributionLink(body);
-    sendEnvelope(response, 201, { ok: true, data: result, meta: {} }, rl);
+    sendEnvelope(response, 201, { ok: true, data: result, meta: {} }, mutRl);
     return;
   }
 
@@ -431,9 +465,10 @@ async function handleMeasurementAttributions(request, response, pathname) {
 
 // ── Technical operations domain handlers ─────────────────────────────────────
 
-async function handleTechnicalOperationsAudit(request, response) {
+async function handleTechnicalOperationsAudit(request, response, identity) {
   if (request.method !== "POST") { sendMethodNotAllowed(response, ["POST"]); return; }
-  const rl = applyRateLimit(request, response);
+  requireIdentity(identity);
+  const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
   if (!rl) return;
   const body = await readJsonBody(request);
   const result = await technicalOperationsService.auditTechnicalSeo(body);
@@ -442,18 +477,20 @@ async function handleTechnicalOperationsAudit(request, response) {
 
 // ── Search intelligence domain handlers ──────────────────────────────────────
 
-async function handleSearchIntelligenceClassify(request, response) {
+async function handleSearchIntelligenceClassify(request, response, identity) {
   if (request.method !== "POST") { sendMethodNotAllowed(response, ["POST"]); return; }
-  const rl = applyRateLimit(request, response);
+  requireIdentity(identity);
+  const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
   if (!rl) return;
   const body = await readJsonBody(request);
   const result = await searchIntelligenceService.classifyIntent(body);
   sendEnvelope(response, 200, { ok: true, data: result, meta: {} }, rl);
 }
 
-async function handleSearchIntelligenceAnalyze(request, response, baseContext) {
+async function handleSearchIntelligenceAnalyze(request, response, baseContext, identity) {
   if (request.method !== "POST") { sendMethodNotAllowed(response, ["POST"]); return; }
-  const rl = applyRateLimit(request, response);
+  requireIdentity(identity);
+  const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
   if (!rl) return;
   const body = await readJsonBody(request);
   const result = await searchIntelligenceService.analyzeQuery(body, { ...baseContext, ...body.context });
@@ -462,7 +499,7 @@ async function handleSearchIntelligenceAnalyze(request, response, baseContext) {
 
 // ── Business intelligence domain handlers ────────────────────────────────────
 
-async function handleBusinessIntelligenceProfiles(request, response) {
+async function handleBusinessIntelligenceProfiles(request, response, identity) {
   const rl = applyRateLimit(request, response);
   if (!rl) return;
 
@@ -473,9 +510,12 @@ async function handleBusinessIntelligenceProfiles(request, response) {
   }
 
   if (request.method === "POST") {
+    requireIdentity(identity);
+    const mutRl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
+    if (!mutRl) return;
     const body = await readJsonBody(request);
     const result = await businessIntelligenceService.createBusinessProfile(body);
-    sendEnvelope(response, 201, { ok: true, data: result, meta: {} }, rl);
+    sendEnvelope(response, 201, { ok: true, data: result, meta: {} }, mutRl);
     return;
   }
 
@@ -528,7 +568,30 @@ function createRequestHandler(baseContext = {}) {
     const url = new URL(request.url, "http://127.0.0.1");
     const { pathname } = url;
 
+    const startedAt = Date.now();
+    const correlationId = request.headers["x-request-id"] || require("node:crypto").randomUUID();
+    response.setHeader("X-Request-ID", correlationId);
+
+    response.on("finish", () => {
+      logRequestEvent("request", {
+        method: request.method,
+        path: new URL(request.url, "http://127.0.0.1").pathname,
+        status: response.statusCode,
+        durationMs: Date.now() - startedAt,
+        correlationId,
+      });
+    });
+
     try {
+      // OPTIONS preflight — handle before any other logic
+      if (request.method === "OPTIONS") {
+        const preflightHeaders = {};
+        addSecurityHeaders(preflightHeaders);
+        response.writeHead(204, preflightHeaders);
+        response.end();
+        return;
+      }
+
       // Resolve identity once per request (async JWT verification)
       const identity = await resolveRequestIdentity(request);
 
@@ -538,7 +601,9 @@ function createRequestHandler(baseContext = {}) {
         if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
         const rl = applyRateLimit(request, response);
         if (!rl) return;
-        sendEnvelope(response, 200, { ok: true, data: buildHealthPayload(), meta: {} }, rl);
+        const healthData = await buildHealthPayload();
+        const healthStatus = healthData.deployable ? 200 : 503;
+        sendEnvelope(response, healthStatus, { ok: healthData.deployable, data: healthData, meta: {} }, rl);
         return;
       }
 
@@ -621,38 +686,38 @@ function createRequestHandler(baseContext = {}) {
       }
 
       if (pathname === "/measurement/snapshots") {
-        await handleMeasurementSnapshots(request, response);
+        await handleMeasurementSnapshots(request, response, identity);
         return;
       }
 
       if (pathname === "/measurement/attributions" || /^\/measurement\/attributions\/[^/]+$/.test(pathname)) {
-        await handleMeasurementAttributions(request, response, pathname);
+        await handleMeasurementAttributions(request, response, pathname, identity);
         return;
       }
 
       // ── Technical operations domain routes ────────────────────────────────
 
       if (pathname === "/technical-operations/audit") {
-        await handleTechnicalOperationsAudit(request, response);
+        await handleTechnicalOperationsAudit(request, response, identity);
         return;
       }
 
       // ── Search intelligence domain routes ─────────────────────────────────
 
       if (pathname === "/search-intelligence/classify") {
-        await handleSearchIntelligenceClassify(request, response);
+        await handleSearchIntelligenceClassify(request, response, identity);
         return;
       }
 
       if (pathname === "/search-intelligence/analyze") {
-        await handleSearchIntelligenceAnalyze(request, response, baseContext);
+        await handleSearchIntelligenceAnalyze(request, response, baseContext, identity);
         return;
       }
 
       // ── Business intelligence domain routes ───────────────────────────────
 
       if (pathname === "/business-intelligence/profiles") {
-        await handleBusinessIntelligenceProfiles(request, response);
+        await handleBusinessIntelligenceProfiles(request, response, identity);
         return;
       }
 
@@ -685,9 +750,12 @@ function createServer({ baseContext = {} } = {}) {
   return http.createServer(createRequestHandler(baseContext));
 }
 
-function startServer({ port = Number(process.env.PORT) || 10000, host = "0.0.0.0" } = {}) {
+async function startServer({ port = Number(process.env.PORT) || 10000, host = "0.0.0.0" } = {}) {
+  const dbPool = await initDb();
+  const baseContext = dbPool ? { query: (sql, params) => dbPool.query(sql, params) } : {};
+
   return new Promise((resolve, reject) => {
-    const server = createServer();
+    const server = createServer({ baseContext });
     server.once("error", reject);
     server.listen(port, host, () => {
       server.removeListener("error", reject);

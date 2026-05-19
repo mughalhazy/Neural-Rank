@@ -39,8 +39,7 @@ function createGovernanceResult({
     blockedReasons,
     warningReasons,
     approvalReasons,
-    requiresApproval:
-      overallClassification === "require_approval" || overallClassification === "block",
+    requiresApproval: overallClassification === "require_approval",
     isBlocked: overallClassification === "block",
     evaluatedAt,
   };

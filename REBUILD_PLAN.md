@@ -1,4 +1,4 @@
-# Neural Rank — Enterprise Rebuild Plan
+﻿# Neural Rank — Enterprise Rebuild Plan
 
 Working document for closing every gap identified in the 2026-05-18 enterprise grading audit,
 the 2026-05-18 reaudit that found 21 additional gaps, the 2026-05-18 DOC_CATALOGUE anchor
@@ -59,7 +59,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Restart Render; create a recommendation; cold-start the service again; recommendation is still present.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -76,7 +76,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Prototype unpolluted after request with `__proto__` in body.context.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -101,7 +101,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Cross-workspace data leakage impossible; all 33 tables have RLS enabled.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -120,7 +120,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Preflight OPTIONS returns 204; all responses carry correct CORS headers.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -143,7 +143,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** `curl -I /health` returns all six headers.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -161,7 +161,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Every request produces a structured JSON log line with duration.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -178,7 +178,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Code and all docs agree on 120/30.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -196,7 +196,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Disconnecting DB causes `/health` to return 503.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -216,7 +216,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Removing `SUPABASE_URL` from Render causes all mutations to return 401 immediately rather than silently accepting actor-header auth.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -238,7 +238,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Forged `X-Forwarded-For` header does not bypass IP rate limiting.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -258,7 +258,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** `npm run ci` fails if a file containing a JWT-shaped string is staged; the allowlist prevents false positives on test files.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -276,7 +276,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Zero occurrences of `http://neural-rank-backend` in any tracked file.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -295,7 +295,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** `LICENSE` file exists; `package.json` declares the same license identifier; README references it.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -315,7 +315,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** `render.yaml` includes `NODE_ENV: production`; `.env.example` documents it; T1-09 auth guard fires correctly in a local test with `NODE_ENV=production`.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -336,7 +336,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** Supabase network failure returns 503 to the caller; invalid token still returns 401.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -355,7 +355,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** `resultModel` sets `requiresApproval: false` for "block" classifications; test confirms the fix.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -379,7 +379,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** `createRecommendation()` throws `governance_blocks_*` before any DB write when `overallClassification === "block"`; no blocked recommendation row is ever created.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -403,7 +403,7 @@ None require architectural rewrites. All Tier 1 items must be resolved before Ti
 
 **Definition of done:** All 6 domain POST endpoints return 401 for unauthenticated callers; authenticated callers proceed normally; test coverage confirms both paths.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1647,24 +1647,24 @@ Both are shared infrastructure used across the codebase with no documented inter
 
 | ID | Item | Tier | Status | Effort |
 |---|---|---|---|---|
-| T1-01 | Wire PostgreSQL at startup | 1 | `open` | M |
-| T1-02 | Fix prototype pollution | 1 | `open` | S |
-| T1-03 | Workspace isolation + RLS audit | 1 | `open` | L |
-| T1-04 | CORS headers | 1 | `open` | S |
-| T1-05 | Security response headers | 1 | `open` | S |
-| T1-06 | Request access log | 1 | `open` | S |
-| T1-07 | Fix rate limit doc discrepancy | 1 | `open` | S |
-| T1-08 | Real /health checks | 1 | `open` | S |
-| T1-09 | Auth bypass hardening (SUPABASE_URL unset) | 1 | `open` | S |
-| T1-10 | X-Forwarded-For IP spoofing fix | 1 | `open` | S |
-| T1-11 | Secrets scanning in CI | 1 | `open` | S |
-| T1-12 | README HTTPS discrepancy | 1 | `open` | S |
-| T1-13 | LICENSE file | 1 | `open` | S |
-| T1-14 | NODE_ENV=production in render.yaml | 1 | `open` | S |
-| T1-15 | verifySupabaseToken network error handling | 1 | `open` | S |
-| T1-16 | Fix governance resultModel classification bug | 1 | `open` | S |
-| T1-17 | Pre-persist governance block gate | 1 | `open` | S |
-| T1-18 | Auth on all 6 domain POST endpoints | 1 | `open` | S |
+| T1-01 | Wire PostgreSQL at startup | 1 | `resolved` | M |
+| T1-02 | Fix prototype pollution | 1 | `resolved` | S |
+| T1-03 | Workspace isolation + RLS audit | 1 | `resolved` | L |
+| T1-04 | CORS headers | 1 | `resolved` | S |
+| T1-05 | Security response headers | 1 | `resolved` | S |
+| T1-06 | Request access log | 1 | `resolved` | S |
+| T1-07 | Fix rate limit doc discrepancy | 1 | `resolved` | S |
+| T1-08 | Real /health checks | 1 | `resolved` | S |
+| T1-09 | Auth bypass hardening (SUPABASE_URL unset) | 1 | `resolved` | S |
+| T1-10 | X-Forwarded-For IP spoofing fix | 1 | `resolved` | S |
+| T1-11 | Secrets scanning in CI | 1 | `resolved` | S |
+| T1-12 | README HTTPS discrepancy | 1 | `resolved` | S |
+| T1-13 | LICENSE file | 1 | `resolved` | S |
+| T1-14 | NODE_ENV=production in render.yaml | 1 | `resolved` | S |
+| T1-15 | verifySupabaseToken network error handling | 1 | `resolved` | S |
+| T1-16 | Fix governance resultModel classification bug | 1 | `resolved` | S |
+| T1-17 | Pre-persist governance block gate | 1 | `resolved` | S |
+| T1-18 | Auth on all 6 domain POST endpoints | 1 | `resolved` | S |
 | T2-01 | Correlation IDs | 2 | `open` | S |
 | T2-02 | API versioning /v1/ | 2 | `open` | M |
 | T2-03 | Pagination + filtering + sorting | 2 | `open` | L |
@@ -1726,7 +1726,7 @@ Both are shared infrastructure used across the codebase with no documented inter
 | T3-33 | Update BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md — 14→24 routes | 3 | `open` | S |
 | T3-34 | Document prioritization.js + rateLimiter.js in BACKEND_CORE_UTILITIES.md | 3 | `open` | S |
 
-**Total: 77 items** — 18 × Tier 1 · 26 × Tier 2 · 33 × Tier 3
+**Total: 77 items** — 18 × Tier 1 (all resolved 2026-05-19) · 26 × Tier 2 · 33 × Tier 3
 *(T3-30 removed after full code audit confirmed Phase 2 signals already implemented)*
 
 ---
@@ -1755,3 +1755,4 @@ a compliance audit (SOC 2 Type II or equivalent), and sustained operational trac
 4. Update `PRODUCTION_READINESS_GAPS.md` if the item maps to a P0/P1/P2 gap.
 5. Add a `CHANGELOG.md` entry when a full tier is complete.
 6. When all Tier 1 items are resolved, regrade Security, Data, and DevOps dimensions.
+
