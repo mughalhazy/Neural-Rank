@@ -1,10 +1,10 @@
 # Neural Rank — Production Readiness Gap Register
 
 **Audit date:** 2026-05-17
-**Last updated:** 2026-05-19 (Tier 2 resolution — P1-8, P2-3, P2-5, P2-9, P2-10 resolved)
+**Last updated:** 2026-05-19 (Tier 3 resolution — P2-2 resolved)
 **Method:** 4-agent parallel audit (backend runtime · data/persistence · frontend/API · infra/ops) + full manual line-by-line verification of all critical files
 **Anchor:** `DOC_CATALOGUE.md`
-**Status:** 14 of 29 items resolved — P0-1 (code resolved, owner rotation pending), P0-2, P0-3 resolved; P1-5, P1-6, P1-7, P1-8, P1-9, P1-11 resolved; P2-1, P2-3, P2-5, P2-9, P2-10 resolved
+**Status:** 15 of 29 items resolved — P0-1 (code resolved, owner rotation pending), P0-2, P0-3 resolved; P1-5, P1-6, P1-7, P1-8, P1-9, P1-11 resolved; P2-1, P2-2, P2-3, P2-5, P2-9, P2-10 resolved
 
 ---
 
@@ -161,7 +161,7 @@ Rate limiting is enforced and does block requests (confirmed). However, the `Map
 
 **Fix required:** Replace the in-memory `Map` with a persistent store (Redis via Upstash free tier, or a lightweight Supabase-backed counter). Upstash Redis has a free tier compatible with the current infrastructure constraint.
 
-**Status:** Open
+**Status:** Owner-pending (T3-04) — code implementation ready; owner must create an Upstash free-tier Redis instance, set `REDIS_URL` in Render dashboard, then T3-04 can be completed. In-memory limiter remains active until then.
 
 ---
 
@@ -244,7 +244,7 @@ process.on('unhandledRejection', (reason) => {
 2. Set `autoDeploy: false` on the production service — deploy manually after staging validation
 3. Document the deploy process in `README.md`
 
-**Status:** Open
+**Status:** Owner-pending (T3-08) — owner must create a second Render service named `neural-rank-backend-staging` on the `staging` branch via Render dashboard. CI workflow already configured to trigger smoke tests on staging merge.
 
 ---
 
@@ -274,7 +274,7 @@ process.on('unhandledRejection', (reason) => {
 2. Measure memory usage and p95 response time
 3. Add a CI step that fails if p95 > 10s or memory > 400MB
 
-**Status:** Open
+**Status:** Owner-pending (T3-16) — depends on staging environment (T3-08). SLO targets defined in `docs/backend/reference/SLO.md`: p99 /v1/health < 500ms, p99 /v1/run/default < 20s.
 
 ---
 
@@ -306,7 +306,7 @@ The `Insight` model is missing `evidence[]`, `explanation`, and `nextStep` field
 2. Update `MockRepository` (and later `ApiRepository`) to populate these fields
 3. Update screens to render evidence chips, action buttons, and next-step links
 
-**Status:** Open
+**Status:** Owner-pending (T3-25) — `FRONTEND_CONTENT_FULL_SYSTEM.md` now covers all 18 modules with full evidence/explanation/nextStep schema (T3-32, 2026-05-19). Dart model fields and widget rendering are the remaining step, depends on T3-12 (Flutter ApiRepository).
 
 ---
 
@@ -317,7 +317,7 @@ These do not block launch but must be resolved before public scale.
 | ID | Finding | File(s) | Fix |
 |----|---------|---------|-----|
 | P2-1 | ~~No `.env.example`~~ **RESOLVED (2026-05-18)** — `.env.example` created documenting all env vars; expanded 2026-05-19 with `NODE_ENV`, `ALLOWED_ORIGIN`, `TRUSTED_PROXY_COUNT` (T1-04, T1-09, T1-10, T1-14) | root | ✅ |
-| P2-2 | No database backup strategy | none | Document backup schedule in `README.md`; enable Supabase PITR when upgrading tier |
+| P2-2 | ~~No database backup strategy~~ **RESOLVED (2026-05-19)** — `npm run db:dump` script added; backup procedure documented in `README.md` (Operations section) and `RUNBOOK.md` (Scenario 7); Supabase Pro PITR noted as upgrade path (T3-27) | none | ✅ |
 | P2-3 | ~~No API versioning strategy~~ **RESOLVED (2026-05-19)** — all 26 routes under `/v1/`; legacy paths redirect 301 with `Deprecation: true`; `/v1/openapi.json` + `/v1/docs` added (T2-02, T2-06) | `server.js` | ✅ |
 | P2-4 | Dual intent classifiers undocumented for future integrators | `docs/backend/decisions/BACKEND_DUAL_CLASSIFIER_DECISION.md` | Already has a decision doc — add explicit warning about not exposing both in a single aggregated response |
 | P2-5 | ~~`assertModuleCatalogIntegrity()` is unidirectional~~ **RESOLVED (2026-05-19)** — reverse check added: registry keys not in either activation set raise an error (T2-26) | `core/activation.js` | ✅ |

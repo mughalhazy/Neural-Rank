@@ -35,14 +35,19 @@ Neural Rank/
 │   └── product/
 │       ├── archive/      Historical decision records (market research)
 │       └── *.md          Active product docs (build plan, UI architecture, build spec)
-├── scripts/              CI and build scripts
-├── supabase/             Database migrations (9 applied)
+├── scripts/              CI and build scripts (check-syntax, check-secrets, check-migrations, scaffold-module)
+├── supabase/             Database migrations (12 applied)
+├── .dockerignore         Docker build excludes
 ├── .env.example          Environment variable reference — copy to .env for local dev
 ├── .eslintrc.json        ESLint config (no-unused-vars, no-undef)
+├── .husky/               Git hooks — pre-commit (lint + secrets), pre-push (ci)
+├── .nvmrc                Node.js version pin (20)
 ├── CHANGELOG.md          All notable changes — keepachangelog.com format
 ├── CONTRIBUTING.md       Branch naming, commit style, doc update rules
+├── docker-compose.yml    Local dev — api + postgres:16-alpine
+├── Dockerfile            Production image — node:20-alpine, non-root user
 ├── SECURITY.md           Responsible disclosure policy
-├── package.json          Root scripts — start, check, lint, test, ci
+├── package.json          Root scripts — start, check, lint, test, ci, scaffold, db:dump
 ├── render.yaml           Render free-tier deployment blueprint (env vars via dashboard)
 └── progress.md           Session anchor and milestone log
 ```
@@ -60,7 +65,10 @@ Neural Rank/
 | Start | `npm start` |
 | Test | `npm run test:backend` |
 | Lint | `npm run lint` (ESLint — no-unused-vars, no-undef) |
-| CI | `npm run ci` (syntax check + lint + full suite) |
+| CI | `npm run ci` (syntax + secrets + lint + 80% coverage gate) |
+| New module | `npm run scaffold -- <moduleKey> "Display Name"` |
+| Migration check | `npm run check:migrations` (requires `DATABASE_URL`) |
+| DB backup | `npm run db:dump` (requires Supabase CLI) |
 
 ### 18 active modules
 
@@ -85,7 +93,7 @@ Neural Rank/
 | Unified Workflow Layer | ✅ |
 | Local SEO | opt-in |
 
-### API surface (26 routes — all under `/v1/`)
+### API surface (27 routes — all under `/v1/`)
 
 All routes are versioned under `/v1/`. Legacy unversioned paths (e.g. `/health`) redirect 301 → `/v1/health`.
 
@@ -114,10 +122,11 @@ All routes are versioned under `/v1/`. Legacy unversioned paths (e.g. `/health`)
 | `GET/POST /v1/business-intelligence/profiles` | Business profiles |
 | `GET /v1/openapi.json` | OpenAPI 3.1 spec (machine-readable) |
 | `GET /v1/docs` | Swagger UI (browser) |
+| `GET /v1/metrics` | Prometheus text format metrics |
 
 ### Rate limiting
 
-All requests are rate-limited by IP address: **120 req/min** default, **30 req/min** for mutation endpoints (POST/PATCH with identity). Limits are enforced in-process and reset on restart (persistent Redis limiter is a Tier 3 item). Rate limit state is exposed via `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` response headers.
+All requests are rate-limited by IP address: **120 req/min** default, **30 req/min** for mutation endpoints (POST/PATCH with identity). Limits are enforced in-process and reset on restart. A Redis-backed persistent limiter (T3-04) requires Upstash setup by the owner. Rate limit state is exposed via `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` response headers.
 
 ### Database (Supabase)
 
@@ -150,6 +159,8 @@ Store backup files outside the repo. See `RUNBOOK.md` for the full restore proce
 | `docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md` | Per-module boundaries (all 18) |
 | `docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md` | All 18 modules mapped to 8 bounded contexts |
 | `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` | API route audit |
+| `docs/backend/reference/SLO.md` | Service Level Objectives — availability, latency, error rate |
+| `docs/backend/reference/RUNBOOK.md` | Operational runbook — 7 scenarios |
 | `docs/backend/implementation/BACKEND_QC_PHASE2.md` | Phase 2 QC — 10 expansion modules |
 | `docs/backend/analysis/SEO_OS_BACKEND_GAP_FILL_REPORT.md` | Production readiness gaps |
 | `docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md` | Full expansion build plan (authoritative) |

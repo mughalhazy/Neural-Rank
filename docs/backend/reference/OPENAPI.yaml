@@ -708,6 +708,20 @@ paths:
       responses:
         "200": { description: Swagger UI HTML., content: { text/html: { schema: { type: string } } } }
 
+  /metrics:
+    get:
+      operationId: getPrometheusMetrics
+      summary: Prometheus-compatible metrics
+      description: >
+        Returns in-process metrics in Prometheus text format (counters and
+        histograms for HTTP requests, durations, errors, and rate limit hits).
+        State resets on server restart. Redis-backed persistence is T3-04.
+      security: []
+      tags: [Infra]
+      responses:
+        "200": { description: Prometheus text format metrics., content: { text/plain: { schema: { type: string } } } }
+        "405": { $ref: "#/components/responses/MethodNotAllowed" }
+
 # ── Tags ─────────────────────────────────────────────────────────────────────────
 tags:
   - name: Infra
