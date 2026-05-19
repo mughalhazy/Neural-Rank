@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [2026-05-19] — Tier 3 Production Hardening — 16/33 Resolved (14 Owner-Pending, 3 Open)
+## [2026-05-19] — Tier 3 Production Hardening — 18/33 Resolved (14 Owner-Pending, 1 Open)
 
 ### Added
 - `backend/src/core/metrics.js` — in-process Prometheus-compatible metrics registry (zero npm dep): `increment`, `observe`, `getMetricsText`; counters + histograms with configurable buckets (T3-03)
@@ -40,6 +40,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `scripts/check-secrets.js` — added `docker-compose.yml` to SKIP_FILES (dev credentials)
 - `.github/dependabot.yml` — added Flutter `pub` ecosystem entry for `/app` directory (T3-23)
 - `package.json` — added `engines: { node: ">=20" }`, `db:dump`, `scaffold`, `check:migrations`, `prepare` scripts; `husky` devDependency (T3-06, T3-07, T3-10, T3-18, T3-27)
+
+### Added (frontend docs)
+- `docs/frontend/planning/FRONTEND_BACKEND_CAPABILITY_AUDIT.md` — extended: 117 capabilities audited across all 18 modules; 17 new module sections added following RA-01 format with source function references, signal names, frontend projections (T3-31)
+- `docs/frontend/planning/FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md` — extended: subpage maps for all 18 modules; 17 new module sections with 2–5 archetype subpages each (T3-31)
+- `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md` — extended: Phase 2 section covering all 10 expansion modules with full content block schema; completion criteria updated from 8→18 modules (T3-32)
 
 ### Owner-pending (14 items — require external infrastructure)
 - T3-01: Async queue → needs Upstash Redis free tier

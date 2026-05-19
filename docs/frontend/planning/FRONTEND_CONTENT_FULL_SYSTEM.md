@@ -857,9 +857,855 @@ For every module and screen, verify:
 - no metric appears without meaning
 - no screen behaves as a passive dashboard
 
+## Phase 2 Modules
+
+### Module 9: Technical SEO Audit
+
+#### Screen
+Technical SEO Audit Screen
+
+#### Screen Purpose
+Convert technical crawl, performance, and indexation data into a prioritized fix sequence.
+
+#### Content Block: Technical Health Overview
+Block name:
+Technical Health Overview
+
+Input:
+- crawl data
+- page speed data (LCP, CLS, INP)
+- robots.txt data
+- sitemap data
+- schema markup data
+
+Analysis:
+- score Core Web Vitals per vital (LCP, CLS, INP)
+- analyze crawlability score from blocked and noindexed pages
+- analyze indexation from canonical issues and duplicate URLs
+- analyze redirects for chains and 404-target redirects
+- analyze schema coverage and errors
+- analyze HTTPS status and mobile-friendliness
+- compute weighted overall health score
+
+Insight:
+- the site has technical issues that are directly limiting ranking eligibility
+
+Explanation:
+- technical health affects whether Google can crawl, index, and rank pages — even strong content cannot compete with poor technical foundations
+
+Evidence:
+- health score (0-100)
+- health band (healthy / needs_work / critical)
+- critical issue count
+- warning count
+- worst failing vital or dimension
+
+Impact:
+- critical when health score is below 50
+- high when any Core Web Vital is poor or crawlability is blocked
+- medium when warnings exist without critical issues
+
+Action:
+- fix failing Core Web Vitals
+- resolve crawl blocks
+- fix canonical issues
+- collapse redirect chains
+- implement missing schema markup
+
+Optional next step:
+- open technical action queue
+- inspect individual dimension detail subpages
+- schedule periodic reaudit
+
+#### Content Block: Core Web Vitals
+Block name:
+Core Web Vitals
+
+Input:
+- LCP, CLS, INP values from page speed data
+
+Analysis:
+- score each vital against good/needs-improvement/poor thresholds
+- compute composite vital score
+
+Insight:
+- one or more Core Web Vitals are failing and reducing ranking eligibility
+
+Explanation:
+- CWV are a confirmed Google ranking signal and directly affect page experience scoring for ranking decisions
+
+Evidence:
+- LCP rating and value
+- CLS rating and value
+- INP rating and value
+- composite vital score
+
+Impact:
+- high when any vital is poor
+- medium when any vital needs improvement
+- low when all vitals are good
+
+Action:
+- prioritise image optimisation for LCP
+- eliminate layout shift sources for CLS
+- improve interaction responsiveness for INP
+
+---
+
+### Module 10: On-Page SEO Scorer
+
+#### Screen
+On-Page SEO Scorer Screen
+
+#### Screen Purpose
+Convert per-page signal scores into an ordered fix list for title tags, meta, headings, content, and links.
+
+#### Content Block: Site-Wide On-Page Score
+Block name:
+Site-Wide On-Page Score
+
+Input:
+- page title, meta description, H1/H2 headings, body content, internal links, image alts, URL slug per page
+- target keywords per page
+
+Analysis:
+- score each page across 7 dimensions (title, meta, headings, content depth, internal links, images, URL)
+- compute site-wide average score
+- identify critical pages below 40/100
+- identify top 5 most common issues across all pages
+
+Insight:
+- a significant portion of pages are under-optimised and unlikely to rank competitively
+
+Explanation:
+- per-page on-page signals are the most directly controllable ranking factors and the fastest to improve without infrastructure changes
+
+Evidence:
+- site average score
+- score band (good / needs_work / poor)
+- critical page count
+- most common issue across pages
+
+Impact:
+- high when critical pages exist or site average is poor
+- medium when average is in needs_work band
+- monitor when score is in good band
+
+Action:
+- fix critically under-optimised pages first
+- rewrite title tags with primary keywords
+- add missing meta descriptions
+- add H1 to pages missing them
+- expand thin content pages
+
+Optional next step:
+- open page-level score detail
+- inspect most common issue across pages
+- schedule periodic reaudit
+
+#### Content Block: Most Common On-Page Issue
+Block name:
+Most Common On-Page Issue
+
+Input:
+- issue counts aggregated across all scored pages
+
+Analysis:
+- identify the issue type affecting the most pages
+
+Insight:
+- one systematic gap is reducing scores across the site
+
+Explanation:
+- systematic issues are more efficiently fixed with a templated approach than one-by-one
+
+Evidence:
+- issue type name
+- number of affected pages
+
+Impact:
+- high impact when issue affects majority of pages
+- medium when it affects a meaningful minority
+
+Action:
+- create a templated fix and apply it across all affected pages
+
+---
+
+### Module 11: Backlink Intelligence
+
+#### Screen
+Backlink Intelligence Screen
+
+#### Screen Purpose
+Convert authority profile, toxicity risk, and link gap data into a link acquisition and risk management plan.
+
+#### Content Block: Authority Profile Summary
+Block name:
+Authority Profile Summary
+
+Input:
+- backlink list with domain authority, link type, anchor text, spam score
+- referring domain list
+- competitor backlink list
+
+Analysis:
+- compute authority distribution (high/medium/low DA)
+- compute overall authority score
+- compute toxicity risk level from spam scores
+- compute anchor diversity score
+- analyze link velocity trend
+- identify competitor link gaps
+
+Insight:
+- the link profile has gaps in authority, toxic risk, or competitor coverage that limit ranking potential
+
+Explanation:
+- backlink authority is a core domain-level ranking signal — a weak or toxic profile limits how well any page can rank for competitive terms
+
+Evidence:
+- total backlinks and unique referring domains
+- overall authority score
+- authority tier
+- toxic link count and risk level
+- dofollow ratio
+
+Impact:
+- high when authority score is below 30 or toxicity is high
+- medium when velocity is declining or competitor gap is large
+- monitor when profile is stable and growing
+
+Action:
+- build high-DA backlinks
+- disavow toxic links
+- run outreach campaign targeting competitor gap domains
+- diversify anchor text distribution
+
+Optional next step:
+- inspect toxic link list
+- open link gap opportunities
+- review anchor text distribution
+
+#### Content Block: Competitor Link Gap
+Block name:
+Competitor Link Gap
+
+Input:
+- referring domain list
+- competitor backlink domain list
+
+Analysis:
+- identify domains that link to competitors but not to the target
+- sort by competitor domain authority
+
+Insight:
+- domains that already trust competitors are the most achievable link targets
+
+Explanation:
+- sites willing to link to one player in a niche are more likely to link to another — competitor link gaps are warmer outreach opportunities than cold targets
+
+Evidence:
+- gap domain count
+- top opportunity domain and DA
+
+Impact:
+- high impact when gap count is large
+- medium when gap is moderate
+
+Action:
+- begin targeted outreach starting with the highest-DA gap domains
+
+---
+
+### Module 12: E-E-A-T Signals
+
+#### Screen
+E-E-A-T Signals Screen
+
+#### Screen Purpose
+Convert author credibility, trust page completeness, and external citation signals into credibility improvement actions.
+
+#### Content Block: E-E-A-T Score Overview
+Block name:
+E-E-A-T Score Overview
+
+Input:
+- pages with author bios, bylines, credentials, body content
+- about page data
+- contact page data
+- trust signals (privacy policy, terms, SSL, certifications)
+- external citations
+- niche (for YMYL classification)
+
+Analysis:
+- score Experience (bylines, author bios, first-hand markers)
+- score Expertise (credentials, citations, content depth)
+- score Authoritativeness (external citations, media mentions, awards)
+- score Trustworthiness (about, contact, privacy policy, terms)
+- compute overall E-E-A-T score and tier
+- classify YMYL risk level
+
+Insight:
+- the site lacks credibility signals that Google uses to evaluate content quality and ranking eligibility
+
+Explanation:
+- E-E-A-T is not a single ranking factor but a framework Google uses to evaluate content quality — weak signals suppress rankings especially in competitive or high-scrutiny niches
+
+Evidence:
+- overall E-E-A-T score
+- E-E-A-T tier (strong / moderate / weak)
+- YMYL risk level
+- weakest dimension score
+
+Impact:
+- high when score is below 40 or site operates in a YMYL niche with weak signals
+- medium when one or two dimensions score poorly
+- monitor when all dimensions score adequately
+
+Action:
+- build trust foundation pages (About, Contact, Privacy Policy, Terms)
+- add author bios and credentials to content pages
+- pursue external citations from authoritative sources
+- document author expertise across all content
+
+Optional next step:
+- open E-E-A-T action queue
+- inspect individual dimension detail
+- monitor quarterly
+
+#### Content Block: Trust Foundation
+Block name:
+Trust Foundation
+
+Input:
+- about page existence and quality
+- contact page with address, phone, email
+- trust signal types (privacy policy, terms, SSL, certifications)
+
+Analysis:
+- score presence and quality of each trust element
+- identify missing critical trust signals
+
+Insight:
+- essential trust pages are missing and reducing credibility scoring
+
+Explanation:
+- trust pages are the minimum baseline Google expects before granting authority in any niche — their absence is a clear negative signal
+
+Evidence:
+- missing trust page types
+- trust score
+
+Impact:
+- high when about or contact pages are missing
+- medium when legal pages are missing
+
+Action:
+- create each missing trust page with appropriate content depth
+
+---
+
+### Module 13: Search Intent Classifier
+
+#### Screen
+Search Intent Classifier Screen
+
+#### Screen Purpose
+Convert intent classification results into content format corrections and creation priorities.
+
+#### Content Block: Intent Alignment Score
+Block name:
+Intent Alignment Score
+
+Input:
+- keywords with existing content type and URL
+- intent classification results (informational, navigational, transactional, commercial)
+
+Analysis:
+- classify intent for each keyword
+- check content format alignment per keyword
+- compute alignment score across all keywords with known content
+- identify high-value (commercial/transactional) misalignments
+
+Insight:
+- a portion of keywords are served by content that does not match the user's search intent
+
+Explanation:
+- Google matches results to intent — when your content format does not match what the query demands (e.g., a blog post for a transactional query), the page is deprioritised regardless of keyword presence
+
+Evidence:
+- overall alignment score (%)
+- misaligned keyword count
+- high-value mismatch count
+- dominant intent type
+
+Impact:
+- high when high-value commercial or transactional keywords are misaligned
+- medium when alignment score is below 80%
+- monitor when most keywords are aligned
+
+Action:
+- reformat high-value misaligned content pages to match intent
+- create new content matched to intent from the start for unmapped keywords
+
+Optional next step:
+- open intent detail per keyword
+- run content format audit for misaligned pages
+- schedule quarterly review
+
+#### Content Block: Content Creation Opportunities
+Block name:
+Content Creation Opportunities
+
+Input:
+- keywords without existing content mapped
+
+Analysis:
+- identify keywords with no content
+- use intent classification to recommend the correct format before creation
+
+Insight:
+- unmapped keywords represent content creation opportunities that can be matched to intent from the start
+
+Explanation:
+- creating content matched to intent from creation is more efficient than reformatting after the fact
+
+Evidence:
+- count of keywords without content
+- recommended formats per intent type
+
+Impact:
+- medium when multiple unmapped keywords exist
+
+Action:
+- check intent classification before creating each new page
+- choose the correct content format for the dominant intent
+
+---
+
+### Module 14: SERP Feature Analyzer
+
+#### Screen
+SERP Feature Analyzer Screen
+
+#### Screen Purpose
+Convert SERP feature gaps into CTR lift opportunities with specific content and schema requirements.
+
+#### Content Block: SERP Feature Opportunity Overview
+Block name:
+SERP Feature Opportunity Overview
+
+Input:
+- keywords with features present in SERP and features owned by target
+- current rank positions
+
+Analysis:
+- identify features present but not owned (gaps)
+- compute estimated CTR lift per gap feature
+- compute total estimated CTR lift across all gaps
+- identify high-value gaps (featured snippet, local pack, sitelinks)
+
+Insight:
+- the site is missing SERP features that could increase clicks without any ranking changes
+
+Explanation:
+- SERP features like featured snippets and People Also Ask boxes add visibility above organic position 1 — capturing them is the fastest CTR improvement available
+
+Evidence:
+- total feature gap count
+- total estimated CTR lift
+- top gap feature type
+- feature ownership ratio
+
+Impact:
+- high when featured snippet or local pack gaps exist
+- medium when PAA or image carousel gaps exist
+- monitor when ownership ratio is adequate
+
+Action:
+- optimise content for featured snippet capture
+- add FAQ schema for People Also Ask capture
+- complete GBP for local pack inclusion
+
+Optional next step:
+- inspect eligibility requirements per feature
+- open SERP feature action queue
+- monitor monthly for ownership changes
+
+#### Content Block: Feature Eligibility Requirements
+Block name:
+Feature Eligibility Requirements
+
+Input:
+- gap feature types per keyword
+
+Analysis:
+- map each gap feature to its implementation requirements
+
+Insight:
+- each SERP feature has specific content, schema, or profile requirements that determine eligibility
+
+Explanation:
+- eligibility requirements vary by feature — understanding them turns vague gap awareness into a concrete implementation checklist
+
+Evidence:
+- gap feature name
+- required content or schema type
+- implementation complexity
+
+Impact:
+- high when multiple high-impact features are achievable
+
+Action:
+- implement each requirement starting with highest-CTR-boost features
+
+---
+
+### Module 15: Topical Authority
+
+#### Screen
+Topical Authority Screen
+
+#### Screen Purpose
+Convert topic coverage gaps, cluster completeness, and competitor gaps into a content planning priority.
+
+#### Content Block: Topical Coverage Status
+Block name:
+Topical Coverage Status
+
+Input:
+- target topic list with subtopics
+- existing content list with topic and subtopic mapping, word count, schema status
+- competitor topic lists
+
+Analysis:
+- map content to topics to identify covered and uncovered topics
+- score cluster completeness (pillar existence, supporting piece count, subtopic coverage)
+- analyze competitor topic gaps
+- analyze semantic depth (average word count, schema adoption)
+- compute overall topical authority score
+
+Insight:
+- the site has significant topical coverage gaps that prevent Google from recognising it as an authority in its niche
+
+Explanation:
+- Google rewards topical depth — a site that comprehensively covers a subject with pillar pages and supporting content outranks sites with scattered shallow coverage
+
+Evidence:
+- topical authority score
+- authority tier (established / developing / thin)
+- coverage ratio
+- uncovered topic count
+- competitor gap count
+
+Impact:
+- high when coverage ratio is below 50% or authority tier is thin
+- medium when clusters lack pillars or supporting pieces
+- monitor when authority is established and coverage is strong
+
+Action:
+- create content for uncovered core topics
+- create missing pillar pages for topic clusters
+- fill competitor topic gaps
+- expand thin clusters with supporting pieces
+
+Optional next step:
+- open topic coverage map
+- inspect cluster completeness detail
+- view competitor topic gap list
+
+#### Content Block: Topic Cluster Detail
+Block name:
+Topic Cluster Detail
+
+Input:
+- covered topics with content pieces per topic
+
+Analysis:
+- score each cluster on pillar existence and supporting piece count
+- identify thin clusters with fewer than 3 supporting pieces
+
+Insight:
+- some topic clusters have a pillar page but lack enough supporting content to signal comprehensive coverage
+
+Explanation:
+- clusters need a pillar anchor plus a network of supporting pieces — thin clusters signal incomplete coverage to Google
+
+Evidence:
+- cluster score
+- pillar existence
+- supporting piece count
+- subtopic coverage ratio
+
+Impact:
+- medium when thin clusters exist
+
+Action:
+- create targeted supporting pieces for each thin cluster
+
+---
+
+### Module 16: Site Architecture
+
+#### Screen
+Site Architecture Screen
+
+#### Screen Purpose
+Convert crawl depth, orphan page, link equity, and silo data into a structural improvement plan.
+
+#### Content Block: Architecture Health Score
+Block name:
+Architecture Health Score
+
+Input:
+- pages with crawl depth, inbound internal links, word count, redirect status
+- internal link graph
+
+Analysis:
+- compute crawl depth distribution and deep page ratio
+- detect orphan pages with zero inbound internal links
+- compute link equity Gini coefficient
+- analyze topic silo cross-link structure
+- detect redirect chains at depth 2+
+- compute weighted overall architecture score
+
+Insight:
+- the site structure has gaps that waste crawl budget and fragment link authority
+
+Explanation:
+- site architecture directly affects how efficiently Googlebot crawls the site and how link authority flows to important pages — poor architecture limits the ranking potential of all content
+
+Evidence:
+- architecture score
+- architecture band (healthy / needs_work / poor)
+- orphan count
+- deep page count
+- silo score
+
+Impact:
+- high when architecture band is poor or orphan ratio is high
+- medium when crawl depth or silo structure needs work
+- monitor when architecture score is healthy
+
+Action:
+- link orphan pages with contextual internal links
+- flatten deep pages through navigation restructuring
+- redistribute internal link equity from over-linked pages
+- strengthen topic silo cross-linking
+
+Optional next step:
+- inspect orphan page list
+- view link equity distribution
+- check crawl depth breakdown
+
+#### Content Block: Orphan Pages
+Block name:
+Orphan Pages
+
+Input:
+- pages with zero inbound internal links
+
+Analysis:
+- identify orphaned URLs
+- assess severity by orphan ratio
+
+Insight:
+- pages with no internal links cannot receive crawl equity and may be invisible to search engines
+
+Explanation:
+- every page needs at least one internal link to be part of the site's crawl and authority flow
+
+Evidence:
+- orphan count
+- orphan ratio
+
+Impact:
+- high when orphan ratio exceeds 10%
+- medium when ratio is 5-10%
+
+Action:
+- add contextual internal links to orphaned pages from relevant content
+
+---
+
+### Module 17: Analytics Integration
+
+#### Screen
+Analytics Integration Screen
+
+#### Screen Purpose
+Convert GSC and GA4 signals into ranking, CTR, and traffic recovery decisions.
+
+#### Content Block: Analytics Health Overview
+Block name:
+Analytics Health Overview
+
+Input:
+- GSC search analytics (queries, clicks, impressions, CTR, position)
+- GSC index coverage (valid, warnings, errors, excluded)
+- GSC crawl errors
+- GA4 page metrics (organic sessions, conversions, bounce rate)
+
+Analysis:
+- compute CTR efficiency for high-impression queries
+- identify page 2 keywords with real impression volume
+- analyze index coverage health
+- identify declining organic pages (20%+ session drop)
+- identify high-traffic zero-conversion pages
+- compute overall analytics health score
+
+Insight:
+- analytics data reveals specific ranking, CTR, and traffic issues that can be acted on immediately
+
+Explanation:
+- GSC and GA4 data provides a direct view of what is costing clicks and traffic right now — unlike technical or content signals, analytics gaps have measurable immediate recovery potential
+
+Evidence:
+- analytics health score
+- health band (healthy / needs_work / critical)
+- CTR underperformer count
+- page 2 quick win count
+- declining page count
+
+Impact:
+- critical when health band is critical or index errors are high
+- high when CTR opportunities or page 2 keywords with volume exist
+- medium when declining pages need investigation
+
+Action:
+- optimise title tags and meta descriptions for CTR underperformers
+- push page 2 keywords to page 1
+- investigate and recover declining pages
+- fix indexation and crawl errors
+
+Optional next step:
+- open CTR underperformer detail
+- view page 2 quick win list
+- inspect declining page list
+
+#### Content Block: CTR Opportunity
+Block name:
+CTR Opportunity
+
+Input:
+- GSC queries with impressions, clicks, CTR, and position
+
+Analysis:
+- compute expected CTR by position
+- compute efficiency score as ratio of actual to expected
+- estimate click lift from bringing each underperformer to expected CTR
+
+Insight:
+- keywords that rank well but get fewer clicks than expected are recoverable through title and meta improvements
+
+Explanation:
+- CTR improvement is the fastest way to increase organic traffic without changing rankings — the opportunity is fully within content control
+
+Evidence:
+- underperformer count
+- total estimated click lift
+- top underperforming query
+
+Impact:
+- high when estimated click lift is significant
+
+Action:
+- rewrite title tags and meta descriptions for underperforming queries
+
+---
+
+### Module 18: Local SEO
+
+#### Screen
+Local SEO Screen
+
+#### Screen Purpose
+Convert GBP completeness, NAP consistency, local pack visibility, and review signals into a local ranking improvement plan.
+
+#### Content Block: Local SEO Score Overview
+Block name:
+Local SEO Score Overview
+
+Input:
+- Google Business Profile data (category, hours, photos, posts, QA, description, products)
+- business NAP (name, address, phone) for consistency check against citations
+- citation list with source, name, address, phone
+- local keyword list with local pack and organic positions
+- review signals (total reviews, average rating, monthly velocity, response rate)
+
+Analysis:
+- score GBP completeness across key fields
+- check NAP consistency ratio across citations
+- score local pack visibility from keyword pack positions
+- score review signals from rating, velocity, and response rate
+- compute overall local SEO score
+
+Insight:
+- local signals are incomplete and are limiting visibility in Google Maps and local search results
+
+Explanation:
+- local pack inclusion is driven primarily by GBP completeness, citation consistency, and review velocity — all of which are directly controllable
+
+Evidence:
+- overall local score
+- score band (strong / moderate / weak)
+- GBP score
+- NAP consistency ratio
+- local pack keyword count
+
+Impact:
+- high when local pack presence is zero or GBP score is below 15
+- medium when NAP is inconsistent or review velocity is slow
+- monitor when local score is strong
+
+Action:
+- complete Google Business Profile
+- fix NAP inconsistencies across directory citations
+- build local pack presence through GBP and citation improvements
+- build a review acquisition system for consistent monthly reviews
+
+Optional next step:
+- inspect GBP completeness checklist
+- view NAP inconsistency detail
+- open local SEO action queue
+
+#### Content Block: Review Signal Health
+Block name:
+Review Signal Health
+
+Input:
+- average rating
+- monthly review velocity
+- response rate
+
+Analysis:
+- score review quality from rating, velocity, and response rate
+- identify slow velocity and low response rate issues
+
+Insight:
+- review quantity and recency are local ranking factors that can be improved through a consistent acquisition process
+
+Explanation:
+- Google factors review velocity and rating into local pack ranking decisions — a review acquisition system is a direct local ranking lever
+
+Evidence:
+- average rating
+- monthly velocity
+- response rate
+- review score
+
+Impact:
+- medium when velocity is below 2 reviews per month
+
+Action:
+- implement a post-service review request via email or SMS
+- respond to every review within 48 hours
+
+---
+
 ## Completion Criteria
 The full frontend content system is applied when:
-- all eight modules follow `INPUT -> ANALYSIS -> INSIGHT -> PRIORITY -> ACTION`
+- all 18 modules follow `INPUT -> ANALYSIS -> INSIGHT -> PRIORITY -> ACTION`
 - every screen has defined content blocks
 - every content block includes insight, explanation, evidence, impact, and action
 - raw data surfaces are converted into interpreted decision surfaces

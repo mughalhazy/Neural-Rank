@@ -1,4 +1,4 @@
-﻿# Neural Rank — Enterprise Rebuild Plan
+# Neural Rank — Enterprise Rebuild Plan
 
 Working document for closing every gap identified in the 2026-05-18 enterprise grading audit,
 the 2026-05-18 reaudit that found 21 additional gaps, the 2026-05-18 DOC_CATALOGUE anchor
@@ -1578,7 +1578,7 @@ Item was added based on doc description of fields as "planned" — code was ahea
 
 **Definition of done:** Both audit docs have entries for all 18 modules; every module has at least one subpage map entry; no module has a frontend screen without a corresponding capability audit.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1598,7 +1598,7 @@ Item was added based on doc description of fields as "planned" — code was ahea
 
 **Definition of done:** `FRONTEND_CONTENT_FULL_SYSTEM.md` covers all 18 modules; content blocks defined for all 10 Phase 2 modules; completion criteria updated.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1721,8 +1721,8 @@ Both are shared infrastructure used across the codebase with no documented inter
 | T3-28 | Adapter env vars missing from .env.example | 3 | `resolved` | S |
 | T3-29 | Fix BACKEND_DOMAIN_SERVICE_ROUTES.md drift | 3 | `resolved` | S |
 | T3-30 | ~~REMOVED — Phase 2 signals already implemented in code~~ | — | — | — |
-| T3-31 | Frontend capability audit — 17 remaining modules | 3 | `open` | L |
-| T3-32 | Extend FRONTEND_CONTENT_FULL_SYSTEM.md to Phase 2 | 3 | `open` | M |
+| T3-31 | Frontend capability audit — 17 remaining modules | 3 | `resolved` | L |
+| T3-32 | Extend FRONTEND_CONTENT_FULL_SYSTEM.md to Phase 2 | 3 | `resolved` | M |
 | T3-33 | Update BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md — 14→24 routes | 3 | `resolved` | S |
 | T3-34 | Document prioritization.js + rateLimiter.js in BACKEND_CORE_UTILITIES.md | 3 | `resolved` | S |
 

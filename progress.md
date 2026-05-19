@@ -10,7 +10,7 @@
 - backend freeze status: Phase 1 (8 modules) FROZEN — Phase 2 (10 modules) DEPLOYED
 - doc health status: CLEAN — T3 doc sync complete 2026-05-19 · 90+ docs
 - workspace structure: restructured 2026-05-18 — 4 folder renames applied
-- REBUILD_PLAN: T1 complete (18/18) · T2 complete (23/26, 3 owner-pending) · T3 in progress (16/33 resolved, 14 owner-pending, 3 open)
+- REBUILD_PLAN: T1 complete (18/18) · T2 complete (23/26, 3 owner-pending) · T3 in progress (18/33 resolved, 14 owner-pending, 1 open)
 
 ## Core Milestones Achieved
 
@@ -49,8 +49,8 @@
 | T3-25 Flutter Insight model fields | owner-pending (T3-12) |
 | T3-26 Play Store assets | owner-pending (design) |
 | T3-13 Router refactoring | open |
-| T3-31 Frontend capability audit | open |
-| T3-32 Frontend content system Phase 2 | open |
+| T3-31 Frontend capability audit — 117 capabilities across 18 modules | resolved |
+| T3-32 Frontend content system Phase 2 — 10 modules added | resolved |
 
 ### 1. Backend documentation set created
 Anchors:
