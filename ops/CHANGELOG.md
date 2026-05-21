@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [2026-05-21] — Doc Structure Reorganisation
+
+### Changed
+- All ops docs (gap registers, build specs, runbooks, logs, market research) moved to `ops/` at repo root — 18 files, 3 commits (`27311b6`, `484b838`, `6153a58`)
+- `docs/product/` and `docs/backend/analysis/` directories removed (all contents relocated)
+- `DOC_CATALOGUE.md` reorganised into two explicit sections: **Section 1 — Ops Docs** and **Section 2 — Repo/Code Docs**
+- All cross-references updated across 32 affected markdown files
+- `DOC_CATALOGUE.md` now logs itself (89 docs total) and includes a Root Config & Tooling table covering all 15 non-.md root files
+
+---
+
 ## [2026-05-19] — Tier 3 Production Hardening — 18/33 Resolved (14 Owner-Pending, 1 Open)
 
 ### Added

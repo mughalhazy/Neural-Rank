@@ -4,17 +4,17 @@
 - repository: `https://github.com/mughalhazy/Neural-Rank`
 - default branch: `main`
 - backend deploy status: live on Render free tier
-- Render health URL: `https://neural-rank-backend.onrender.com/health`
+- Render health URL: `https://neural-rank-backend.onrender.com/v1/health`
 - backend modules: 18 total — 17 default-active, 1 opt-in (`local_seo`)
 - backend QC: Phase 1 `10/10` · Phase 2 `60/60 PASS` · tests `30/30` · coverage 85%
 - backend freeze status: Phase 1 (8 modules) FROZEN — Phase 2 (10 modules) DEPLOYED
-- doc health status: CLEAN — T3 doc sync complete 2026-05-19 · 90+ docs
-- workspace structure: restructured 2026-05-18 — 4 folder renames applied
+- doc health status: CLEAN — ops/ restructure complete 2026-05-21 · 89 docs
+- workspace structure: restructured 2026-05-18 (4 folder renames) + 2026-05-21 (ops/ folder, docs/product/ + docs/backend/analysis/ removed)
 - REBUILD_PLAN: T1 complete (18/18) · T2 complete (23/26, 3 owner-pending) · T3 in progress (18/33 resolved, 14 owner-pending, 1 open)
 
 ## Core Milestones Achieved
 
-### 15. Tier 3 — Production Hardening (2026-05-19) — 16/33 resolved
+### 15. Tier 3 — Production Hardening (2026-05-19) — 18/33 resolved
 
 | T3 Item | Status |
 |---|---|
@@ -264,37 +264,36 @@ No code changes made — audit only.
 
 ## Current Resume Anchors
 Use these first in a new session:
-- [progress.md](progress.md)
-- [REBUILD_PLAN.md](REBUILD_PLAN.md)
-- [README.md](README.md)
-- [DOC_CATALOGUE.md](DOC_CATALOGUE.md)
-- [PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md)
-- [PRODUCT_SEO_OS_BUILD_PLAN.md](PRODUCT_SEO_OS_BUILD_PLAN.md)
-- [backend/src/server.js](backend/src/server.js)
-- [app/README.md](app/README.md)
-- [render.yaml](render.yaml)
+- [ops/progress.md](progress.md)
+- [ops/REBUILD_PLAN.md](REBUILD_PLAN.md)
+- [README.md](../README.md)
+- [DOC_CATALOGUE.md](../DOC_CATALOGUE.md)
+- [ops/PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md)
+- [ops/PRODUCT_SEO_OS_BUILD_PLAN.md](PRODUCT_SEO_OS_BUILD_PLAN.md)
+- [backend/src/server.js](../backend/src/server.js)
+- [app/README.md](../app/README.md)
+- [render.yaml](../render.yaml)
 
 ## Current Operational Facts
 - backend: 18 modules live on Render free tier — 17 default-active, 1 opt-in (`local_seo`)
 - tests: 30/30 passing (`npm run ci` = syntax check + secrets + lint + c8 80% coverage gate + full suite)
 - lint: ESLint clean — 0 errors (`eslint@8`, `no-unused-vars`, `no-undef`)
-- API: 26 routes — all under `/v1/`; `GET /v1/openapi.json` + `GET /v1/docs` added; legacy paths redirect 301
+- API: 27 routes — all under `/v1/`; includes `/v1/metrics` (Prometheus), `/v1/openapi.json`, `/v1/docs`; legacy paths redirect 301
 - database: Supabase `neural-rank` — 12 migrations applied, 33 tables in `app_public`; DB wired at startup via `db.js`
 - Flutter apps: `app/` (BLoC architecture — canonical production app) + `ui/` (UI prototype — pending consolidation into `app/`)
-- docs: 86 `.md` files — includes ADRs, RUNBOOK, OPENAPI.yaml
-- REBUILD_PLAN: Tier 1 complete (18/18) · Tier 2 complete (23/26 code, 3 owner-pending) · Tier 3 open (0/33)
-- workspace: fully restructured — `app/`, `ui/`, `design/library/`, `design/mockups/archetypes/`
+- docs: 89 `.md` files — ops/ (18 ops docs) + docs/ (repo/code docs); DOC_CATALOGUE.md is the master index
+- REBUILD_PLAN: Tier 1 complete (18/18) · Tier 2 complete (23/26, 3 owner-pending) · Tier 3 in progress (18/33 resolved, 14 owner-pending, 1 open)
+- workspace: `app/`, `ui/`, `design/library/`, `design/mockups/archetypes/`, `ops/` (2026-05-21), `docs/backend/` + `docs/frontend/` (repo/code docs only)
 - npm cache and global prefix: on D: — project does not leak to C:
 
 ## Suggested Next Work Areas
-Ordered by PRODUCTION_READINESS_GAPS.md priority:
-1. **P0-1 owner action** — Rotate `SUPABASE_ANON_KEY` at Supabase dashboard → Settings → API (old key still valid until rotated); set all 6 env vars in Render dashboard — git history is clean, render.yaml is clean, this is the last step
-2. **Step 8** — Add UptimeRobot free monitor: `https://neural-rank-backend.onrender.com/health`, HTTP monitor, 5-min interval — prevents Render spindown (free tier, owner account required)
-3. **P0-2** — Wire database: add `pg` client, create `backend/src/db.js`, pass `query` into `baseContext` at startup — currently all data is lost on every Render restart
-4. **P0-3** — Add `workspace_id` column migration; filter all execution queries by workspace — currently all workspaces share data
-5. **P0-4 / P0-5** — Flutter consolidation: port `ui/` screens + components into `app/`; implement `ApiRepository` with real Dio HTTP calls against the 24 live backend routes
-6. **P1-1** — Set `SERP_PROVIDER` and `SERP_API_KEY` in Render dashboard — SERP adapter is wired but env vars are missing
-7. Full P1 list in [PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md)
+Ordered by [ops/PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md) priority:
+1. **P0-1 owner action** — Rotate `SUPABASE_ANON_KEY` at Supabase dashboard → Settings → API; set all env vars in Render dashboard — git history is clean, this is the last step
+2. **T2-17 owner action** — Create UptimeRobot free monitor: `https://neural-rank-backend.onrender.com/v1/health`, HTTP, 5-min interval — prevents Render + Supabase spindown
+3. **T2-23 owner action** — Set `SERP_PROVIDER` + `SERP_API_KEY` in Render dashboard (SerpApi free tier)
+4. **P0-4 / P0-5 / T3-12** — Flutter consolidation: implement `ApiRepository` with real Dio HTTP calls against the 27 live backend routes; port `ui/` screens into `app/`
+5. **T3-13** — Router refactoring (map-based dispatcher) — the one remaining open T3 item; medium risk, no external infra needed
+6. Full backlog in [ops/PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md) and [ops/REBUILD_PLAN.md](REBUILD_PLAN.md)
 
 ---
 

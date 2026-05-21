@@ -32,14 +32,6 @@ npm run ci
 
 All test suites must pass and lint must be clean.
 
-## Doc update rules
-
-| Change | Required update |
-|--------|----------------|
-| File added, removed, or renamed | Update `DOC_CATALOGUE.md` |
-| Production gap resolved | Mark `RESOLVED` in `ops/PRODUCTION_READINESS_GAPS.md` with date and commit |
-| Significant milestone | Append to `ops/progress.md` and `ops/CHANGELOG.md` |
-
 ## Backend module rules
 
 - All modules follow the 5-file contract: `service.js / analysis.js / insights.js / actions.js / repository.js`
