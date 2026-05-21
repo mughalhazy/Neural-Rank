@@ -1,7 +1,7 @@
-# Frontend Content Implementation Log
+﻿# Frontend Content Implementation Log
 
 ## Anchors
-- `docs/product/MASTER_BUILD_SPEC.md`
+- `MASTER_BUILD_SPEC.md`
 - `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`
 - `docs/frontend/reference/FRONTEND_BACKEND_CONTENT_MAPPING.md`
 - `docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md`

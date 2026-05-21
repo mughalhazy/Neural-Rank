@@ -1,10 +1,10 @@
-# Frontend Gap Register
+﻿# Frontend Gap Register
 
 ## Purpose
 Record the implementation gaps found by overlaying:
-- `docs/product/SYSTEMATIC_UI_ARCHITECTURE.md`
-- `docs/product/MASTER_BUILD_SPEC.md`
-- `docs/product/archive/MARKET_RESEARCH_PLAYSTORE.md`
+- `SYSTEMATIC_UI_ARCHITECTURE.md`
+- `MASTER_BUILD_SPEC.md`
+- `MARKET_RESEARCH_PLAYSTORE.md`
 - `docs/frontend/**/*.md`
 
 against the current frontend code in `ui/lib`.
@@ -433,7 +433,7 @@ This register is the authority for pre-polish remediation. No refinement or poli
   - A dedicated pass log template exists for later execution
 - Evidence:
   - `docs/frontend/phases/PHASE_12_ITERATION_PASSES.md`
-  - `docs/frontend/logs/ITERATION_PASS_LOG.md`
+  - `ITERATION_PASS_LOG.md`
 - Risk:
   - Refinement could become ad hoc without architectural checkpoints
 - Required remediation:

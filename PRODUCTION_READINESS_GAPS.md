@@ -1,4 +1,4 @@
-# Neural Rank — Production Readiness Gap Register
+﻿# Neural Rank — Production Readiness Gap Register
 
 **Audit date:** 2026-05-17
 **Last updated:** 2026-05-19 (Tier 3 resolution — P2-2 resolved)
@@ -274,7 +274,7 @@ process.on('unhandledRejection', (reason) => {
 2. Measure memory usage and p95 response time
 3. Add a CI step that fails if p95 > 10s or memory > 400MB
 
-**Status:** Owner-pending (T3-16) — depends on staging environment (T3-08). SLO targets defined in `docs/backend/reference/SLO.md`: p99 /v1/health < 500ms, p99 /v1/run/default < 20s.
+**Status:** Owner-pending (T3-16) — depends on staging environment (T3-08). SLO targets defined in `SLO.md`: p99 /v1/health < 500ms, p99 /v1/run/default < 20s.
 
 ---
 

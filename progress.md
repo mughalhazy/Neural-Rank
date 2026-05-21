@@ -1,4 +1,4 @@
-# Progress
+﻿# Progress
 
 ## Project State
 - repository: `https://github.com/mughalhazy/Neural-Rank`
@@ -180,7 +180,7 @@ All 78 docs across backend, frontend, and product directories audited and cleane
 
 Anchors:
 - [DOC_CATALOGUE.md](DOC_CATALOGUE.md) — living index of all 78 docs
-- [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md) — authoritative production backlog
+- [PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md) — authoritative production backlog
 
 ### 10. Workspace folder restructure
 > Completed: 2026-05-18
@@ -268,8 +268,8 @@ Use these first in a new session:
 - [REBUILD_PLAN.md](REBUILD_PLAN.md)
 - [README.md](README.md)
 - [DOC_CATALOGUE.md](DOC_CATALOGUE.md)
-- [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
-- [docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md](docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md)
+- [PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md)
+- [PRODUCT_SEO_OS_BUILD_PLAN.md](PRODUCT_SEO_OS_BUILD_PLAN.md)
 - [backend/src/server.js](backend/src/server.js)
 - [app/README.md](app/README.md)
 - [render.yaml](render.yaml)
@@ -294,7 +294,7 @@ Ordered by PRODUCTION_READINESS_GAPS.md priority:
 4. **P0-3** — Add `workspace_id` column migration; filter all execution queries by workspace — currently all workspaces share data
 5. **P0-4 / P0-5** — Flutter consolidation: port `ui/` screens + components into `app/`; implement `ApiRepository` with real Dio HTTP calls against the 24 live backend routes
 6. **P1-1** — Set `SERP_PROVIDER` and `SERP_API_KEY` in Render dashboard — SERP adapter is wired but env vars are missing
-7. Full P1 list in [docs/product/PRODUCTION_READINESS_GAPS.md](docs/product/PRODUCTION_READINESS_GAPS.md)
+7. Full P1 list in [PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md)
 
 ---
 
@@ -343,7 +343,7 @@ Ordered by PRODUCTION_READINESS_GAPS.md priority:
 
 ## SEO OS Expansion — Build Progress
 
-> Reference plan: `docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md`
+> Reference plan: `PRODUCT_SEO_OS_BUILD_PLAN.md`
 > Expansion started: 2026-05-15
 > Goal: Grow from 8 modules to 18, adding 10 new modules, 7 enhancements, 3 core utilities, 5 adapters
 
@@ -525,7 +525,7 @@ All programmatically-executable Tier 2 items from REBUILD_PLAN.md resolved in a 
 | T2-07 | Coverage gate in CI | `package.json:test:backend:ci` — c8 80% threshold; `.c8rc`; `coverage/` in `.gitignore` |
 | T2-08 | Input string length limits | `api/validation.js:assertStringMaxLength` — title≤500, summary≤5000, actionType≤100, nextStatus≤50, actor≤255 |
 | T2-09 | Architecture decision records | `docs/backend/decisions/ADR_001/002/003` |
-| T2-10 | Operational runbook | `docs/backend/reference/RUNBOOK.md` — 6 scenarios |
+| T2-10 | Operational runbook | `RUNBOOK.md` — 6 scenarios |
 | T2-11 | GitHub Actions CI workflow | `.github/workflows/ci.yml` — syntax + secrets + lint + coverage gate |
 | T2-12 | Per-module execution timeout | `orchestration/defaultMvpOrchestrator.js:runModuleSafe` — 10s `Promise.race` |
 | T2-13 | Dependabot configuration | `.github/dependabot.yml` — weekly npm, 5 PR limit |

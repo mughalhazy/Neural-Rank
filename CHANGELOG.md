@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to Neural Rank are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
@@ -18,7 +18,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `.husky/pre-push` — runs `npm run ci` before every push (T3-07)
 - `scripts/scaffold-module.js` — generates 5 contract files + service test from templates; prints manual-step checklist (T3-10)
 - `scripts/check-migrations.js` — verifies all 37+ expected `app_public` tables exist; skips when DATABASE_URL unset (T3-18)
-- `docs/backend/reference/SLO.md` — SLO definitions: 99.5% availability, p99 latency targets, 0.5% error rate; error budget policy; review cadence (T3-19)
+- `SLO.md` — SLO definitions: 99.5% availability, p99 latency targets, 0.5% error rate; error budget policy; review cadence (T3-19)
 
 ### Changed
 - `backend/src/server.js` — ETag + `If-None-Match` / 304 support on all list endpoints (recommendations, tasks, audit-logs) (T3-11)
@@ -35,7 +35,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `docs/backend/decisions/BACKEND_DOMAIN_SERVICE_ROUTES.md` — fully rewritten: all 4 domain services now have HTTP routes; complete 26-route inventory; historical "routeless" decision preserved as context (T3-29)
 - `docs/backend/reference/BACKEND_CORE_UTILITIES.md` — nine→fourteen; added entries 10–14: dbUtils, errorReporter, moduleInputRequirements, prioritization, rateLimiter (T3-34 + prior session T3-28 additions)
 - `docs/backend/reference/BACKEND_DATA_AND_PERSISTENCE.md` — 3 new migration rows: workspace_isolation, audit_log_immutability, sync_activation_from_js
-- `docs/backend/reference/RUNBOOK.md` — added "Database backup procedure" scenario (T3-27)
+- `RUNBOOK.md` — added "Database backup procedure" scenario (T3-27)
 - `README.md` — Operations section with db:dump command; full env var table (11 core + 8 adapter vars); route count 24→27 (T3-27, T3-28)
 - `scripts/check-secrets.js` — added `docker-compose.yml` to SKIP_FILES (dev credentials)
 - `.github/dependabot.yml` — added Flutter `pub` ecosystem entry for `/app` directory (T3-23)
@@ -83,7 +83,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `docs/backend/decisions/ADR_001_ZERO_RUNTIME_DEPENDENCIES.md` — decision record (T2-09)
 - `docs/backend/decisions/ADR_002_PURE_NODE_HTTP.md` — decision record (T2-09)
 - `docs/backend/decisions/ADR_003_IN_MEMORY_DEFAULT_REPOSITORY.md` — decision record (T2-09)
-- `docs/backend/reference/RUNBOOK.md` — 6 operational scenarios with remediation steps (T2-10)
+- `RUNBOOK.md` — 6 operational scenarios with remediation steps (T2-10)
 - `supabase/migrations/20260519000001_audit_log_immutability.sql` — `seq BIGSERIAL`, BEFORE UPDATE/DELETE triggers raising exceptions on `audit_logs` (T2-21)
 - `supabase/migrations/20260519000002_sync_activation_from_js.sql` — drops `is_active` from `backend_module_activation_defaults`; JS catalog is now authoritative (T2-19)
 - `scripts/check-activation-sync.js` — verifies JS activation catalog matches DB `backend_module_catalog` (T2-19)

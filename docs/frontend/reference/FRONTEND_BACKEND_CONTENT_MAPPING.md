@@ -1,4 +1,4 @@
-# Frontend Backend Content Mapping
+﻿# Frontend Backend Content Mapping
 
 ## Purpose
 This document defines how backend outputs become frontend content.
@@ -18,7 +18,7 @@ Frontend content must present:
 
 ## Source Anchors
 - `docs/backend/reference/BACKEND_MASTER_SPEC.md`
-- `docs/product/MASTER_BUILD_SPEC.md`
+- `MASTER_BUILD_SPEC.md`
 - `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`
 - `docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md`
 

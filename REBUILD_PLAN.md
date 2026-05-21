@@ -1,4 +1,4 @@
-# Neural Rank — Enterprise Rebuild Plan
+﻿# Neural Rank — Enterprise Rebuild Plan
 
 Working document for closing every gap identified in the 2026-05-18 enterprise grading audit,
 the 2026-05-18 reaudit that found 21 additional gaps, the 2026-05-18 DOC_CATALOGUE anchor
@@ -590,7 +590,7 @@ All Tier 1 items must be resolved before beginning Tier 2.
 
 **Dimension:** DevOps / Observability · Documentation
 **Current state:** No documented procedure for any on-call scenario.
-**Files:** New `docs/backend/reference/RUNBOOK.md`
+**Files:** New `RUNBOOK.md`
 **Effort:** M · **Risk:** low
 
 **Implementation steps:**
@@ -1297,7 +1297,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Dimension:** DevOps / Observability · Architecture
 **Current state:** No defined Service Level Objectives. "Is the service healthy?" has no quantified answer.
-**Files:** New `docs/backend/reference/SLO.md`
+**Files:** New `SLO.md`
 **Effort:** M · **Risk:** low · **Depends on:** T3-03 (metrics), T3-08 (staging), T2-17 (UptimeRobot)
 
 **Implementation steps:**
@@ -1452,14 +1452,14 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Dimension:** Developer Experience
 **Current state:** `app/` has no branded app icon (1024×1024 px), no splash screen, and no privacy policy URL — all three are required before Google Play Store submission. Without them, the app cannot be submitted regardless of code quality. This is P2-6 in `PRODUCTION_READINESS_GAPS.md`.
-**Files:** `app/android/app/src/main/res/`, `app/lib/`, new `docs/product/PRIVACY_POLICY.md`
+**Files:** `app/android/app/src/main/res/`, `app/lib/`, new `PRIVACY_POLICY.md`
 **Effort:** M · **Risk:** low · **Depends on:** T3-12, T3-20
 
 **Implementation steps:**
 1. Design and export a Neural Rank branded app icon at 1024×1024 px (PNG with transparency) and at all required Android density sizes (mdpi through xxxhdpi).
 2. Add icon to `app/android/app/src/main/res/mipmap-*/` using `flutter_launcher_icons` package.
 3. Add splash screen via `flutter_native_splash` package — use brand primary colour and Neural Rank wordmark.
-4. Write `docs/product/PRIVACY_POLICY.md` — covers: data collected, how it's used, third-party services (Supabase, GSC, GA4), user rights, contact. Host as a public URL before submission.
+4. Write `PRIVACY_POLICY.md` — covers: data collected, how it's used, third-party services (Supabase, GSC, GA4), user rights, contact. Host as a public URL before submission.
 5. Register privacy policy URL in Play Console and in `app/android/app/src/main/AndroidManifest.xml` as a metadata entry.
 
 **Definition of done:** App icon appears on device home screen; splash screen shows on launch; privacy policy URL is live and linked in Play Console.
@@ -1472,7 +1472,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Dimension:** Data Layer · DevOps
 **Current state:** No backup strategy is documented anywhere. Supabase free tier does not include point-in-time recovery (PITR). If the Supabase project is accidentally deleted or corrupted, all execution data, recommendations, tasks, and audit logs are unrecoverable. This is P2-2 in `PRODUCTION_READINESS_GAPS.md`.
-**Files:** `README.md`, `docs/backend/reference/RUNBOOK.md` (T2-10)
+**Files:** `README.md`, `RUNBOOK.md` (T2-10)
 **Effort:** S · **Risk:** low
 
 **Implementation steps:**

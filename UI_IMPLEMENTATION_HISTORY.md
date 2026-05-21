@@ -1,12 +1,12 @@
-# UI Implementation History
+﻿# UI Implementation History
 
 ## Purpose
 Record the UI implementation path so future sessions can resume without drift.
 
 ## Source Anchors
-- `docs/product/SYSTEMATIC_UI_ARCHITECTURE.md`
-- `docs/product/MASTER_BUILD_SPEC.md`
-- `docs/product/archive/MARKET_RESEARCH_PLAYSTORE.md`
+- `SYSTEMATIC_UI_ARCHITECTURE.md`
+- `MASTER_BUILD_SPEC.md`
+- `MARKET_RESEARCH_PLAYSTORE.md`
 - `design/inspiration/`
 - `docs/frontend/planning/FRONTEND_PHASE_INDEX.md`
 

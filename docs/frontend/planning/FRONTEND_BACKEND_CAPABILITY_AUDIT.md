@@ -1,4 +1,4 @@
-# Frontend Backend Capability Audit
+﻿# Frontend Backend Capability Audit
 
 ## Purpose
 This document is the deterministic source of truth for backend capability extraction before UI projection.
@@ -6,7 +6,7 @@ This document is the deterministic source of truth for backend capability extrac
 The frontend must not invent module capabilities. Each capability must be extracted from backend code, then projected into the existing UI framework, content system, and archetype subpages.
 
 ## Anchors
-- `docs/product/MASTER_BUILD_SPEC.md`
+- `MASTER_BUILD_SPEC.md`
 - `docs/backend/reference/BACKEND_MASTER_SPEC.md`
 - `docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md`
 - `docs/frontend/phases/PHASE_01_ARCHETYPES_AND_MAPPING.md`

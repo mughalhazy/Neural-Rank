@@ -1,4 +1,4 @@
-# Neural Rank
+﻿# Neural Rank
 
 [![CI](https://github.com/mughalhazy/Neural-Rank/actions/workflows/ci.yml/badge.svg)](https://github.com/mughalhazy/Neural-Rank/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -159,12 +159,12 @@ Store backup files outside the repo. See `RUNBOOK.md` for the full restore proce
 | `docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md` | Per-module boundaries (all 18) |
 | `docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md` | All 18 modules mapped to 8 bounded contexts |
 | `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` | API route audit |
-| `docs/backend/reference/SLO.md` | Service Level Objectives — availability, latency, error rate |
-| `docs/backend/reference/RUNBOOK.md` | Operational runbook — 7 scenarios |
+| `SLO.md` | Service Level Objectives — availability, latency, error rate |
+| `RUNBOOK.md` | Operational runbook — 7 scenarios |
 | `docs/backend/implementation/BACKEND_QC_PHASE2.md` | Phase 2 QC — 10 expansion modules |
-| `docs/backend/analysis/SEO_OS_BACKEND_GAP_FILL_REPORT.md` | Production readiness gaps |
-| `docs/product/PRODUCT_SEO_OS_BUILD_PLAN.md` | Full expansion build plan (authoritative) |
-| `docs/product/PRODUCTION_READINESS_GAPS.md` | Live gap register — P0/P1/P2 backlog with fix instructions |
+| `SEO_OS_BACKEND_GAP_FILL_REPORT.md` | Production readiness gaps |
+| `PRODUCT_SEO_OS_BUILD_PLAN.md` | Full expansion build plan (authoritative) |
+| `PRODUCTION_READINESS_GAPS.md` | Live gap register — P0/P1/P2 backlog with fix instructions |
 | `CONTRIBUTING.md` | Branch naming, commit style, doc update rules |
 | `progress.md` | Session milestone log and resume anchors |
 
