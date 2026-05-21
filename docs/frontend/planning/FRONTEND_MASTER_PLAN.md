@@ -1,7 +1,7 @@
 ﻿# Frontend Master Plan
 
 ## Goal
-Build a Flutter-first UI system for Neural Rank that follows `SYSTEMATIC_UI_ARCHITECTURE.md`, honors `MASTER_BUILD_SPEC.md`, and `MARKET_RESEARCH_PLAYSTORE.md`, and uses the backend module boundaries as the product surface contract.
+Build a Flutter-first UI system for Neural Rank that follows `ops/SYSTEMATIC_UI_ARCHITECTURE.md`, honors `ops/MASTER_BUILD_SPEC.md`, and `ops/MARKET_RESEARCH_PLAYSTORE.md`, and uses the backend module boundaries as the product surface contract.
 
 ## Product Surface
 - Active MVP modules:

@@ -19,37 +19,41 @@ Neural Rank/
 │   ├── mockups/
 │   │   └── archetypes/   HTML archetype mockups
 │   └── screenshots/      UI screenshots
-├── ui/                   Flutter UI prototype (design archetype layer — pending consolidation into app/)
 ├── docs/
 │   ├── backend/
 │   │   ├── reference/    Live backend specs (master spec, module boundaries, APIs)
 │   │   ├── decisions/    One-time architectural decisions (dual classifier, service routes)
 │   │   ├── implementation/ Completed work records (domain services, QC, schema alignment)
-│   │   ├── analysis/     Gap scans and audit reports
 │   │   └── archive/      Phase 1 freeze records (historical, superseded)
-│   ├── frontend/
-│   │   ├── reference/    Live design system rules (UI baseline, content system, design language)
-│   │   ├── planning/     Active planning docs (master plan, screen archetypes, capability maps)
-│   │   ├── phases/       Completed phase deliverables PHASE_01–PHASE_13 (historical)
-│   │   └── logs/         Iteration logs, implementation history, gap register
-│   └── product/
-│       ├── archive/      Historical decision records (market research)
-│       └── *.md          Active product docs (build plan, UI architecture, build spec)
+│   └── frontend/
+│       ├── reference/    Live design system rules (UI baseline, content system, design language)
+│       ├── planning/     Active planning docs (master plan, screen archetypes, capability maps)
+│       ├── phases/       Completed phase deliverables PHASE_01–PHASE_13 (historical)
+│       ├── archive/      Superseded frontend docs
+│       └── logs/         Frontend protocol docs (IMAGE_PROTOCOL.md)
+├── ops/                  Ops docs — gap registers, build specs, runbooks, logs, market research
+│   ├── REBUILD_PLAN.md           Enterprise gap register — 77 items across Tier 1/2/3
+│   ├── PRODUCTION_READINESS_GAPS.md  Live P0/P1/P2 gap register
+│   ├── PRODUCT_SEO_OS_BUILD_PLAN.md  Authoritative full-product build plan
+│   ├── RUNBOOK.md                Operational runbook — 7 scenarios
+│   ├── SLO.md                    Service Level Objectives
+│   ├── progress.md               Session milestone log and resume anchors
+│   └── CHANGELOG.md              All notable changes — keepachangelog.com format
 ├── scripts/              CI and build scripts (check-syntax, check-secrets, check-migrations, scaffold-module)
 ├── supabase/             Database migrations (12 applied)
+├── ui/                   Flutter UI prototype (design archetype layer — pending consolidation into app/)
 ├── .dockerignore         Docker build excludes
 ├── .env.example          Environment variable reference — copy to .env for local dev
 ├── .eslintrc.json        ESLint config (no-unused-vars, no-undef)
 ├── .husky/               Git hooks — pre-commit (lint + secrets), pre-push (ci)
 ├── .nvmrc                Node.js version pin (20)
-├── CHANGELOG.md          All notable changes — keepachangelog.com format
 ├── CONTRIBUTING.md       Branch naming, commit style, doc update rules
 ├── docker-compose.yml    Local dev — api + postgres:16-alpine
 ├── Dockerfile            Production image — node:20-alpine, non-root user
+├── DOC_CATALOGUE.md      Index of all 88 docs — ops section + repo/code section
 ├── SECURITY.md           Responsible disclosure policy
 ├── package.json          Root scripts — start, check, lint, test, ci, scaffold, db:dump
-├── render.yaml           Render free-tier deployment blueprint (env vars via dashboard)
-└── progress.md           Session anchor and milestone log
+└── render.yaml           Render free-tier deployment blueprint (env vars via dashboard)
 ```
 
 ---
@@ -147,7 +151,7 @@ Supabase free tier does not include PITR. Manual export procedure:
 npm run db:dump   # runs: supabase db dump --project-ref bvujfwwwwzlpsxbshxyn -f backup_$(date +%Y%m%d).sql
 ```
 
-Store backup files outside the repo. See `RUNBOOK.md` for the full restore procedure. Supabase Pro ($25/month) enables daily automated PITR.
+Store backup files outside the repo. See `ops/RUNBOOK.md` for the full restore procedure. Supabase Pro ($25/month) enables daily automated PITR.
 
 ---
 
@@ -159,14 +163,14 @@ Store backup files outside the repo. See `RUNBOOK.md` for the full restore proce
 | `docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md` | Per-module boundaries (all 18) |
 | `docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md` | All 18 modules mapped to 8 bounded contexts |
 | `docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` | API route audit |
-| `SLO.md` | Service Level Objectives — availability, latency, error rate |
-| `RUNBOOK.md` | Operational runbook — 7 scenarios |
+| `ops/SLO.md` | Service Level Objectives — availability, latency, error rate |
+| `ops/RUNBOOK.md` | Operational runbook — 7 scenarios |
 | `docs/backend/implementation/BACKEND_QC_PHASE2.md` | Phase 2 QC — 10 expansion modules |
-| `SEO_OS_BACKEND_GAP_FILL_REPORT.md` | Production readiness gaps |
-| `PRODUCT_SEO_OS_BUILD_PLAN.md` | Full expansion build plan (authoritative) |
-| `PRODUCTION_READINESS_GAPS.md` | Live gap register — P0/P1/P2 backlog with fix instructions |
+| `ops/SEO_OS_BACKEND_GAP_FILL_REPORT.md` | Production readiness gaps |
+| `ops/PRODUCT_SEO_OS_BUILD_PLAN.md` | Full expansion build plan (authoritative) |
+| `ops/PRODUCTION_READINESS_GAPS.md` | Live gap register — P0/P1/P2 backlog with fix instructions |
 | `CONTRIBUTING.md` | Branch naming, commit style, doc update rules |
-| `progress.md` | Session milestone log and resume anchors |
+| `ops/progress.md` | Session milestone log and resume anchors |
 
 ---
 

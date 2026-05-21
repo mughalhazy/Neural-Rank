@@ -1,8 +1,8 @@
 ﻿# Frontend Module Feature Mapping
 
 ## Anchors
-- `MASTER_BUILD_SPEC.md`
-- `MARKET_RESEARCH_PLAYSTORE.md`
+- `ops/MASTER_BUILD_SPEC.md`
+- `ops/MARKET_RESEARCH_PLAYSTORE.md`
 - `docs/backend/reference/BACKEND_MASTER_SPEC.md`
 - `docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md`
 - `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`

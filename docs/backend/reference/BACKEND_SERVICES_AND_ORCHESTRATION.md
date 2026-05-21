@@ -1,8 +1,8 @@
-# Backend Services And Orchestration
+﻿# Backend Services And Orchestration
 
 Anchors:
 
-- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER_BUILD_SPEC.md](../../product/MASTER_BUILD_SPEC.md)
+- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [ops/MASTER_BUILD_SPEC.md](../../product/ops/MASTER_BUILD_SPEC.md)
 - [BACKEND_MASTER_SPEC.md](BACKEND_MASTER_SPEC.md)
 - [BACKEND_MODULE_BOUNDARIES.md](BACKEND_MODULE_BOUNDARIES.md)
 

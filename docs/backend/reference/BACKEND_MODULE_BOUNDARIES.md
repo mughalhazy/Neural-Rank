@@ -1,8 +1,8 @@
-# Backend Module Boundaries
+﻿# Backend Module Boundaries
 
 Anchors:
 
-- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER_BUILD_SPEC.md](../../product/MASTER_BUILD_SPEC.md)
+- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [ops/MASTER_BUILD_SPEC.md](../../product/ops/MASTER_BUILD_SPEC.md)
 - [BACKEND_MASTER_SPEC.md](BACKEND_MASTER_SPEC.md)
 
 This document defines explicit backend module boundaries so implementation does not drift, merge modules, or collapse into a monolith. It covers all 18 modules: the original 8 plus the 10 SEO OS expansion modules added 2026-05-15.

@@ -1,4 +1,4 @@
-# Backend Domain Service Routes
+﻿# Backend Domain Service Routes
 
 Anchors:
 
@@ -165,6 +165,6 @@ All 26 routes are versioned under `/v1/`. Legacy unversioned paths redirect 301 
 2. Each service had a specific reason for deferral: credential injection strategies (search intelligence), user identity scoping (business intelligence, measurement), or interface boundary decisions (technical operations).
 3. Exposing them prematurely without addressing these dependencies would create routes that either did not work in production or created security surface without proper guarding.
 
-**Route addition (2026-05-15):** Direct routes were added once the `resolveRequestIdentity` / `requireIdentity` infrastructure matured and the frontend integration layer required direct domain service access. See CHANGELOG.md entry for 2026-05-15 for the full list of routes added.
+**Route addition (2026-05-15):** Direct routes were added once the `resolveRequestIdentity` / `requireIdentity` infrastructure matured and the frontend integration layer required direct domain service access. See ops/CHANGELOG.md entry for 2026-05-15 for the full list of routes added.
 
 **Current status:** All four domain services have dedicated HTTP routes. The original "routeless" classification no longer applies.

@@ -1,7 +1,7 @@
-# Frontend Phase Index
+﻿# Frontend Phase Index
 
 ## Purpose
-This index is the review and execution map for frontend work anchored to `SYSTEMATIC_UI_ARCHITECTURE.md`.
+This index is the review and execution map for frontend work anchored to `ops/SYSTEMATIC_UI_ARCHITECTURE.md`.
 
 Each phase document exists to:
 - define scope
@@ -33,5 +33,5 @@ Each phase document exists to:
 
 ## Implementation Record
 - Current UI baseline: [CURRENT_UI_BASELINE.md](../reference/CURRENT_UI_BASELINE.md)
-- Full UI implementation history: [UI_IMPLEMENTATION_HISTORY.md](../logs/UI_IMPLEMENTATION_HISTORY.md)
-- Iteration pass log: [ITERATION_PASS_LOG.md](../logs/ITERATION_PASS_LOG.md)
+- Full UI implementation history: [ops/UI_IMPLEMENTATION_HISTORY.md](../logs/ops/UI_IMPLEMENTATION_HISTORY.md)
+- Iteration pass log: [ops/ITERATION_PASS_LOG.md](../logs/ops/ITERATION_PASS_LOG.md)

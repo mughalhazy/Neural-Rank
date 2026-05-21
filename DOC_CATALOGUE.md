@@ -30,12 +30,12 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 
 | File | Status | Description |
 |------|--------|-------------|
-| [REBUILD_PLAN.md](REBUILD_PLAN.md) | `LIVE` | Enterprise rebuild plan — 77-item gap register across Tier 1 (18 resolved), Tier 2 (23 resolved + 3 owner-pending), Tier 3 (18 resolved + 14 owner-pending + 1 open); grade 91/100 after Tier 2, target A+ (98/100) |
-| [PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md) | `LIVE` | **Production readiness gap register** — 5 P0s, 14 P1s, 10 P2s identified by 4-agent audit + manual verification 2026-05-17; each item has exact file/line evidence and fix instructions; update in place as gaps are resolved |
-| [GAP_REGISTER.md](GAP_REGISTER.md) | `LIVE` | Live register of known frontend gaps — missing screens, incomplete features, content gaps; updated as gaps are found or closed |
-| [BACKEND_GAP_ANALYSIS_2026_05_16.md](BACKEND_GAP_ANALYSIS_2026_05_16.md) | `LIVE` | Comprehensive gap scan dated 2026-05-16 — compares all 32 docs vs codebase reality, health score per doc, identifies stale claims and missing coverage |
-| [SEO_OS_BACKEND_GAP_FILL_REPORT.md](SEO_OS_BACKEND_GAP_FILL_REPORT.md) | `LIVE` | Production readiness summary for original 8-module backend + domain layer — scope notice added; Phase 2 (10 new modules) not included; cross-check against BACKEND_GAP_ANALYSIS before using |
-| [SEO_OS_DELTA_ANALYSIS_REPORT.md](SEO_OS_DELTA_ANALYSIS_REPORT.md) | `LIVE` | Delta analysis vs full SEO OS target capability model — scope notice added; maturity % based on pre-Phase-2 8-module state; recalculate figures against 18-module backend before using for planning |
+| [ops/REBUILD_PLAN.md](ops/REBUILD_PLAN.md) | `LIVE` | Enterprise rebuild plan — 77-item gap register across Tier 1 (18 resolved), Tier 2 (23 resolved + 3 owner-pending), Tier 3 (18 resolved + 14 owner-pending + 1 open); grade 91/100 after Tier 2, target A+ (98/100) |
+| [ops/PRODUCTION_READINESS_GAPS.md](ops/PRODUCTION_READINESS_GAPS.md) | `LIVE` | **Production readiness gap register** — 5 P0s, 14 P1s, 10 P2s identified by 4-agent audit + manual verification 2026-05-17; each item has exact file/line evidence and fix instructions; update in place as gaps are resolved |
+| [ops/GAP_REGISTER.md](ops/GAP_REGISTER.md) | `LIVE` | Live register of known frontend gaps — missing screens, incomplete features, content gaps; updated as gaps are found or closed |
+| [ops/BACKEND_GAP_ANALYSIS_2026_05_16.md](ops/BACKEND_GAP_ANALYSIS_2026_05_16.md) | `LIVE` | Comprehensive gap scan dated 2026-05-16 — compares all 32 docs vs codebase reality, health score per doc, identifies stale claims and missing coverage |
+| [ops/SEO_OS_BACKEND_GAP_FILL_REPORT.md](ops/SEO_OS_BACKEND_GAP_FILL_REPORT.md) | `LIVE` | Production readiness summary for original 8-module backend + domain layer — scope notice added; Phase 2 (10 new modules) not included; cross-check against BACKEND_GAP_ANALYSIS before using |
+| [ops/SEO_OS_DELTA_ANALYSIS_REPORT.md](ops/SEO_OS_DELTA_ANALYSIS_REPORT.md) | `LIVE` | Delta analysis vs full SEO OS target capability model — scope notice added; maturity % based on pre-Phase-2 8-module state; recalculate figures against 18-module backend before using for planning |
 
 ---
 
@@ -43,10 +43,10 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 
 | File | Status | Description |
 |------|--------|-------------|
-| [PRODUCT_SEO_OS_BUILD_PLAN.md](PRODUCT_SEO_OS_BUILD_PLAN.md) | `LIVE` | **Authoritative full-product expansion build plan** — all phases, 25 tasks, deliverables, priorities; supersedes MASTER_BUILD_SPEC for planning purposes |
-| [MASTER_BUILD_SPEC.md](MASTER_BUILD_SPEC.md) | `LIVE` | Original product build specification — updated 2026-05-17 to acknowledge 18-module state; PRODUCT_SEO_OS_BUILD_PLAN is now the planning authority |
-| [SYSTEMATIC_UI_ARCHITECTURE.md](SYSTEMATIC_UI_ARCHITECTURE.md) | `LIVE` | UI architecture governance — screen hierarchy, navigation model, state management rules, layout system |
-| [MVP_TO_FULL_SUITE_ROLLOUT.md](MVP_TO_FULL_SUITE_ROLLOUT.md) | `ARCHIVE` | Original 7-phase MVP-to-full-suite rollout plan — superseded by PRODUCT_SEO_OS_BUILD_PLAN Part 7; moved from product/ to archive/ *(archived 2026-05-17)* |
+| [ops/PRODUCT_SEO_OS_BUILD_PLAN.md](ops/PRODUCT_SEO_OS_BUILD_PLAN.md) | `LIVE` | **Authoritative full-product expansion build plan** — all phases, 25 tasks, deliverables, priorities; supersedes MASTER_BUILD_SPEC for planning purposes |
+| [ops/MASTER_BUILD_SPEC.md](ops/MASTER_BUILD_SPEC.md) | `LIVE` | Original product build specification — updated 2026-05-17 to acknowledge 18-module state; PRODUCT_SEO_OS_BUILD_PLAN is now the planning authority |
+| [ops/SYSTEMATIC_UI_ARCHITECTURE.md](ops/SYSTEMATIC_UI_ARCHITECTURE.md) | `LIVE` | UI architecture governance — screen hierarchy, navigation model, state management rules, layout system |
+| [ops/MVP_TO_FULL_SUITE_ROLLOUT.md](ops/MVP_TO_FULL_SUITE_ROLLOUT.md) | `ARCHIVE` | Original 7-phase MVP-to-full-suite rollout plan — superseded by PRODUCT_SEO_OS_BUILD_PLAN Part 7; moved from product/ to archive/ *(archived 2026-05-17)* |
 
 ---
 
@@ -54,10 +54,10 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 
 | File | Status | Description |
 |------|--------|-------------|
-| [RUNBOOK.md](RUNBOOK.md) | `LIVE` | Operational runbook — 7 scenarios: cold-start latency, DB unreachable, SERP rate-limited, Supabase outage, force restart, credential rotation, database backup procedure *(created 2026-05-19, T2-10; updated T3-27)* |
-| [SLO.md](SLO.md) | `LIVE` | Service Level Objectives — availability 99.5%, p99 latency targets for /health and /run/default, 0.5% error rate; error budget policy; review cadence *(created 2026-05-19, T3-19)* |
-| [progress.md](progress.md) | `LIVE` | Session milestone log and resume anchors — running record of every build session |
-| [CHANGELOG.md](CHANGELOG.md) | `LOG` | All notable changes — keepachangelog.com format; append on every significant milestone |
+| [ops/RUNBOOK.md](ops/RUNBOOK.md) | `LIVE` | Operational runbook — 7 scenarios: cold-start latency, DB unreachable, SERP rate-limited, Supabase outage, force restart, credential rotation, database backup procedure *(created 2026-05-19, T2-10; updated T3-27)* |
+| [ops/SLO.md](ops/SLO.md) | `LIVE` | Service Level Objectives — availability 99.5%, p99 latency targets for /health and /run/default, 0.5% error rate; error budget policy; review cadence *(created 2026-05-19, T3-19)* |
+| [ops/progress.md](ops/progress.md) | `LIVE` | Session milestone log and resume anchors — running record of every build session |
+| [ops/CHANGELOG.md](ops/CHANGELOG.md) | `LOG` | All notable changes — keepachangelog.com format; append on every significant milestone |
 
 ---
 
@@ -65,9 +65,9 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 
 | File | Status | Description |
 |------|--------|-------------|
-| [FRONTEND_CONTENT_IMPLEMENTATION_LOG.md](FRONTEND_CONTENT_IMPLEMENTATION_LOG.md) | `LOG` | Running log of content implementation decisions and changes made session by session |
-| [ITERATION_PASS_LOG.md](ITERATION_PASS_LOG.md) | `LOG` | Log of all iteration passes run on frontend screens — what changed, what was improved, pass outcomes |
-| [UI_IMPLEMENTATION_HISTORY.md](UI_IMPLEMENTATION_HISTORY.md) | `LOG` | Chronological history of all UI implementation sessions with key decisions and outcomes |
+| [ops/FRONTEND_CONTENT_IMPLEMENTATION_LOG.md](ops/FRONTEND_CONTENT_IMPLEMENTATION_LOG.md) | `LOG` | Running log of content implementation decisions and changes made session by session |
+| [ops/ITERATION_PASS_LOG.md](ops/ITERATION_PASS_LOG.md) | `LOG` | Log of all iteration passes run on frontend screens — what changed, what was improved, pass outcomes |
+| [ops/UI_IMPLEMENTATION_HISTORY.md](ops/UI_IMPLEMENTATION_HISTORY.md) | `LOG` | Chronological history of all UI implementation sessions with key decisions and outcomes |
 
 ---
 
@@ -75,7 +75,7 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 
 | File | Status | Description |
 |------|--------|-------------|
-| [MARKET_RESEARCH_PLAYSTORE.md](MARKET_RESEARCH_PLAYSTORE.md) | `ARCHIVE` | Historical Play Store competitor market validation — written pre-backend build as initial market context; retained as a historical decision record |
+| [ops/MARKET_RESEARCH_PLAYSTORE.md](ops/MARKET_RESEARCH_PLAYSTORE.md) | `ARCHIVE` | Historical Play Store competitor market validation — written pre-backend build as initial market context; retained as a historical decision record |
 
 ---
 
@@ -160,7 +160,7 @@ Freeze records, QC reports, and gap scans from the original 8-module Phase 1 bui
 | [BACKEND_V1_FROZEN.md](docs/backend/archive/BACKEND_V1_FROZEN.md) | `ARCHIVE` | Phase 1 freeze status record for original 8 modules — dated 2026-04-22; marks V1 as stable before Phase 2 expansion |
 | [BACKEND_V1_HARDENED.md](docs/backend/archive/BACKEND_V1_HARDENED.md) | `ARCHIVE` | Phase 1 hardening validation record — checks module catalog, activation, orchestration, tests, HTTP server for original 8 modules |
 | [BACKEND_BUILD_SEQUENCE.md](docs/backend/archive/BACKEND_BUILD_SEQUENCE.md) | `ARCHIVE` | Original Phase 1 build sequence for 8 modules — documentation-first order, architecture setup, implementation sequence; not updated for Phase 2 |
-| [BACKEND_IMPLEMENTATION_GAP_SCAN.md](docs/backend/archive/BACKEND_IMPLEMENTATION_GAP_SCAN.md) | `ARCHIVE` | Phase 1 only gap scan for original 8 modules — all declared fixed; superseded by BACKEND_GAP_ANALYSIS_2026_05_16.md which covers all 18 |
+| [BACKEND_IMPLEMENTATION_GAP_SCAN.md](docs/backend/archive/BACKEND_IMPLEMENTATION_GAP_SCAN.md) | `ARCHIVE` | Phase 1 only gap scan for original 8 modules — all declared fixed; superseded by ops/BACKEND_GAP_ANALYSIS_2026_05_16.md which covers all 18 |
 | [BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_REPORT.md](docs/backend/archive/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_REPORT.md) | `ARCHIVE` | Phase 1 schema/repository alignment fix for original 8 modules — documents 5 field-name mismatches resolved 2026-05-06; superseded by BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md |
 | [BACKEND_DOMAIN_BOUNDARY_MAP.md](docs/backend/archive/BACKEND_DOMAIN_BOUNDARY_MAP.md) | `ARCHIVE` | Original Phase 1 domain boundary map for 8 modules — fully superseded by BACKEND_DOMAIN_BOUNDARIES.md *(archived 2026-05-17)* |
 | [BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md](docs/backend/archive/BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md) | `ARCHIVE` | Original implementation record for the 8-domain bounded context layer — fully superseded by BACKEND_DOMAIN_BOUNDARIES.md *(archived 2026-05-17)* |

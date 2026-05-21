@@ -1,8 +1,8 @@
-# Backend Activation And Gating
+﻿# Backend Activation And Gating
 
 Anchors:
 
-- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [MASTER_BUILD_SPEC.md](../../product/MASTER_BUILD_SPEC.md)
+- `MASTER_PRODUCT_BUILD_SPEC.md` as contained in [ops/MASTER_BUILD_SPEC.md](../../product/ops/MASTER_BUILD_SPEC.md)
 - [BACKEND_MASTER_SPEC.md](BACKEND_MASTER_SPEC.md)
 
 This document defines backend activation and gating for the current 18-module state. As of the SEO OS expansion (2026-05-15), `BUILT_BUT_INACTIVE_MODULES` is non-empty for the first time: `local_seo` is the sole opt-in module.

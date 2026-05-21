@@ -18,7 +18,7 @@ Frontend content must present:
 
 ## Source Anchors
 - `docs/backend/reference/BACKEND_MASTER_SPEC.md`
-- `MASTER_BUILD_SPEC.md`
+- `ops/MASTER_BUILD_SPEC.md`
 - `docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md`
 - `docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md`
 

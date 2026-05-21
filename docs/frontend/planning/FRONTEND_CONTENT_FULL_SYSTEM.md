@@ -20,7 +20,7 @@ This is structure only. It does not redesign the UI.
 
 ## Source Anchors
 ## Source Anchors
-- `MASTER_BUILD_SPEC.md`
+- `ops/MASTER_BUILD_SPEC.md`
 - `docs/frontend/reference/FRONTEND_BACKEND_CONTENT_MAPPING.md`
 - `docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md`
 - `docs/frontend/planning/FRONTEND_SCREEN_ARCHETYPES.md`

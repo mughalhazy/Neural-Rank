@@ -1,9 +1,9 @@
-# Frontend Screen Archetypes
+﻿# Frontend Screen Archetypes
 
 Anchors:
 
-- `MASTER_PRODUCT_BUILD_SPEC.md` interpreted from [MASTER_BUILD_SPEC.md](../../product/MASTER_BUILD_SPEC.md)
-- [MARKET_RESEARCH_PLAYSTORE.md](../../product/archive/MARKET_RESEARCH_PLAYSTORE.md)
+- `MASTER_PRODUCT_BUILD_SPEC.md` interpreted from [ops/MASTER_BUILD_SPEC.md](../../product/ops/MASTER_BUILD_SPEC.md)
+- [ops/MARKET_RESEARCH_PLAYSTORE.md](../../product/archive/ops/MARKET_RESEARCH_PLAYSTORE.md)
 - [BACKEND_MODULE_BOUNDARIES.md](../../backend/reference/BACKEND_MODULE_BOUNDARIES.md)
 - `backend` code under `D:\Neural Rank\backend\src`
 

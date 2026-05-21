@@ -1,7 +1,7 @@
-# Phase 3: Market Overlay
+﻿# Phase 3: Market Overlay
 
 ## Objective
-Apply market truth from `MARKET_RESEARCH_PLAYSTORE.md` and `MASTER BUILD SPEC.md` to the frozen archetypes and behaviour layer before pattern assembly.
+Apply market truth from `ops/MARKET_RESEARCH_PLAYSTORE.md` and `MASTER BUILD SPEC.md` to the frozen archetypes and behaviour layer before pattern assembly.
 
 ## Market Inputs
 - fragmented mobile SEO/ASO tooling
