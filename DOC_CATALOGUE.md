@@ -1,7 +1,7 @@
 ﻿# DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-21 | **Total documents:** 88
+**Last updated:** 2026-05-21 | **Total documents:** 89
 
 ---
 
@@ -87,13 +87,40 @@ Specs, contracts, design systems, API definitions, architectural decisions, and 
 
 ---
 
-## Root
+## Root — Docs
+
+GitHub-recognized special files and the master doc index. All must remain at root.
 
 | File | Status | Description |
 |------|--------|-------------|
 | [README.md](README.md) | `LIVE` | Project overview — 18-module table, 27-route API surface, Supabase details, env var reference, project tree |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | `LIVE` | Branch naming, commit style, pre-push checklist, doc update rules, backend module contract |
 | [SECURITY.md](SECURITY.md) | `LIVE` | Responsible disclosure policy — contact, scope, SLA; in-scope: backend API, auth, schema, governance |
+| [DOC_CATALOGUE.md](DOC_CATALOGUE.md) | `LIVE` | Master index of all 89 docs — Section 1 (ops), Section 2 (repo/code); this file |
+
+---
+
+## Root — Config & Tooling
+
+Non-markdown root files. All must remain at root — tooling, runtimes, and deployment systems require or expect them here. Not `.md` files; listed for completeness.
+
+| File | Purpose | Must stay at root? |
+|------|---------|-------------------|
+| `package.json` | npm manifest — scripts, dependencies, engines | Yes — npm |
+| `package-lock.json` | Exact dependency lock file | Yes — paired with package.json |
+| `render.yaml` | Render free-tier deployment blueprint — service, env vars (`sync: false`) | Yes — Render reads root |
+| `Dockerfile` | Production image — node:20-alpine, non-root user | Yes — Docker build context |
+| `docker-compose.yml` | Local dev — api + postgres:16-alpine with healthcheck | Yes — convention |
+| `docker-compose.test.yml` | Integration test compose — postgres:16-alpine for CI | Yes — paired with docker-compose.yml |
+| `.env.example` | Environment variable reference — copy to `.env` for local dev; contains no secrets | Yes — convention |
+| `LICENSE` | MIT license | Yes — GitHub surface + legal convention |
+| `.eslintrc.json` | ESLint config — no-unused-vars, no-undef | Yes — ESLint traverses from root |
+| `.c8rc` | c8 coverage config — 80% threshold, excludes test files | Yes — c8 reads from root |
+| `.gitignore` | Git ignore rules — node_modules, .env, coverage, Flutter build artifacts | Yes — git requires root |
+| `.nvmrc` | Node.js version pin — `20` | Yes — nvm reads from root |
+| `.dockerignore` | Docker build excludes — node_modules, .env, design/, ui/, app/, docs/ | Yes — must be alongside Dockerfile |
+| `.husky/` | Git hooks directory — pre-commit (lint + secrets), pre-push (ci) | Yes — Husky convention |
+| `.github/` | GitHub Actions CI workflow + Dependabot config | Yes — GitHub requires this path |
 
 ---
 
