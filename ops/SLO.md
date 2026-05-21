@@ -18,7 +18,7 @@
 
 **Free-tier note:** Render free tier spins down after 15 minutes of inactivity. UptimeRobot pings every 5 minutes to prevent spin-down. If UptimeRobot is unconfigured, the effective availability will be lower. A single cold-start event does not count as downtime unless the service fails to respond within 60 seconds.
 
-**Breach consequence:** Investigate Render logs and Supabase status. Document the incident in `progress.md` with duration, cause, and resolution.
+**Breach consequence:** Investigate Render logs and Supabase status. Document the incident in `PROGRESS.md` with duration, cause, and resolution.
 
 ---
 

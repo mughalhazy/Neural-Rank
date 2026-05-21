@@ -37,7 +37,7 @@ Neural Rank/
 │   ├── PRODUCT_SEO_OS_BUILD_PLAN.md  Authoritative full-product build plan
 │   ├── RUNBOOK.md                Operational runbook — 7 scenarios
 │   ├── SLO.md                    Service Level Objectives
-│   ├── progress.md               Session milestone log and resume anchors
+│   ├── PROGRESS.md               Session milestone log and resume anchors
 │   └── CHANGELOG.md              All notable changes — keepachangelog.com format
 ├── scripts/              CI and build scripts (check-syntax, check-secrets, check-migrations, scaffold-module)
 ├── supabase/             Database migrations (12 applied)
@@ -170,7 +170,7 @@ Store backup files outside the repo. See `ops/RUNBOOK.md` for the full restore p
 | `ops/PRODUCT_SEO_OS_BUILD_PLAN.md` | Full expansion build plan (authoritative) |
 | `ops/PRODUCTION_READINESS_GAPS.md` | Live gap register — P0/P1/P2 backlog with fix instructions |
 | `CONTRIBUTING.md` | Branch naming, commit style, doc update rules |
-| `ops/progress.md` | Session milestone log and resume anchors |
+| `ops/PROGRESS.md` | Session milestone log and resume anchors |
 
 ---
 

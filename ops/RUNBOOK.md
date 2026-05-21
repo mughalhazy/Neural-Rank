@@ -100,7 +100,7 @@
 3. Trigger a Manual Deploy to pick up the new value.
 4. Verify `/health` returns `{ "deployable": true }` after deploy completes.
 5. Revoke the old credential in the source dashboard.
-6. Update `progress.md` with the rotation date.
+6. Update `PROGRESS.md` with the rotation date.
 
 **Never commit credentials:** All production credentials live exclusively in the Render dashboard (`sync: false` in `render.yaml`). The `.env.example` file contains only placeholder values.
 

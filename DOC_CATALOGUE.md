@@ -56,7 +56,7 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 |------|--------|-------------|
 | [ops/RUNBOOK.md](ops/RUNBOOK.md) | `LIVE` | Operational runbook — 7 scenarios: cold-start latency, DB unreachable, SERP rate-limited, Supabase outage, force restart, credential rotation, database backup procedure *(created 2026-05-19, T2-10; updated T3-27)* |
 | [ops/SLO.md](ops/SLO.md) | `LIVE` | Service Level Objectives — availability 99.5%, p99 latency targets for /health and /run/default, 0.5% error rate; error budget policy; review cadence *(created 2026-05-19, T3-19)* |
-| [ops/progress.md](ops/progress.md) | `LIVE` | Session milestone log and resume anchors — running record of every build session |
+| [ops/PROGRESS.md](ops/PROGRESS.md) | `LIVE` | Session milestone log and resume anchors — running record of every build session |
 | [ops/CHANGELOG.md](ops/CHANGELOG.md) | `LOG` | All notable changes — keepachangelog.com format; append on every significant milestone |
 
 ---

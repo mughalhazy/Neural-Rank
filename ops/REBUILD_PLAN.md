@@ -1244,7 +1244,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 1. Write a `k6` load test script: ramp from 1 to 50 virtual users over 2 minutes; measure p50, p95, p99 latency for `/v1/health`, `/v1/run/default`, and `/v1/execution/recommendations`.
 2. Define pass thresholds: p99 < 2000ms for `/v1/health`; p99 < 15000ms for `/v1/run/default` (18 modules); error rate < 1%.
 3. Run against the staging environment (T3-08) to avoid affecting production.
-4. Document baseline numbers in `progress.md` and `RUNBOOK.md`.
+4. Document baseline numbers in `PROGRESS.md` and `RUNBOOK.md`.
 5. Re-run after T3-01 (async queue) to measure improvement.
 
 **Definition of done:** Load test script runs and produces a pass/fail against defined thresholds; baseline numbers documented.

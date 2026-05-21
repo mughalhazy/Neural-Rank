@@ -264,7 +264,7 @@ No code changes made — audit only.
 
 ## Current Resume Anchors
 Use these first in a new session:
-- [ops/progress.md](progress.md)
+- [ops/PROGRESS.md](PROGRESS.md)
 - [ops/REBUILD_PLAN.md](REBUILD_PLAN.md)
 - [README.md](../README.md)
 - [DOC_CATALOGUE.md](../DOC_CATALOGUE.md)

@@ -345,4 +345,4 @@ These do not block launch but must be resolved before public scale.
 When a gap is resolved:
 1. Mark the item `**Status: RESOLVED — [date] · [commit/PR]**`
 2. Update `DOC_CATALOGUE.md` if any new files were created
-3. Update `progress.md` with the milestone
+3. Update `PROGRESS.md` with the milestone

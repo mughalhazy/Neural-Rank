@@ -46,6 +46,6 @@ All test suites must pass and lint must be clean.
 |--------|----------------|
 | File added, removed, or renamed | Update `DOC_CATALOGUE.md` |
 | Production gap resolved | Mark `RESOLVED` in `ops/PRODUCTION_READINESS_GAPS.md` with date and commit |
-| Significant milestone | Append to `ops/progress.md` and `ops/CHANGELOG.md` |
+| Significant milestone | Append to `ops/PROGRESS.md` and `ops/CHANGELOG.md` |
 | New migration applied | Add row to `BACKEND_DATA_AND_PERSISTENCE.md` migration inventory |
 | API route added | Add to `AVAILABLE_ROUTES` in `server.js`, add path to `api/openapi.js`, add row to `OPENAPI.yaml`, add row to `BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md` |
