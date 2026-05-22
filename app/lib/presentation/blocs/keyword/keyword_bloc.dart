@@ -1,7 +1,7 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+﻿import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:seosync/data/models/keyword.dart';
-import 'package:seosync/data/repositories/seo_repository.dart';
+import 'package:neural_rank/data/models/keyword.dart';
+import 'package:neural_rank/data/repositories/seo_repository.dart';
 
 part 'keyword_event.dart';
 part 'keyword_state.dart';

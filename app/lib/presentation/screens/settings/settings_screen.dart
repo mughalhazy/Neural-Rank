@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:seosync/core/theme/app_theme.dart';
-import 'package:seosync/core/constants/app_constants.dart';
-import 'package:seosync/presentation/blocs/settings/settings_bloc.dart';
-import 'package:seosync/presentation/widgets/shared/loading_state.dart';
-import 'package:seosync/presentation/widgets/shared/error_state.dart';
-import 'package:seosync/presentation/widgets/shared/section_header.dart';
+import 'package:neural_rank/core/theme/app_theme.dart';
+import 'package:neural_rank/core/constants/app_constants.dart';
+import 'package:neural_rank/presentation/blocs/settings/settings_bloc.dart';
+import 'package:neural_rank/presentation/widgets/shared/loading_state.dart';
+import 'package:neural_rank/presentation/widgets/shared/error_state.dart';
+import 'package:neural_rank/presentation/widgets/shared/section_header.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

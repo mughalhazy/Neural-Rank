@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:seosync/core/theme/app_theme.dart';
-import 'package:seosync/data/models/review.dart';
-import 'package:seosync/presentation/blocs/review/review_bloc.dart';
-import 'package:seosync/presentation/widgets/shared/loading_state.dart';
-import 'package:seosync/presentation/widgets/shared/empty_state.dart';
-import 'package:seosync/presentation/widgets/shared/error_state.dart';
-import 'package:seosync/presentation/widgets/shared/section_header.dart';
+import 'package:neural_rank/core/theme/app_theme.dart';
+import 'package:neural_rank/data/models/review.dart';
+import 'package:neural_rank/presentation/blocs/review/review_bloc.dart';
+import 'package:neural_rank/presentation/widgets/shared/loading_state.dart';
+import 'package:neural_rank/presentation/widgets/shared/empty_state.dart';
+import 'package:neural_rank/presentation/widgets/shared/error_state.dart';
+import 'package:neural_rank/presentation/widgets/shared/section_header.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class ReviewInsightScreen extends StatefulWidget {

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:seosync/core/theme/app_theme.dart';
-import 'package:seosync/core/constants/app_constants.dart';
+import 'package:neural_rank/core/theme/app_theme.dart';
+import 'package:neural_rank/core/constants/app_constants.dart';
 
 class AppShell extends StatefulWidget {
   final Widget child;

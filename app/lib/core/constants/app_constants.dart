@@ -1,7 +1,8 @@
 /// App-wide constants following systematic UI architecture
 
 class AppConstants {
-  static const String appName = 'SEOSync';
+  static const String appName = 'Neural Rank';
+  static const String backendBaseUrl = 'https://neural-rank-backend.onrender.com/v1';
   static const String appTagline = 'Insight to Action';
   static const String appVersion = '1.0.0';
 

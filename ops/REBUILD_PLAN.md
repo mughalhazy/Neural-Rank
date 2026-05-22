@@ -1169,7 +1169,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Release build communicates with Render backend; MockRepository retained for debug/test.
 
-**Status:** `owner-pending`
+**Status:** `resolved`
 
 ---
 
@@ -1189,7 +1189,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `createRequestHandler` body is under 50 lines; all 24 routes still pass their tests.
 
-**Status:** `open`
+**Status:** `resolved`
 
 ---
 
@@ -1209,7 +1209,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** Adding a new cross-cutting concern (e.g., a new header) requires changing one middleware, not every handler.
 
-**Status:** `owner-pending`
+**Status:** `resolved`
 
 ---
 
@@ -1229,7 +1229,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `resetExecutionServiceState()` calls are no longer needed in tests; each test creates a fresh container.
 
-**Status:** `owner-pending`
+**Status:** `resolved`
 
 ---
 
@@ -1270,7 +1270,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** `ui/` directory removed; `app/` contains all screens; no `MockRepository` calls in production build.
 
-**Status:** `owner-pending`
+**Status:** `resolved`
 
 ---
 
@@ -1376,7 +1376,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** An unhandled exception in a widget shows a friendly error screen in release builds; crash is reported to the monitoring service.
 
-**Status:** `owner-pending`
+**Status:** `resolved`
 
 ---
 
@@ -1444,7 +1444,7 @@ These transform Neural Rank from a solid indie backend into infrastructure that 
 
 **Definition of done:** All insight cards in the app display evidence, explanation, and a next-step action; no insight renders with empty evidence section.
 
-**Status:** `owner-pending`
+**Status:** `resolved`
 
 ---
 
@@ -1702,20 +1702,20 @@ Both are shared infrastructure used across the codebase with no documented inter
 | T3-09 | Connection pool tuning | 3 | `resolved` | S |
 | T3-10 | Module scaffolding generator | 3 | `resolved` | M |
 | T3-11 | ETag / conditional requests | 3 | `resolved` | M |
-| T3-12 | Flutter ApiRepository | 3 | `owner-pending` | XL |
-| T3-13 | Router refactoring (map-based dispatcher) | 3 | `open` | M |
-| T3-14 | Composable middleware stack | 3 | `owner-pending` | L |
-| T3-15 | Domain service DI pattern | 3 | `owner-pending` | L |
+| T3-12 | Flutter ApiRepository | 3 | `resolved` | XL |
+| T3-13 | Router refactoring (map-based dispatcher) | 3 | `resolved` | M |
+| T3-14 | Composable middleware stack | 3 | `resolved` | L |
+| T3-15 | Domain service DI pattern | 3 | `resolved` | L |
 | T3-16 | Load and performance tests | 3 | `owner-pending` | M |
-| T3-17 | Flutter screen consolidation (ui/ → app/) | 3 | `owner-pending` | XL |
+| T3-17 | Flutter screen consolidation (ui/ → app/) | 3 | `resolved` | XL |
 | T3-18 | Automated DB migration CI check | 3 | `resolved` | M |
 | T3-19 | SLO definition and error budget | 3 | `resolved` | M |
 | T3-20 | Flutter app name consistency (seosync → neural-rank) | 3 | `resolved` | S |
 | T3-21 | Volatility analysis implementation | 3 | `resolved` | L |
-| T3-22 | Flutter error boundary and crash resilience | 3 | `owner-pending` | M |
+| T3-22 | Flutter error boundary and crash resilience | 3 | `resolved` | M |
 | T3-23 | Flutter dependency version pinning | 3 | `resolved` | S |
 | T3-24 | Wire real provider integrations — 13 stub adapters | 3 | `owner-pending` | XL |
-| T3-25 | Flutter Insight model — add evidence/explanation/nextStep | 3 | `owner-pending` | M |
+| T3-25 | Flutter Insight model — add evidence/explanation/nextStep | 3 | `resolved` | M |
 | T3-26 | Play Store submission assets | 3 | `owner-pending` | M |
 | T3-27 | DB backup strategy documentation | 3 | `resolved` | S |
 | T3-28 | Adapter env vars missing from .env.example | 3 | `resolved` | S |

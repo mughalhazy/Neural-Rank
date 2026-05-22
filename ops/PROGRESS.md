@@ -10,11 +10,11 @@
 - backend freeze status: Phase 1 (8 modules) FROZEN — Phase 2 (10 modules) DEPLOYED
 - doc health status: CLEAN — ops/ restructure complete 2026-05-21 · 89 docs
 - workspace structure: restructured 2026-05-18 (4 folder renames) + 2026-05-21 (ops/ folder, docs/product/ + docs/backend/analysis/ removed)
-- REBUILD_PLAN: T1 complete (18/18) · T2 complete (23/26, 3 owner-pending) · T3 in progress (18/33 resolved, 14 owner-pending, 1 open)
+- REBUILD_PLAN: T1 complete (18/18) · T2 complete (23/26, 3 owner-pending) · T3 in progress (25/33 resolved, 8 owner-pending, 0 open)
 
 ## Core Milestones Achieved
 
-### 15. Tier 3 — Production Hardening (2026-05-19) — 18/33 resolved
+### 15. Tier 3 — Production Hardening (2026-05-19 → 2026-05-22) — 25/33 resolved
 
 | T3 Item | Status |
 |---|---|
@@ -24,6 +24,9 @@
 | T3-09 Pool stats in `/v1/health` | resolved |
 | T3-10 Module scaffolding generator | resolved |
 | T3-11 ETag + 304 on list endpoints | resolved |
+| T3-13 Router refactoring — `ROUTE_MAP` + `dispatch()`, `createRequestHandler` 44 lines | resolved (2026-05-22) |
+| T3-14 Composable middleware — `backend/src/api/middleware.js`, `compose()` + 4 built-ins | resolved (2026-05-22) |
+| T3-15 Domain service DI — `backend/src/container.js`, `resetExecutionServiceState()` removed | resolved (2026-05-22) |
 | T3-18 Migration CI check script | resolved |
 | T3-19 SLO.md created | resolved |
 | T3-20 Flutter app name seosync→neural_rank | resolved |
@@ -32,25 +35,22 @@
 | T3-27 DB backup docs (RUNBOOK + README) | resolved |
 | T3-28 Adapter env vars documented | resolved |
 | T3-29 BACKEND_DOMAIN_SERVICE_ROUTES.md rewritten | resolved |
-| T3-33 API hardening report updated to 26 routes | resolved (prior session) |
+| T3-31 Frontend capability audit — 117 capabilities across 18 modules | resolved |
+| T3-32 Frontend content system Phase 2 — 10 modules added | resolved |
+| T3-33 API hardening report updated to 26 routes | resolved |
 | T3-34 prioritization.js + rateLimiter.js docs | resolved |
 | T3-01 Async queue | owner-pending (Redis) |
 | T3-02 OpenTelemetry | owner-pending (Grafana Cloud) |
 | T3-04 Redis rate limiter | owner-pending (Redis) |
 | T3-05 Response caching | owner-pending (T3-04) |
 | T3-08 Staging environment | owner-pending (Render) |
-| T3-12 Flutter ApiRepository | owner-pending (XL) |
-| T3-14 Composable middleware | owner-pending (L refactor) |
-| T3-15 Domain service DI | owner-pending (T3-14) |
+| T3-12 Flutter ApiRepository — NeuralRankClient (Dio+Bearer+retry), ApiRepository, SignInScreen, kDebugMode switch | resolved (2026-05-22) |
 | T3-16 Load tests | owner-pending (k6) |
-| T3-17 Flutter screen consolidation | owner-pending (T3-12) |
-| T3-22 Flutter error boundary | owner-pending (T3-12) |
+| T3-17 Flutter screen consolidation — 4 stub screens upgraded, DrilldownScreen added, ui/ deleted | resolved (2026-05-22) |
+| T3-22 Flutter error boundary — ErrorBoundaryWidget, FlutterError.onError, PlatformDispatcher.onError, runZonedGuarded | resolved (2026-05-22) |
 | T3-24 13 stub adapter integrations | owner-pending (API keys) |
-| T3-25 Flutter Insight model fields | owner-pending (T3-12) |
+| T3-25 Flutter Insight model — evidence/explanation/nextStep fields + InsightCard widget | resolved (2026-05-22) |
 | T3-26 Play Store assets | owner-pending (design) |
-| T3-13 Router refactoring | open |
-| T3-31 Frontend capability audit — 117 capabilities across 18 modules | resolved |
-| T3-32 Frontend content system Phase 2 — 10 modules added | resolved |
 
 ### 1. Backend documentation set created
 Anchors:
@@ -280,10 +280,10 @@ Use these first in a new session:
 - lint: ESLint clean — 0 errors (`eslint@8`, `no-unused-vars`, `no-undef`)
 - API: 27 routes — all under `/v1/`; includes `/v1/metrics` (Prometheus), `/v1/openapi.json`, `/v1/docs`; legacy paths redirect 301
 - database: Supabase `neural-rank` — 12 migrations applied, 33 tables in `app_public`; DB wired at startup via `db.js`
-- Flutter apps: `app/` (BLoC architecture — canonical production app) + `ui/` (UI prototype — pending consolidation into `app/`)
+- Flutter apps: `app/` (BLoC architecture — canonical production app); `ui/` deleted (consolidated into `app/` — T3-17 resolved 2026-05-22)
 - docs: 89 `.md` files — ops/ (18 ops docs) + docs/ (repo/code docs); DOC_CATALOGUE.md is the master index
-- REBUILD_PLAN: Tier 1 complete (18/18) · Tier 2 complete (23/26, 3 owner-pending) · Tier 3 in progress (18/33 resolved, 14 owner-pending, 1 open)
-- workspace: `app/`, `ui/`, `design/library/`, `design/mockups/archetypes/`, `ops/` (2026-05-21), `docs/backend/` + `docs/frontend/` (repo/code docs only)
+- REBUILD_PLAN: Tier 1 complete (18/18) · Tier 2 complete (23/26, 3 owner-pending) · Tier 3 in progress (23/33 resolved, 10 owner-pending, 0 open)
+- workspace: `app/`, `design/library/`, `design/mockups/archetypes/`, `ops/` (2026-05-21), `docs/backend/` + `docs/frontend/` (repo/code docs only)
 - npm cache and global prefix: on D: — project does not leak to C:
 
 ## Suggested Next Work Areas
@@ -292,7 +292,7 @@ Ordered by [ops/PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md) prio
 2. **T2-17 owner action** — Create UptimeRobot free monitor: `https://neural-rank-backend.onrender.com/v1/health`, HTTP, 5-min interval — prevents Render + Supabase spindown
 3. **T2-23 owner action** — Set `SERP_PROVIDER` + `SERP_API_KEY` in Render dashboard (SerpApi free tier)
 4. **P0-4 / P0-5 / T3-12** — Flutter consolidation: implement `ApiRepository` with real Dio HTTP calls against the 27 live backend routes; port `ui/` screens into `app/`
-5. **T3-13** — Router refactoring (map-based dispatcher) — the one remaining open T3 item; medium risk, no external infra needed
+5. **T3-12** — Flutter `ApiRepository`: Dio client, Bearer interceptor, retry, `flutter_secure_storage`, Supabase auth flow — unblocks T3-22 and T3-17
 6. Full backlog in [ops/PRODUCTION_READINESS_GAPS.md](PRODUCTION_READINESS_GAPS.md) and [ops/REBUILD_PLAN.md](REBUILD_PLAN.md)
 
 ---

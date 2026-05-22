@@ -14,11 +14,7 @@ const {
   runActivationAwareFlow,
   runDefaultBackendFlow,
 } = require("./index");
-const { getExecutionService } = require("./domains/execution/service");
-const { createMeasurementService } = require("./domains/measurement/service");
-const { createTechnicalOperationsService } = require("./domains/technical-operations/service");
-const { createSearchIntelligenceService } = require("./domains/search-intelligence/service");
-const { createBusinessIntelligenceService } = require("./domains/business-intelligence/service");
+const { createContainer } = require("./container");
 const { normalizeError } = require("./api/errors");
 const { SPEC_JSON, SWAGGER_UI_HTML } = require("./api/openapi");
 const { resolveRequestIdentity, requireIdentity } = require("./api/auth");
@@ -41,13 +37,6 @@ const {
   getIpKey,
   getActorKey,
 } = require("./core/rateLimiter");
-
-// ── Domain service singletons ─────────────────────────────────────────────────
-
-const measurementService = createMeasurementService();
-const technicalOperationsService = createTechnicalOperationsService();
-const searchIntelligenceService = createSearchIntelligenceService();
-const businessIntelligenceService = createBusinessIntelligenceService();
 
 // ── Response helpers ──────────────────────────────────────────────────────────
 
@@ -298,8 +287,7 @@ function buildRequestContext(baseContext = {}, bodyContext = {}, identity = {}) 
   };
 }
 
-async function handleExecutionRecommendations(request, response, baseContext, identity) {
-  const executionService = getExecutionService();
+async function handleExecutionRecommendations(request, response, baseContext, identity, executionService) {
   const rl = applyRateLimit(request, response);
   if (!rl) return;
 
@@ -340,7 +328,7 @@ async function handleExecutionRecommendations(request, response, baseContext, id
   sendMethodNotAllowed(response, ["GET", "POST"]);
 }
 
-async function handleExecutionRecommendationStatus(request, response, pathname, baseContext, identity) {
+async function handleExecutionRecommendationStatus(request, response, pathname, baseContext, identity, executionService) {
   if (request.method !== "PATCH") { sendMethodNotAllowed(response, ["PATCH"]); return; }
   requireIdentity(identity);
   const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
@@ -355,7 +343,7 @@ async function handleExecutionRecommendationStatus(request, response, pathname, 
 
   const body = await readJsonBody(request);
   validateRecommendationStatusBody(body);
-  const updated = await getExecutionService().updateRecommendationStatus(
+  const updated = await executionService.updateRecommendationStatus(
     recommendationId, body, buildRequestContext(baseContext, body.context || {}, identity),
   );
   sendEnvelope(response, 200, {
@@ -364,7 +352,7 @@ async function handleExecutionRecommendationStatus(request, response, pathname, 
   }, rl);
 }
 
-async function handleExecutionRecommendationTaskCreation(request, response, pathname, baseContext, identity) {
+async function handleExecutionRecommendationTaskCreation(request, response, pathname, baseContext, identity, executionService) {
   if (request.method !== "POST") { sendMethodNotAllowed(response, ["POST"]); return; }
   requireIdentity(identity);
   const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
@@ -379,7 +367,7 @@ async function handleExecutionRecommendationTaskCreation(request, response, path
 
   const body = await readJsonBody(request);
   validateTaskCreateBody(body);
-  const task = await getExecutionService().createTaskFromRecommendation(
+  const task = await executionService.createTaskFromRecommendation(
     recommendationId, body, buildRequestContext(baseContext, body.context || {}, identity),
   );
   sendEnvelope(response, 201, {
@@ -388,14 +376,14 @@ async function handleExecutionRecommendationTaskCreation(request, response, path
   }, rl);
 }
 
-async function handleExecutionTasks(request, response, baseContext) {
+async function handleExecutionTasks(request, response, baseContext, executionService) {
   if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
   const rl = applyRateLimit(request, response);
   if (!rl) return;
   const url = new URL(request.url, "http://127.0.0.1");
   const pagination = parsePaginationParams(url);
   const filters = parseFilterParams(url, ["status"]);
-  const all = await getExecutionService().listTasks(baseContext);
+  const all = await executionService.listTasks(baseContext);
   const filtered = all.filter((t) => {
     if (filters.status && t.currentStatus !== filters.status) return false;
     return true;
@@ -405,13 +393,13 @@ async function handleExecutionTasks(request, response, baseContext) {
   sendWithETag(response, 200, { ok: true, data: { tasks: items, count, nextCursor }, meta: {} }, rl, items);
 }
 
-async function handleExecutionTask(request, response, pathname, baseContext) {
+async function handleExecutionTask(request, response, pathname, baseContext, executionService) {
   if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
   const rl = applyRateLimit(request, response);
   if (!rl) return;
   const match = pathname.match(/^\/execution\/tasks\/([^/]+)$/);
   const taskId = match ? decodeURIComponent(match[1]) : null;
-  const task = taskId ? await getExecutionService().getTask(taskId, baseContext) : null;
+  const task = taskId ? await executionService.getTask(taskId, baseContext) : null;
   if (!task) {
     sendEnvelope(response, 404, { ok: false, error: { code: "task_not_found", message: "Task was not found." }, meta: {} }, rl);
     return;
@@ -419,7 +407,7 @@ async function handleExecutionTask(request, response, pathname, baseContext) {
   sendEnvelope(response, 200, { ok: true, data: task, meta: {} }, rl);
 }
 
-async function handleExecutionTaskStatus(request, response, pathname, baseContext, identity) {
+async function handleExecutionTaskStatus(request, response, pathname, baseContext, identity, executionService) {
   if (request.method !== "PATCH") { sendMethodNotAllowed(response, ["PATCH"]); return; }
   requireIdentity(identity);
   const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
@@ -434,7 +422,7 @@ async function handleExecutionTaskStatus(request, response, pathname, baseContex
 
   const body = await readJsonBody(request);
   validateTaskStatusBody(body);
-  const updated = await getExecutionService().updateTaskStatus(
+  const updated = await executionService.updateTaskStatus(
     taskId, body, buildRequestContext(baseContext, body.context || {}, identity),
   );
   sendEnvelope(response, 200, {
@@ -443,7 +431,7 @@ async function handleExecutionTaskStatus(request, response, pathname, baseContex
   }, rl);
 }
 
-async function handleExecutionTaskHistory(request, response, pathname, baseContext) {
+async function handleExecutionTaskHistory(request, response, pathname, baseContext, executionService) {
   if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
   const rl = applyRateLimit(request, response);
   if (!rl) return;
@@ -453,18 +441,18 @@ async function handleExecutionTaskHistory(request, response, pathname, baseConte
     sendEnvelope(response, 404, { ok: false, error: { code: "task_not_found", message: "Task was not found." }, meta: {} }, rl);
     return;
   }
-  const history = await getExecutionService().listTaskStatusHistory(taskId, baseContext);
+  const history = await executionService.listTaskStatusHistory(taskId, baseContext);
   sendEnvelope(response, 200, { ok: true, data: buildExecutionPayloadList(history, "history"), meta: {} }, rl);
 }
 
-async function handleExecutionAuditLogs(request, response, baseContext) {
+async function handleExecutionAuditLogs(request, response, baseContext, executionService) {
   if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
   const rl = applyRateLimit(request, response);
   if (!rl) return;
   const url = new URL(request.url, "http://127.0.0.1");
   const pagination = parsePaginationParams(url);
   const filters = parseFilterParams(url, ["entityType", "from"]);
-  const all = await getExecutionService().listAuditLogs(baseContext);
+  const all = await executionService.listAuditLogs(baseContext);
   const filtered = all.filter((log) => {
     if (filters.entityType && log.entityType !== filters.entityType) return false;
     if (filters.from && log.createdAt < filters.from) return false;
@@ -477,7 +465,7 @@ async function handleExecutionAuditLogs(request, response, baseContext) {
 
 // ── Measurement domain handlers ───────────────────────────────────────────────
 
-async function handleMeasurementMetrics(request, response) {
+async function handleMeasurementMetrics(request, response, measurementService) {
   if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
   const rl = applyRateLimit(request, response);
   if (!rl) return;
@@ -485,7 +473,7 @@ async function handleMeasurementMetrics(request, response) {
   sendEnvelope(response, 200, { ok: true, data: { metrics: sources, count: sources.length }, meta: {} }, rl);
 }
 
-async function handleMeasurementSnapshots(request, response, identity) {
+async function handleMeasurementSnapshots(request, response, identity, measurementService) {
   if (request.method !== "POST") { sendMethodNotAllowed(response, ["POST"]); return; }
   requireIdentity(identity);
   const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
@@ -498,7 +486,7 @@ async function handleMeasurementSnapshots(request, response, identity) {
   sendEnvelope(response, 201, { ok: true, data: result, meta: { snapshotKind: kind } }, rl);
 }
 
-async function handleMeasurementAttributions(request, response, pathname, identity) {
+async function handleMeasurementAttributions(request, response, pathname, identity, measurementService) {
   const rl = applyRateLimit(request, response);
   if (!rl) return;
 
@@ -529,7 +517,7 @@ async function handleMeasurementAttributions(request, response, pathname, identi
 
 // ── Technical operations domain handlers ─────────────────────────────────────
 
-async function handleTechnicalOperationsAudit(request, response, identity) {
+async function handleTechnicalOperationsAudit(request, response, identity, technicalOperationsService) {
   if (request.method !== "POST") { sendMethodNotAllowed(response, ["POST"]); return; }
   requireIdentity(identity);
   const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
@@ -541,7 +529,7 @@ async function handleTechnicalOperationsAudit(request, response, identity) {
 
 // ── Search intelligence domain handlers ──────────────────────────────────────
 
-async function handleSearchIntelligenceClassify(request, response, identity) {
+async function handleSearchIntelligenceClassify(request, response, identity, searchIntelligenceService) {
   if (request.method !== "POST") { sendMethodNotAllowed(response, ["POST"]); return; }
   requireIdentity(identity);
   const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
@@ -551,7 +539,7 @@ async function handleSearchIntelligenceClassify(request, response, identity) {
   sendEnvelope(response, 200, { ok: true, data: result, meta: {} }, rl);
 }
 
-async function handleSearchIntelligenceAnalyze(request, response, baseContext, identity) {
+async function handleSearchIntelligenceAnalyze(request, response, baseContext, identity, searchIntelligenceService) {
   if (request.method !== "POST") { sendMethodNotAllowed(response, ["POST"]); return; }
   requireIdentity(identity);
   const rl = applyRateLimit(request, response, { actor: identity.actor, isMutation: true });
@@ -563,7 +551,7 @@ async function handleSearchIntelligenceAnalyze(request, response, baseContext, i
 
 // ── Business intelligence domain handlers ────────────────────────────────────
 
-async function handleBusinessIntelligenceProfiles(request, response, identity) {
+async function handleBusinessIntelligenceProfiles(request, response, identity, businessIntelligenceService) {
   const rl = applyRateLimit(request, response);
   if (!rl) return;
 
@@ -586,6 +574,51 @@ async function handleBusinessIntelligenceProfiles(request, response, identity) {
   sendMethodNotAllowed(response, ["GET", "POST"]);
 }
 
+// ── System & diagnostic route handlers ───────────────────────────────────────
+
+async function handleHealth(request, response) {
+  if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
+  const rl = applyRateLimit(request, response);
+  if (!rl) return;
+  const healthData = await buildHealthPayload();
+  sendEnvelope(response, healthData.deployable ? 200 : 503, { ok: healthData.deployable, data: healthData, meta: {} }, rl);
+}
+
+function handleReady(request, response) {
+  if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
+  sendEnvelope(response, 200, { ok: true, data: buildReadinessPayload(), meta: {} });
+}
+
+function handleModules(request, response) {
+  if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
+  sendEnvelope(response, 200, { ok: true, data: buildModulesPayload(), meta: {} });
+}
+
+function handleOpenApiSpec(request, response) {
+  if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
+  const headers = { "Content-Type": "application/json; charset=utf-8", "Content-Length": Buffer.byteLength(SPEC_JSON) };
+  addSecurityHeaders(headers);
+  response.writeHead(200, headers);
+  response.end(SPEC_JSON);
+}
+
+function handleSwaggerDocs(request, response) {
+  if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
+  const headers = { "Content-Type": "text/html; charset=utf-8", "Content-Length": Buffer.byteLength(SWAGGER_UI_HTML) };
+  addSecurityHeaders(headers);
+  response.writeHead(200, headers);
+  response.end(SWAGGER_UI_HTML);
+}
+
+function handlePrometheusMetrics(request, response) {
+  if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
+  const metricsBody = getMetricsText();
+  const headers = { "Content-Type": "text/plain; version=0.0.4; charset=utf-8", "Content-Length": Buffer.byteLength(metricsBody) };
+  addSecurityHeaders(headers);
+  response.writeHead(200, headers);
+  response.end(metricsBody);
+}
+
 // ── Logging ───────────────────────────────────────────────────────────────────
 
 function logRequestEvent(kind, payload = {}) {
@@ -596,6 +629,90 @@ function logRequestEvent(kind, payload = {}) {
     delete sanitized.headers["x-api-key"];
   }
   console.log(JSON.stringify({ kind, ...sanitized }));
+}
+
+// ── Per-request helpers ───────────────────────────────────────────────────────
+
+function attachRequestTelemetry(request, response, rawPathname, startedAt, correlationId) {
+  response.on("finish", () => {
+    const durationMs = Date.now() - startedAt;
+    logRequestEvent("request", { method: request.method, path: rawPathname, status: response.statusCode, durationMs, correlationId });
+    const routeLabel = rawPathname.replace(/\/[0-9a-f-]{36}/gi, "/:id").replace(/^\/v1/, "/v1");
+    increment("http_request_total", { route: routeLabel, method: request.method, status: String(response.statusCode) });
+    observe("http_request_duration_ms", durationMs, { route: routeLabel });
+    if (response.statusCode >= 500) increment("http_error_total", { route: routeLabel, status: String(response.statusCode) });
+    if (response.statusCode === 429) increment("rate_limit_hit_total", { route: routeLabel });
+  });
+}
+
+function handleRequestError(error, request, rawPathname, response) {
+  const normalizedError = normalizeError(error);
+  logRequestEvent("api_error", { method: request.method, path: rawPathname, code: normalizedError.code, statusCode: normalizedError.statusCode, headers: request.headers });
+  if (normalizedError.statusCode >= 500) reportError(error, { tags: { route: rawPathname, method: request.method } });
+  sendEnvelope(response, normalizedError.statusCode, {
+    ok: false,
+    error: { code: normalizedError.code, message: normalizedError.message },
+    meta: { details: normalizedError.details },
+  });
+}
+
+// ── Route map & dispatcher ────────────────────────────────────────────────────
+
+const ROUTE_MAP = [
+  { path: "/health",                    handler: (req, res) => handleHealth(req, res) },
+  { path: "/ready",                     handler: (req, res) => handleReady(req, res) },
+  { path: "/modules",                   handler: (req, res) => handleModules(req, res) },
+  { path: "/run/default",               handler: (req, res) => handleDefaultRun(req, res) },
+  { path: "/run/activation-aware",      handler: (req, res) => handleActivationAwareRun(req, res) },
+  { pattern: /^\/modules\/[^/]+\/run$/, handler: (req, res, { pathname }) => handleSingleModuleRun(req, res, pathname) },
+
+  { path: "/execution/recommendations",
+    handler: (req, res, { baseContext, identity, container }) => handleExecutionRecommendations(req, res, baseContext, identity, container.executionService) },
+  { pattern: /^\/execution\/recommendations\/[^/]+\/status$/,
+    handler: (req, res, { pathname, baseContext, identity, container }) => handleExecutionRecommendationStatus(req, res, pathname, baseContext, identity, container.executionService) },
+  { pattern: /^\/execution\/recommendations\/[^/]+\/tasks$/,
+    handler: (req, res, { pathname, baseContext, identity, container }) => handleExecutionRecommendationTaskCreation(req, res, pathname, baseContext, identity, container.executionService) },
+  { path: "/execution/tasks",
+    handler: (req, res, { baseContext, container }) => handleExecutionTasks(req, res, baseContext, container.executionService) },
+  { pattern: /^\/execution\/tasks\/[^/]+\/history$/,
+    handler: (req, res, { pathname, baseContext, container }) => handleExecutionTaskHistory(req, res, pathname, baseContext, container.executionService) },
+  { pattern: /^\/execution\/tasks\/[^/]+\/status$/,
+    handler: (req, res, { pathname, baseContext, identity, container }) => handleExecutionTaskStatus(req, res, pathname, baseContext, identity, container.executionService) },
+  { pattern: /^\/execution\/tasks\/[^/]+$/,
+    handler: (req, res, { pathname, baseContext, container }) => handleExecutionTask(req, res, pathname, baseContext, container.executionService) },
+  { path: "/execution/audit-logs",
+    handler: (req, res, { baseContext, container }) => handleExecutionAuditLogs(req, res, baseContext, container.executionService) },
+
+  { path: "/measurement/metrics",
+    handler: (req, res, { container }) => handleMeasurementMetrics(req, res, container.measurementService) },
+  { path: "/measurement/snapshots",
+    handler: (req, res, { identity, container }) => handleMeasurementSnapshots(req, res, identity, container.measurementService) },
+  { path: "/measurement/attributions",
+    handler: (req, res, { pathname, identity, container }) => handleMeasurementAttributions(req, res, pathname, identity, container.measurementService) },
+  { pattern: /^\/measurement\/attributions\/[^/]+$/,
+    handler: (req, res, { pathname, identity, container }) => handleMeasurementAttributions(req, res, pathname, identity, container.measurementService) },
+
+  { path: "/technical-operations/audit",
+    handler: (req, res, { identity, container }) => handleTechnicalOperationsAudit(req, res, identity, container.technicalOperationsService) },
+  { path: "/search-intelligence/classify",
+    handler: (req, res, { identity, container }) => handleSearchIntelligenceClassify(req, res, identity, container.searchIntelligenceService) },
+  { path: "/search-intelligence/analyze",
+    handler: (req, res, { baseContext, identity, container }) => handleSearchIntelligenceAnalyze(req, res, baseContext, identity, container.searchIntelligenceService) },
+  { path: "/business-intelligence/profiles",
+    handler: (req, res, { identity, container }) => handleBusinessIntelligenceProfiles(req, res, identity, container.businessIntelligenceService) },
+
+  { path: "/openapi.json", handler: (req, res) => handleOpenApiSpec(req, res) },
+  { path: "/docs",         handler: (req, res) => handleSwaggerDocs(req, res) },
+  { path: "/metrics",      handler: (req, res) => handlePrometheusMetrics(req, res) },
+];
+
+function dispatch(pathname, req, res, ctx) {
+  for (const { path, pattern, handler } of ROUTE_MAP) {
+    if ((path !== undefined && path === pathname) || (pattern !== undefined && pattern.test(pathname))) {
+      return handler(req, res, ctx);
+    }
+  }
+  return null;
 }
 
 // ── Main request handler ──────────────────────────────────────────────────────
@@ -630,255 +747,64 @@ const AVAILABLE_ROUTES = [
   "GET /v1/metrics",
 ];
 
-function createRequestHandler(baseContext = {}) {
+function createRequestHandler(container) {
+  const baseContext = container.baseContext || {};
   return async function requestHandler(request, response) {
     const url = new URL(request.url, "http://127.0.0.1");
     const rawPathname = url.pathname;
-
     const startedAt = Date.now();
     const correlationId = request.headers["x-request-id"] || require("node:crypto").randomUUID();
     response.setHeader("X-Request-ID", correlationId);
-
-    response.on("finish", () => {
-      const durationMs = Date.now() - startedAt;
-      logRequestEvent("request", {
-        method: request.method,
-        path: rawPathname,
-        status: response.statusCode,
-        durationMs,
-        correlationId,
-      });
-      const routeLabel = rawPathname.replace(/\/[0-9a-f-]{36}/gi, "/:id").replace(/^\/v1/, "/v1");
-      increment("http_request_total", { route: routeLabel, method: request.method, status: String(response.statusCode) });
-      observe("http_request_duration_ms", durationMs, { route: routeLabel });
-      if (response.statusCode >= 500) {
-        increment("http_error_total", { route: routeLabel, status: String(response.statusCode) });
-      }
-      if (response.statusCode === 429) {
-        increment("rate_limit_hit_total", { route: routeLabel });
-      }
-    });
+    attachRequestTelemetry(request, response, rawPathname, startedAt, correlationId);
 
     try {
-      // OPTIONS preflight — handle before any other logic
       if (request.method === "OPTIONS") {
-        const preflightHeaders = {};
-        addSecurityHeaders(preflightHeaders);
-        response.writeHead(204, preflightHeaders);
+        const headers = {};
+        addSecurityHeaders(headers);
+        response.writeHead(204, headers);
         response.end();
         return;
       }
 
-      // Redirect legacy unversioned paths → /v1/<path> (301 permanent)
       if (!rawPathname.startsWith("/v1")) {
         const target = `/v1${rawPathname}${url.search}`;
-        const redirectHeaders = { Location: target, Deprecation: "true" };
-        addSecurityHeaders(redirectHeaders);
-        response.writeHead(301, redirectHeaders);
+        const headers = { Location: target, Deprecation: "true" };
+        addSecurityHeaders(headers);
+        response.writeHead(301, headers);
         response.end();
         return;
       }
 
-      // Strip /v1 prefix — all route matching below uses the unversioned pathname.
       const pathname = rawPathname.slice(3) || "/";
-
-      // Resolve identity once per request (async JWT verification)
       const identity = await resolveRequestIdentity(request);
-
-      // ── Unprotected routes ────────────────────────────────────────────────
-
-      if (pathname === "/health") {
-        if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
-        const rl = applyRateLimit(request, response);
-        if (!rl) return;
-        const healthData = await buildHealthPayload();
-        const healthStatus = healthData.deployable ? 200 : 503;
-        sendEnvelope(response, healthStatus, { ok: healthData.deployable, data: healthData, meta: {} }, rl);
+      const pending = dispatch(pathname, request, response, { baseContext, identity, pathname, container });
+      if (pending === null) {
+        sendEnvelope(response, 404, {
+          ok: false,
+          error: { code: "not_found", message: "Route was not found." },
+          meta: { availableRoutes: AVAILABLE_ROUTES, registeredModules: getRegisteredModuleKeys() },
+        });
         return;
       }
-
-      if (pathname === "/ready") {
-        if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
-        sendEnvelope(response, 200, { ok: true, data: buildReadinessPayload(), meta: {} });
-        return;
-      }
-
-      if (pathname === "/modules") {
-        if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
-        sendEnvelope(response, 200, { ok: true, data: buildModulesPayload(), meta: {} });
-        return;
-      }
-
-      // ── Module run routes ─────────────────────────────────────────────────
-
-      if (pathname === "/run/default") {
-        await handleDefaultRun(request, response);
-        return;
-      }
-
-      if (pathname === "/run/activation-aware") {
-        await handleActivationAwareRun(request, response);
-        return;
-      }
-
-      if (/^\/modules\/[^/]+\/run$/.test(pathname)) {
-        await handleSingleModuleRun(request, response, pathname);
-        return;
-      }
-
-      // ── Execution lifecycle routes ────────────────────────────────────────
-
-      if (pathname === "/execution/recommendations") {
-        await handleExecutionRecommendations(request, response, baseContext, identity);
-        return;
-      }
-
-      if (/^\/execution\/recommendations\/[^/]+\/status$/.test(pathname)) {
-        await handleExecutionRecommendationStatus(request, response, pathname, baseContext, identity);
-        return;
-      }
-
-      if (/^\/execution\/recommendations\/[^/]+\/tasks$/.test(pathname)) {
-        await handleExecutionRecommendationTaskCreation(request, response, pathname, baseContext, identity);
-        return;
-      }
-
-      if (pathname === "/execution/tasks") {
-        await handleExecutionTasks(request, response, baseContext);
-        return;
-      }
-
-      if (/^\/execution\/tasks\/[^/]+\/history$/.test(pathname)) {
-        await handleExecutionTaskHistory(request, response, pathname, baseContext);
-        return;
-      }
-
-      if (/^\/execution\/tasks\/[^/]+\/status$/.test(pathname)) {
-        await handleExecutionTaskStatus(request, response, pathname, baseContext, identity);
-        return;
-      }
-
-      if (/^\/execution\/tasks\/[^/]+$/.test(pathname)) {
-        await handleExecutionTask(request, response, pathname, baseContext);
-        return;
-      }
-
-      if (pathname === "/execution/audit-logs") {
-        await handleExecutionAuditLogs(request, response, baseContext);
-        return;
-      }
-
-      // ── Measurement domain routes ─────────────────────────────────────────
-
-      if (pathname === "/measurement/metrics") {
-        await handleMeasurementMetrics(request, response);
-        return;
-      }
-
-      if (pathname === "/measurement/snapshots") {
-        await handleMeasurementSnapshots(request, response, identity);
-        return;
-      }
-
-      if (pathname === "/measurement/attributions" || /^\/measurement\/attributions\/[^/]+$/.test(pathname)) {
-        await handleMeasurementAttributions(request, response, pathname, identity);
-        return;
-      }
-
-      // ── Technical operations domain routes ────────────────────────────────
-
-      if (pathname === "/technical-operations/audit") {
-        await handleTechnicalOperationsAudit(request, response, identity);
-        return;
-      }
-
-      // ── Search intelligence domain routes ─────────────────────────────────
-
-      if (pathname === "/search-intelligence/classify") {
-        await handleSearchIntelligenceClassify(request, response, identity);
-        return;
-      }
-
-      if (pathname === "/search-intelligence/analyze") {
-        await handleSearchIntelligenceAnalyze(request, response, baseContext, identity);
-        return;
-      }
-
-      // ── Business intelligence domain routes ───────────────────────────────
-
-      if (pathname === "/business-intelligence/profiles") {
-        await handleBusinessIntelligenceProfiles(request, response, identity);
-        return;
-      }
-
-      // ── OpenAPI spec + Swagger UI ─────────────────────────────────────────
-
-      if (pathname === "/openapi.json") {
-        if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
-        const headers = { "Content-Type": "application/json; charset=utf-8", "Content-Length": Buffer.byteLength(SPEC_JSON) };
-        addSecurityHeaders(headers);
-        response.writeHead(200, headers);
-        response.end(SPEC_JSON);
-        return;
-      }
-
-      if (pathname === "/docs") {
-        if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
-        const headers = { "Content-Type": "text/html; charset=utf-8", "Content-Length": Buffer.byteLength(SWAGGER_UI_HTML) };
-        addSecurityHeaders(headers);
-        response.writeHead(200, headers);
-        response.end(SWAGGER_UI_HTML);
-        return;
-      }
-
-      if (pathname === "/metrics") {
-        if (request.method !== "GET") { sendMethodNotAllowed(response, ["GET"]); return; }
-        const body = getMetricsText();
-        const headers = { "Content-Type": "text/plain; version=0.0.4; charset=utf-8", "Content-Length": Buffer.byteLength(body) };
-        addSecurityHeaders(headers);
-        response.writeHead(200, headers);
-        response.end(body);
-        return;
-      }
-
-      // ── 404 ───────────────────────────────────────────────────────────────
-
-      sendEnvelope(response, 404, {
-        ok: false,
-        error: { code: "not_found", message: "Route was not found." },
-        meta: { availableRoutes: AVAILABLE_ROUTES, registeredModules: getRegisteredModuleKeys() },
-      });
+      await pending;
     } catch (error) {
-      const normalizedError = normalizeError(error);
-      logRequestEvent("api_error", {
-        method: request.method,
-        path: rawPathname,
-        code: normalizedError.code,
-        statusCode: normalizedError.statusCode,
-        headers: request.headers,
-      });
-      if (normalizedError.statusCode >= 500) {
-        reportError(error, { tags: { route: rawPathname, method: request.method } });
-      }
-      sendEnvelope(response, normalizedError.statusCode, {
-        ok: false,
-        error: { code: normalizedError.code, message: normalizedError.message },
-        meta: { details: normalizedError.details },
-      });
+      handleRequestError(error, request, rawPathname, response);
     }
   };
 }
 
-function createServer({ baseContext = {} } = {}) {
-  return http.createServer(createRequestHandler(baseContext));
+function createServer({ container } = {}) {
+  const c = container || createContainer();
+  return http.createServer(createRequestHandler(c));
 }
 
 async function startServer({ port = Number(process.env.PORT) || 10000, host = "0.0.0.0" } = {}) {
   const dbPool = await initDb();
-  const baseContext = dbPool ? { query: (sql, params) => dbPool.query(sql, params) } : {};
+  const query = dbPool ? (sql, params) => dbPool.query(sql, params) : null;
+  const container = createContainer({ query });
 
   return new Promise((resolve, reject) => {
-    const server = createServer({ baseContext });
+    const server = createServer({ container });
     server.once("error", reject);
     server.listen(port, host, () => {
       server.removeListener("error", reject);
@@ -894,7 +820,6 @@ module.exports = {
   buildModulesPayload,
   createRequestHandler,
   createServer,
-  requestHandler: createRequestHandler(),
   startServer,
 };
 

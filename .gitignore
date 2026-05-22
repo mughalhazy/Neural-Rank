@@ -28,10 +28,6 @@ codex.ps1
 *.zip
 
 # Flutter build outputs
-ui/build/
-ui/.dart_tool/
-ui/.flutter-plugins
-ui/.flutter-plugins-dependencies
 app/build/
 app/.dart_tool/
 app/.flutter-plugins

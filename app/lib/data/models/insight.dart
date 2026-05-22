@@ -11,6 +11,9 @@ class Insight extends Equatable {
   final DateTime createdAt;
   final bool isRead;
   final Map<String, dynamic>? metadata;
+  final List<String>? evidence;
+  final String? explanation;
+  final String? nextStep;
 
   const Insight({
     required this.id,
@@ -22,6 +25,9 @@ class Insight extends Equatable {
     required this.createdAt,
     this.isRead = false,
     this.metadata,
+    this.evidence,
+    this.explanation,
+    this.nextStep,
   });
 
   Insight copyWith({
@@ -34,6 +40,9 @@ class Insight extends Equatable {
     DateTime? createdAt,
     bool? isRead,
     Map<String, dynamic>? metadata,
+    List<String>? evidence,
+    String? explanation,
+    String? nextStep,
   }) => Insight(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -44,8 +53,14 @@ class Insight extends Equatable {
     createdAt: createdAt ?? this.createdAt,
     isRead: isRead ?? this.isRead,
     metadata: metadata ?? this.metadata,
+    evidence: evidence ?? this.evidence,
+    explanation: explanation ?? this.explanation,
+    nextStep: nextStep ?? this.nextStep,
   );
 
   @override
-  List<Object?> get props => [id, title, description, module, priority, action, createdAt, isRead, metadata];
+  List<Object?> get props => [
+    id, title, description, module, priority, action,
+    createdAt, isRead, metadata, evidence, explanation, nextStep,
+  ];
 }

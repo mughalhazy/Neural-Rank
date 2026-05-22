@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:seosync/core/theme/app_theme.dart';
-import 'package:seosync/core/constants/app_constants.dart';
-import 'package:seosync/presentation/blocs/dashboard/dashboard_bloc.dart';
-import 'package:seosync/presentation/widgets/shared/insight_card.dart';
-import 'package:seosync/presentation/widgets/shared/loading_state.dart';
-import 'package:seosync/presentation/widgets/shared/empty_state.dart';
-import 'package:seosync/presentation/widgets/shared/error_state.dart';
-import 'package:seosync/presentation/widgets/shared/score_ring.dart';
-import 'package:seosync/presentation/widgets/shared/section_header.dart';
+import 'package:neural_rank/core/theme/app_theme.dart';
+import 'package:neural_rank/core/constants/app_constants.dart';
+import 'package:neural_rank/presentation/blocs/dashboard/dashboard_bloc.dart';
+import 'package:neural_rank/presentation/widgets/shared/insight_card.dart';
+import 'package:neural_rank/presentation/widgets/shared/loading_state.dart';
+import 'package:neural_rank/presentation/widgets/shared/empty_state.dart';
+import 'package:neural_rank/presentation/widgets/shared/error_state.dart';
+import 'package:neural_rank/presentation/widgets/shared/score_ring.dart';
+import 'package:neural_rank/presentation/widgets/shared/section_header.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -89,6 +89,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 MarkInsightRead(state.insights[index].id),
                               );
                             },
+                            onNextStep: state.insights[index].nextStep != null
+                                ? () => context.push('/drilldown', extra: state.insights[index])
+                                : null,
                           ).animate().fadeIn(delay: (index * 100).ms).slideY(begin: 0.1, end: 0),
                           childCount: state.insights.length,
                         ),

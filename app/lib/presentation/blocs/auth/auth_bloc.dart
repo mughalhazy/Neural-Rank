@@ -1,7 +1,7 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+﻿import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:seosync/data/models/user.dart';
-import 'package:seosync/data/repositories/seo_repository.dart';
+import 'package:neural_rank/data/models/user.dart';
+import 'package:neural_rank/data/repositories/seo_repository.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';

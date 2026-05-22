@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:seosync/core/theme/app_theme.dart';
+import 'package:neural_rank/core/theme/app_theme.dart';
 
 class LoadingState extends StatelessWidget {
   const LoadingState({super.key});

@@ -28,6 +28,7 @@ const ALLOWLIST_PATTERNS = [
   /\[REDACTED/i,                   // Explicitly redacted entries
   /\[PASSWORD\]/i,                 // Placeholder marker
   /password\s*[:=]\s*['"]?(?:password|newPassword|visiblePassword|TextInputType|IconData|AutofillHints)/i,
+  /password\s*[:=]\s*['"]?[_!]\w+/i,   // Flutter private variable refs and boolean toggles
 ];
 
 function getAllTextFiles(dir) {

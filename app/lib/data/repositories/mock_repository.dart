@@ -1,11 +1,11 @@
-import 'dart:math';
-import 'package:seosync/data/models/insight.dart';
-import 'package:seosync/data/models/keyword.dart';
-import 'package:seosync/data/models/rank_data.dart';
-import 'package:seosync/data/models/review.dart';
-import 'package:seosync/data/models/content_analysis.dart';
-import 'package:seosync/data/models/user.dart';
-import 'package:seosync/data/repositories/seo_repository.dart';
+﻿import 'dart:math';
+import 'package:neural_rank/data/models/insight.dart';
+import 'package:neural_rank/data/models/keyword.dart';
+import 'package:neural_rank/data/models/rank_data.dart';
+import 'package:neural_rank/data/models/review.dart';
+import 'package:neural_rank/data/models/content_analysis.dart';
+import 'package:neural_rank/data/models/user.dart';
+import 'package:neural_rank/data/repositories/seo_repository.dart';
 
 /// Mock repository for MVP — simulates backend responses
 /// Ready for Supabase swap with zero UI changes
@@ -53,6 +53,11 @@ class MockRepository implements SEORepository {
         priority: 'High Impact',
         action: 'Review and update content for dropped keywords',
         createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+        evidence: ['seo tools: pos 8 → 11', 'keyword tracker: pos 5 → 8', 'rank checker: pos 12 → 15'],
+        explanation: 'Content freshness signals dropped after 47 days without updates. '
+            'Google\'s Freshness algorithm penalises articles covering rapidly-evolving '
+            'topics when competitors publish newer content.',
+        nextStep: 'Create recommendation to refresh content',
       ),
       Insight(
         id: 'ins_002',
@@ -62,6 +67,10 @@ class MockRepository implements SEORepository {
         priority: 'High Impact',
         action: 'Create content targeting this keyword',
         createdAt: DateTime.now().subtract(const Duration(hours: 5)),
+        evidence: ['12,400 monthly searches', '0.31 difficulty', '\$1.90 avg CPC', 'Informational intent'],
+        explanation: 'Low difficulty combined with high search volume signals an underserved query. '
+            'Three first-page results are over 2 years old with no structured data — a clear content gap.',
+        nextStep: 'Create content brief for this keyword',
       ),
       Insight(
         id: 'ins_003',
@@ -71,6 +80,10 @@ class MockRepository implements SEORepository {
         priority: 'Medium Impact',
         action: 'Audit page speed and optimize core web vitals',
         createdAt: DateTime.now().subtract(const Duration(hours: 8)),
+        evidence: ['23% more "slow loading" mentions', '18 reviews in last 30 days', 'Avg rating 3.4 (was 4.1)'],
+        explanation: 'The spike in performance complaints correlates with a CSS bundle size increase '
+            'in the last deployment. Affected pages show LCP above 4.2s on mobile.',
+        nextStep: 'Run Core Web Vitals audit',
       ),
       Insight(
         id: 'ins_004',
@@ -80,6 +93,58 @@ class MockRepository implements SEORepository {
         priority: 'Low Impact',
         action: 'Expand meta descriptions to 150-160 characters',
         createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        evidence: ['12 pages affected', 'Avg 94 chars (target 150–160)', 'CTR 1.8% below site average'],
+        explanation: 'Short meta descriptions are often replaced by Google with auto-generated snippets, '
+            'which typically have lower CTR than a description targeting the searcher\'s intent.',
+        nextStep: 'Expand 12 meta descriptions',
+      ),
+      Insight(
+        id: 'ins_005',
+        title: 'Rival A is winning through clearer exam-prep messaging',
+        description: 'Competitor pressure is messaging-led. Response should focus on creative clarity before keyword expansion.',
+        module: 'Competitor Analysis',
+        priority: 'High Impact',
+        action: 'Compare screenshot promise with Rival A',
+        createdAt: DateTime.now().subtract(const Duration(hours: 10)),
+        evidence: ['+14 SOV vs Rival A', 'Messaging-led gap', 'Head terms affected'],
+        explanation: 'Rival A wins through clearer promise, not volume alone. Their headline directly addresses exam prep anxiety while yours leads with features.',
+        nextStep: 'Open competitor gap map',
+      ),
+      Insight(
+        id: 'ins_006',
+        title: 'Rewrite work should start with listing opening',
+        description: 'The opening copy affects both high-intent discovery and conversion — it outranks lower-value metadata cleanup.',
+        module: 'Optimization Layer',
+        priority: 'High Impact',
+        action: 'Prepare opening copy rewrite',
+        createdAt: DateTime.now().subtract(const Duration(hours: 12)),
+        evidence: ['Exam-prep intent gap', 'High-volume terms affected', 'Action-ready'],
+        explanation: 'The first 180 characters of your description are scanned on high-intent queries. Feature-led copy reduces relevance signals compared to outcome-led copy.',
+        nextStep: 'Create content rewrite task',
+      ),
+      Insight(
+        id: 'ins_007',
+        title: 'Screenshot promise does not match strongest user intent',
+        description: 'Users see the creative promise before deeper listing copy — message mismatch suppresses conversion.',
+        module: 'Creative / Messaging',
+        priority: 'Medium Impact',
+        action: 'Rewrite screenshot headline around offline study',
+        createdAt: DateTime.now().subtract(const Duration(hours: 14)),
+        evidence: ['Offline study intent gap', 'Weak headline clarity', 'Rival contrast present'],
+        explanation: 'Hero screenshot headline leads with app features rather than the user outcome. Offline study intent is your strongest ranking signal but is absent from the creative.',
+        nextStep: 'Review creative brief',
+      ),
+      Insight(
+        id: 'ins_008',
+        title: 'Sync trust and listing intent should move as one workflow',
+        description: 'Review repair and content rewrite affect the same conversion path — handle them as a single workflow task.',
+        module: 'Unified Workflow Layer',
+        priority: 'High Impact',
+        action: 'Bundle into single workflow queue',
+        createdAt: DateTime.now().subtract(const Duration(hours: 16)),
+        evidence: ['Review risk present', 'Copy gap confirmed', 'Shared conversion impact'],
+        explanation: 'Cross-module analysis shows the sync complaint cluster and the listing intent gap both reduce conversion on the same traffic. Fixing them separately is less efficient than one coordinated workflow.',
+        nextStep: 'Open unified workflow queue',
       ),
     ];
   }

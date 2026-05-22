@@ -2,7 +2,6 @@ const assert = require("node:assert/strict");
 const http = require("node:http");
 
 const { createServer } = require("./server");
-const { resetExecutionServiceState } = require("./domains/execution/service");
 
 function request(server, method, path, payload, headers = {}) {
   return new Promise((resolve, reject) => {
@@ -48,7 +47,6 @@ function request(server, method, path, payload, headers = {}) {
 }
 
 async function withServer(run) {
-  resetExecutionServiceState();
   const server = createServer();
 
   await new Promise((resolve, reject) => {
@@ -66,7 +64,6 @@ async function withServer(run) {
     await run(server);
   } finally {
     await new Promise((resolve) => server.close(resolve));
-    resetExecutionServiceState();
   }
 }
 

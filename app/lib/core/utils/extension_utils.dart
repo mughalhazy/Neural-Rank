@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:seosync/core/theme/app_theme.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:neural_rank/core/theme/app_theme.dart';
 
 extension BuildContextExt on BuildContext {
   ThemeData get theme => Theme.of(this);

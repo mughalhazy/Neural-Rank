@@ -1,9 +1,9 @@
-import 'package:seosync/data/models/insight.dart';
-import 'package:seosync/data/models/keyword.dart';
-import 'package:seosync/data/models/rank_data.dart';
-import 'package:seosync/data/models/review.dart';
-import 'package:seosync/data/models/content_analysis.dart';
-import 'package:seosync/data/models/user.dart';
+﻿import 'package:neural_rank/data/models/insight.dart';
+import 'package:neural_rank/data/models/keyword.dart';
+import 'package:neural_rank/data/models/rank_data.dart';
+import 'package:neural_rank/data/models/review.dart';
+import 'package:neural_rank/data/models/content_analysis.dart';
+import 'package:neural_rank/data/models/user.dart';
 
 /// Abstract repository contract — domain-driven, backend-agnostic
 abstract class SEORepository {
