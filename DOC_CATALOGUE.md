@@ -1,7 +1,7 @@
 ﻿# DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-22 | **Total documents:** 88
+**Last updated:** 2026-05-22 | **Total documents:** 87 (.md) + 1 (.yaml)
 
 ---
 
