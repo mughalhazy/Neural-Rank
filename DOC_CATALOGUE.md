@@ -1,7 +1,7 @@
 ﻿# DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-21 | **Total documents:** 89
+**Last updated:** 2026-05-22 | **Total documents:** 88
 
 ---
 
@@ -30,7 +30,7 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 
 | File | Status | Description |
 |------|--------|-------------|
-| [ops/REBUILD_PLAN.md](ops/REBUILD_PLAN.md) | `LIVE` | Enterprise rebuild plan — 77-item gap register across Tier 1 (18 resolved), Tier 2 (23 resolved + 3 owner-pending), Tier 3 (18 resolved + 14 owner-pending + 1 open); grade 91/100 after Tier 2, target A+ (98/100) |
+| [ops/REBUILD_PLAN.md](ops/REBUILD_PLAN.md) | `LIVE` | Enterprise rebuild plan — 77-item gap register across Tier 1 (18 resolved), Tier 2 (23 resolved + 3 owner-pending), Tier 3 (25 resolved + 8 owner-pending + 0 open); grade ~93/100, target A+ (98/100) |
 | [ops/PRODUCTION_READINESS_GAPS.md](ops/PRODUCTION_READINESS_GAPS.md) | `LIVE` | **Production readiness gap register** — 5 P0s, 14 P1s, 10 P2s identified by 4-agent audit + manual verification 2026-05-17; each item has exact file/line evidence and fix instructions; update in place as gaps are resolved |
 | [ops/GAP_REGISTER.md](ops/GAP_REGISTER.md) | `LIVE` | Live register of known frontend gaps — missing screens, incomplete features, content gaps; updated as gaps are found or closed |
 | [ops/BACKEND_GAP_ANALYSIS_2026_05_16.md](ops/BACKEND_GAP_ANALYSIS_2026_05_16.md) | `LIVE` | Comprehensive gap scan dated 2026-05-16 — compares all 32 docs vs codebase reality, health score per doc, identifies stale claims and missing coverage |
@@ -273,7 +273,6 @@ Superseded or stub-only docs moved here during 2026-05-17 deduplication pass. No
 | File | Status | Description |
 |------|--------|-------------|
 | [app/README.md](app/README.md) | `LIVE` | BLoC Flutter app README — canonical production app; setup, BLoC architecture overview, state management guide |
-| [ui/README.md](ui/README.md) | `LIVE` | Flutter UI prototype README — design archetype layer; points to app/README.md (production app) and docs/frontend/ (all frontend docs) |
 
 ---
 
