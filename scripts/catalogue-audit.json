@@ -5,8 +5,8 @@
     "total": 88,
     "batch_size": 10,
     "batches_total": 9,
-    "batches_done": 6,
-    "entries_done": 60
+    "batches_done": 7,
+    "entries_done": 70
   },
   "entries": [
     {
@@ -554,90 +554,90 @@
       "path": "docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md",
       "status": "LIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Defines how all UI text is written — the enforceable writing standard covering the statement→reason→action pattern, length rules, language rules, and action specificity; consult before writing or reviewing any UI copy",
+      "description": "Microcopy rules — labels, empty states, error messages, CTA text standards across all screens"
     },
     {
       "id": 62,
       "path": "docs/frontend/reference/FRONTEND_BACKEND_CONTENT_MAPPING.md",
       "status": "LIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Defines how each backend module's outputs map to frontend content layers — the translation contract ensuring raw backend data becomes interpreted decisions; consult before projecting any module output into UI screens",
+      "description": "Maps each backend module's output fields to the specific UI elements that display them"
     },
     {
       "id": 63,
       "path": "docs/frontend/reference/FRONTEND_MODULE_FEATURE_MAPPING.md",
       "status": "LIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Converts all 18 backend modules into named commercial feature surfaces with commercial jobs, required screen blocks, and demo data requirements — the product feature authority; consult before implementing or updating any module screen",
+      "description": "Maps all 18 backend modules to frontend feature surfaces — full commercial job, screen blocks, and demo data for all 18; Phase 2 expansion modules documented with planned feature surfaces"
     },
     {
       "id": 64,
       "path": "docs/frontend/planning/FRONTEND_MASTER_PLAN.md",
       "status": "LIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Top-level Flutter frontend build plan — defines product surface, 13-phase sequence, design direction, and dependency policy; the anchor document for the UI system; read at the start of any new frontend work stream",
+      "description": "Master frontend plan — full screen list, implementation phases, feature priorities; product surface lists all 18 modules across MVP / gated / Phase 2 expansion / opt-in tiers"
     },
     {
       "id": 65,
       "path": "docs/frontend/planning/FRONTEND_SCREEN_ARCHETYPES.md",
       "status": "LIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Defines the 8 reusable screen archetypes all module screens must compose — structural templates governing layout, behavior, content responsibilities, and anti-patterns; consult before building any new screen type",
+      "description": "Screen archetype definitions — 8 reusable screen patterns (Dashboard, Analysis Workspace, Insight Feed, Detail Drilldown, Comparison, Optimization Workspace, Alert/Notification, Settings/Configuration) with composition rules"
     },
     {
       "id": 66,
       "path": "docs/frontend/planning/FRONTEND_BACKEND_CAPABILITY_AUDIT.md",
       "status": "LIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Deterministic audit of every implemented backend capability across all 18 modules — the authoritative source frontend features must trace back to; must be consulted before projecting any module capability into UI to avoid inventing non-existent features",
+      "description": "Full capability audit for all 18 modules — 117 capabilities extracted from backend code with input/output/frontend projection/archetype subpage/UI implication per capability"
     },
     {
       "id": 67,
       "path": "docs/frontend/planning/FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md",
       "status": "LIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Turns audited backend capabilities into deterministic frontend feature subpages, workflow steps, and outcomes for all 18 modules — the pre-implementation reference; must be updated after each capability audit and before any UI work begins",
+      "description": "Subpage maps for all 18 modules — maps capability→screen→workflow→outcome; 2–5 subpage entries per module with backing capabilities, user job, workflow steps, and outcomes"
     },
     {
       "id": 68,
       "path": "docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md",
       "status": "LIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Applies the content system across all 18 module screens — defines every required content block with input, analysis, insight, explanation, evidence, impact, and action; the screen-level content specification preventing passive dashboards",
+      "description": "Authoritative full content system — 18 modules (Phase 1 original 8 + Phase 2 10 new); content blocks for all modules with Input/Analysis/Insight/Explanation/Evidence/Impact/Action/NextStep"
     },
     {
       "id": 69,
       "path": "docs/frontend/planning/FRONTEND_PHASE_INDEX.md",
       "status": "LIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Review and execution map for all 13 frontend work phases — the navigation index into all phase documents; read to locate the right phase doc before starting any phase-gated frontend work",
+      "description": "Index of all 13 frontend design phases with status, deliverable summary, and completion date; phases 6/9/10/11 archived"
     },
     {
       "id": 70,
       "path": "docs/frontend/phases/PHASE_01_ARCHETYPES_AND_MAPPING.md",
       "status": "ARCHIVE",
       "batch": 7,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 1 output — defines the 6 initial core screen archetypes and maps every module to its archetype before any styling or component work began; retained as the original structural decision record",
+      "description": "Phase 1 deliverable — 6 archetypes (Dashboard, Analysis Feed, Table+Trend, Detail Drilldown, Configuration, Gated Expansion); MVP and full-suite module-to-archetype mapping; backend-derived 8-module contract"
     },
     {
       "id": 71,
