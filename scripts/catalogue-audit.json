@@ -5,8 +5,8 @@
     "total": 88,
     "batch_size": 10,
     "batches_total": 9,
-    "batches_done": 7,
-    "entries_done": 70
+    "batches_done": 8,
+    "entries_done": 80
   },
   "entries": [
     {
@@ -644,90 +644,90 @@
       "path": "docs/frontend/phases/PHASE_02_BEHAVIOUR_AND_MARKET_OVERLAY.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 2 output — defines per-archetype user intent, state logic, and market differentiation rules (data-to-insight, trust cues, SMB positioning) before visual implementation; retained as the behavioural anchor behind the current shared state model",
+      "description": "Phase 2 deliverable — per-archetype behaviour overlays (intent, primary/secondary actions, core states); cross-screen behaviour model; market overlay decisions for trust, actionability, and SMB positioning"
     },
     {
       "id": 72,
       "path": "docs/frontend/phases/PHASE_03_MARKET_OVERLAY.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 3 output — applies market positioning rules from Play Store research to the frozen archetypes, defining trust cue requirements, actionability rules per screen, and anti-patterns for shallow tooling; the market-alignment record",
+      "description": "Phase 3 deliverable — market inputs from Play Store analysis; UI implications per screen; trust cue definitions; anti-pattern list for shallow mobile tooling"
     },
     {
       "id": 73,
       "path": "docs/frontend/phases/PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 3 output — freezes 7 reusable UI patterns, visual language tokens, and design system rules (spacing, typography, color semantics, interaction states) before screen implementation; retained as the original pattern and token decisions record",
+      "description": "Phase 3 supplemental — 7 pattern definitions (Command Header through Locked Module Preview); visual language (slate base, cyan/mint accents); design system rules (4pt spacing, radius, typography hierarchy, color semantics)"
     },
     {
       "id": 74,
       "path": "docs/frontend/phases/PHASE_04_IMPLEMENTATION_BLUEPRINT.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 4 output — translates the frozen UI system into a Flutter folder plan and lean implementation rules with MVP build order and validation targets; retained as the architecture-to-code translation record",
+      "description": "Phase 4 deliverable — Flutter folder plan (app/core/features/shared/demo_data); lean implementation rules (Material 3, no extra packages); 7-step MVP build order; validation targets"
     },
     {
       "id": 75,
       "path": "docs/frontend/phases/PHASE_04_INSPIRATION_PATTERN_EXTRACTION.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 4 output — extracts 6 structural patterns from the Design Inspiration image set and traces each to a named product pattern; retained as the record of how inspiration was governed rather than literally copied",
+      "description": "Phase 4 supplemental — 6 extracted patterns (Command Header, Atmospheric Backplate, Stacked Decision Cards, Compact Trend Blocks, Bottom Navigation, Input Panel) with reference signal, practical use, structural borrow, and what must not be copied"
     },
     {
       "id": 76,
       "path": "docs/frontend/phases/PHASE_04_INSPIRATION_VISUAL_AUDIT.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 4A output — direct observation audit of 8 inspiration reference images identifying 10 core premium visual traits and 5 frontend gaps; the document that triggered the premium-minimal light-first direction correction; retained as the visual direction decision record",
+      "description": "Phase 4 supplemental — 10 core visual traits (strong focus, low density, breathing room, soft surfaces, typography-led hierarchy); 5 identified frontend gaps; visual direction correction toward premium-minimal mobile SaaS; parent screen rule"
     },
     {
       "id": 77,
       "path": "docs/frontend/phases/PHASE_05_PATTERN_EXTRACTION_CHECKLIST.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 5 output — formalizes 12 extracted patterns into governed reusable units with purpose, structure, allowed variants, and anti-patterns; the pattern governance record preventing ad hoc component reuse",
+      "description": "Phase 5 deliverable — 12 formalized patterns (Command Header through Competitor Comparison Block) each with purpose, where used, structure, behaviour notes, allowed variants, and anti-patterns"
     },
     {
       "id": 78,
       "path": "docs/frontend/phases/PHASE_12_ITERATION_PASSES.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 12 output — defines the 6-pass refinement framework (structural → hierarchy → design language → design system → density → polish) with explicit rules and per-pass focus; governs all post-architecture UI refinement work",
+      "description": "Phase 12 deliverable — 6 named pass definitions with focus scope and boundaries; pass readiness record; Pass 6B edge integration correction triggered by UI screenshots"
     },
     {
       "id": 79,
       "path": "docs/frontend/phases/PHASE_13_IMPLEMENTATION_SEQUENCE.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 13 output — sets the required code build order (SVG icons → components → archetypes → product screens) and execution rules preventing drift into ad hoc screen work; the implementation sequencing gate",
+      "description": "Phase 13 deliverable — 4-step required build order; 6 execution rules; backfill status confirming historical drift was corrected before refinement passes began"
     },
     {
       "id": 80,
       "path": "docs/frontend/archive/FRONTEND_CONTENT_SYSTEM.md",
       "status": "ARCHIVE",
       "batch": 8,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Original content system defining the signal→insight→priority→action flow, per-archetype content contracts, and pattern-level content rules; superseded by FRONTEND_CONTENT_FULL_SYSTEM.md but retained as the conceptual foundation record",
+      "description": "Base content system spec — 4 content layers (Signal/Insight/Priority/Action); 5 system rules; per-archetype content contracts for 6 archetypes; pattern-level contracts; tone rules and anti-patterns"
     },
     {
       "id": 81,

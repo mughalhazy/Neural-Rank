@@ -1,7 +1,7 @@
 # DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-23 | **Total documents:** 87 (.md) + 1 (.yaml) | **Purpose audit:** 70 / 88 done (Batches 1–7 complete)
+**Last updated:** 2026-05-23 | **Total documents:** 87 (.md) + 1 (.yaml) | **Purpose audit:** 80 / 88 done (Batches 1–8 complete)
 
 ---
 
@@ -236,15 +236,15 @@ Historical design phase outputs from PHASE_01 through PHASE_13. Frozen deliverab
 | File | Status | Purpose | Description |
 |------|--------|---------|-------------|
 | [PHASE_01_ARCHETYPES_AND_MAPPING.md](docs/frontend/phases/PHASE_01_ARCHETYPES_AND_MAPPING.md) | `ARCHIVE` | Phase 1 output — defines the 6 initial core screen archetypes and maps every module to its archetype before any styling or component work began; retained as the original structural decision record | Phase 1 deliverable — initial screen archetypes and module-to-screen mapping |
-| [PHASE_02_BEHAVIOUR_AND_MARKET_OVERLAY.md](docs/frontend/phases/PHASE_02_BEHAVIOUR_AND_MARKET_OVERLAY.md) | `ARCHIVE` | — | Phase 2 deliverable — user behaviour research and market context overlay applied to design |
-| [PHASE_03_MARKET_OVERLAY.md](docs/frontend/phases/PHASE_03_MARKET_OVERLAY.md) | `ARCHIVE` | — | Phase 3 deliverable — market positioning overlay applied to the design language |
-| [PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md](docs/frontend/phases/PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md) | `ARCHIVE` | — | Phase 3 supplemental — pattern language foundations and system primitives |
-| [PHASE_04_IMPLEMENTATION_BLUEPRINT.md](docs/frontend/phases/PHASE_04_IMPLEMENTATION_BLUEPRINT.md) | `ARCHIVE` | — | Phase 4 deliverable — implementation blueprint for translating design decisions to code |
-| [PHASE_04_INSPIRATION_PATTERN_EXTRACTION.md](docs/frontend/phases/PHASE_04_INSPIRATION_PATTERN_EXTRACTION.md) | `ARCHIVE` | — | Phase 4 supplemental — design patterns extracted from the inspiration library |
-| [PHASE_04_INSPIRATION_VISUAL_AUDIT.md](docs/frontend/phases/PHASE_04_INSPIRATION_VISUAL_AUDIT.md) | `ARCHIVE` | — | Phase 4 supplemental — visual audit of inspiration images with pattern annotations |
-| [PHASE_05_PATTERN_EXTRACTION_CHECKLIST.md](docs/frontend/phases/PHASE_05_PATTERN_EXTRACTION_CHECKLIST.md) | `ARCHIVE` | — | Phase 5 deliverable — checklist of all extracted design patterns with adoption status |
-| [PHASE_12_ITERATION_PASSES.md](docs/frontend/phases/PHASE_12_ITERATION_PASSES.md) | `ARCHIVE` | — | Phase 12 deliverable — structured iteration pass methodology and pass definitions |
-| [PHASE_13_IMPLEMENTATION_SEQUENCE.md](docs/frontend/phases/PHASE_13_IMPLEMENTATION_SEQUENCE.md) | `ARCHIVE` | — | Phase 13 deliverable — ordered implementation sequence for the full frontend build |
+| [PHASE_02_BEHAVIOUR_AND_MARKET_OVERLAY.md](docs/frontend/phases/PHASE_02_BEHAVIOUR_AND_MARKET_OVERLAY.md) | `ARCHIVE` | Phase 2 output — defines per-archetype user intent, state logic, and market differentiation rules (data-to-insight, trust cues, SMB positioning) before visual implementation; retained as the behavioural anchor behind the current shared state model | Phase 2 deliverable — user behaviour research and market context overlay applied to design |
+| [PHASE_03_MARKET_OVERLAY.md](docs/frontend/phases/PHASE_03_MARKET_OVERLAY.md) | `ARCHIVE` | Phase 3 output — applies market positioning rules from Play Store research to the frozen archetypes, defining trust cue requirements, actionability rules per screen, and anti-patterns for shallow tooling; the market-alignment record | Phase 3 deliverable — market positioning overlay applied to the design language |
+| [PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md](docs/frontend/phases/PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md) | `ARCHIVE` | Phase 3 output — freezes 7 reusable UI patterns, visual language tokens, and design system rules (spacing, typography, color semantics, interaction states) before screen implementation; retained as the original pattern and token decisions record | Phase 3 supplemental — pattern language foundations and system primitives |
+| [PHASE_04_IMPLEMENTATION_BLUEPRINT.md](docs/frontend/phases/PHASE_04_IMPLEMENTATION_BLUEPRINT.md) | `ARCHIVE` | Phase 4 output — translates the frozen UI system into a Flutter folder plan and lean implementation rules with MVP build order and validation targets; retained as the architecture-to-code translation record | Phase 4 deliverable — implementation blueprint for translating design decisions to code |
+| [PHASE_04_INSPIRATION_PATTERN_EXTRACTION.md](docs/frontend/phases/PHASE_04_INSPIRATION_PATTERN_EXTRACTION.md) | `ARCHIVE` | Phase 4 output — extracts 6 structural patterns from the Design Inspiration image set and traces each to a named product pattern; retained as the record of how inspiration was governed rather than literally copied | Phase 4 supplemental — design patterns extracted from the inspiration library |
+| [PHASE_04_INSPIRATION_VISUAL_AUDIT.md](docs/frontend/phases/PHASE_04_INSPIRATION_VISUAL_AUDIT.md) | `ARCHIVE` | Phase 4A output — direct observation audit of 8 inspiration reference images identifying 10 core premium visual traits and 5 frontend gaps; the document that triggered the premium-minimal light-first direction correction; retained as the visual direction decision record | Phase 4 supplemental — visual audit of inspiration images with pattern annotations |
+| [PHASE_05_PATTERN_EXTRACTION_CHECKLIST.md](docs/frontend/phases/PHASE_05_PATTERN_EXTRACTION_CHECKLIST.md) | `ARCHIVE` | Phase 5 output — formalizes 12 extracted patterns into governed reusable units with purpose, structure, allowed variants, and anti-patterns; the pattern governance record preventing ad hoc component reuse | Phase 5 deliverable — checklist of all extracted design patterns with adoption status |
+| [PHASE_12_ITERATION_PASSES.md](docs/frontend/phases/PHASE_12_ITERATION_PASSES.md) | `ARCHIVE` | Phase 12 output — defines the 6-pass refinement framework (structural → hierarchy → design language → design system → density → polish) with explicit rules and per-pass focus; governs all post-architecture UI refinement work | Phase 12 deliverable — structured iteration pass methodology and pass definitions |
+| [PHASE_13_IMPLEMENTATION_SEQUENCE.md](docs/frontend/phases/PHASE_13_IMPLEMENTATION_SEQUENCE.md) | `ARCHIVE` | Phase 13 output — sets the required code build order (SVG icons → components → archetypes → product screens) and execution rules preventing drift into ad hoc screen work; the implementation sequencing gate | Phase 13 deliverable — ordered implementation sequence for the full frontend build |
 
 ---
 
@@ -254,7 +254,7 @@ Superseded or stub-only docs moved here during 2026-05-17 deduplication pass. No
 
 | File | Status | Purpose | Description |
 |------|--------|---------|-------------|
-| [FRONTEND_CONTENT_SYSTEM.md](docs/frontend/archive/FRONTEND_CONTENT_SYSTEM.md) | `ARCHIVE` | — | Base content system spec — fully subsumed by FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
+| [FRONTEND_CONTENT_SYSTEM.md](docs/frontend/archive/FRONTEND_CONTENT_SYSTEM.md) | `ARCHIVE` | Original content system defining the signal→insight→priority→action flow, per-archetype content contracts, and pattern-level content rules; superseded by FRONTEND_CONTENT_FULL_SYSTEM.md but retained as the conceptual foundation record | Base content system spec — fully subsumed by FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
 | [FRONTEND_CONTENT_PATTERNS_BASE.md](docs/frontend/archive/FRONTEND_CONTENT_PATTERNS_BASE.md) | `ARCHIVE` | — | Base pattern rules — unique "Pattern Combination Rules" section migrated to FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
 | [FRONTEND_INSIGHT_STRUCTURE.md](docs/frontend/archive/FRONTEND_INSIGHT_STRUCTURE.md) | `ARCHIVE` | — | Insight structure spec — unique sections migrated to FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
 | [PHASE_06_PATTERN_LIBRARY.md](docs/frontend/archive/PHASE_06_PATTERN_LIBRARY.md) | `ARCHIVE` | — | Phase 6 stub — thin spec (42 lines); actual pattern library is in code under app/lib/presentation/widgets/ *(archived 2026-05-17)* |
