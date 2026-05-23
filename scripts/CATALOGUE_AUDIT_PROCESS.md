@@ -40,7 +40,7 @@ If a session ends mid-audit:
 | Batch | IDs | Section | Status |
 |-------|-----|---------|--------|
 | 1 | 1–10 | ops/ gap registers + product planning | **DONE** (2026-05-23) |
-| 2 | 11–20 | ops/ runbooks, logs, market research + root docs | pending |
+| 2 | 11–20 | ops/ runbooks, logs, market research + root docs | **DONE** (2026-05-23) |
 | 3 | 21–30 | root docs + docs/backend/reference/ (first 8) | pending |
 | 4 | 31–40 | docs/backend/reference/ (last 2) + decisions + implementation (first 3) | pending |
 | 5 | 41–50 | docs/backend/implementation/ (last 4) + docs/backend/archive/ (first 3) | pending |
@@ -53,6 +53,6 @@ If a session ends mid-audit:
 
 ## Progress tracker
 
-- Entries done: **10 / 88**
-- Batches done: **1 / 9**
-- Last commit: pending (will be committed after each batch)
+- Entries done: **20 / 88**
+- Batches done: **2 / 9**
+- Last commit: `456cdd8` (Batch 1) · Batch 2 pending commit

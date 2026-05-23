@@ -5,8 +5,8 @@
     "total": 88,
     "batch_size": 10,
     "batches_total": 9,
-    "batches_done": 1,
-    "entries_done": 10
+    "batches_done": 2,
+    "entries_done": 20
   },
   "entries": [
     {
@@ -104,90 +104,90 @@
       "path": "ops/RUNBOOK.md",
       "status": "LIVE",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Step-by-step operator guide for resolving live incidents — read immediately when an alert fires; covers every expected failure mode on the free-tier Render + Supabase stack",
+      "description": "7 scenarios: cold-start latency, DB unreachable, SERP rate-limited, Supabase outage, force restart, credential rotation, and DB backup — each with symptom, cause, and numbered resolution steps"
     },
     {
       "id": 12,
       "path": "ops/SLO.md",
       "status": "LIVE",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Defines the binding service level objectives for the production backend — establishes measurable uptime, latency, and error-rate targets and their breach consequences",
+      "description": "4 SLOs: availability 99.5% (3.6 hr/month budget), p99 /health <500ms, p99 /run/default <20s, error rate <0.5%/24h rolling window, module timeout rate <1%; error budget policy table; 30-day review cadence"
     },
     {
       "id": 13,
       "path": "ops/PROGRESS.md",
       "status": "LIVE",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Session-by-session milestone log and project state tracker — the canonical resume anchor; read this first at the start of any new work session to understand current state",
+      "description": "Project state header (deploy status, backend QC, rebuild plan progress), milestone table per phase, session anchors with resolved items and dates, suggested next work"
     },
     {
       "id": 14,
       "path": "ops/CHANGELOG.md",
       "status": "LOG",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Append-only record of all notable changes following Keep a Changelog format — provides a clean history for contributors and downstream release notes",
+      "description": "Per-release entries with Added/Changed/Fixed/Owner-pending sections; covers all T1/T2/T3 milestones, doc restructures, backend changes, Flutter wiring, and adapter work from 2026-05-19 to 2026-05-22"
     },
     {
       "id": 15,
       "path": "ops/FRONTEND_CONTENT_IMPLEMENTATION_LOG.md",
       "status": "LOG",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Running log of content implementation decisions — tracks what content rules were applied to which screens so future sessions do not undo prior work",
+      "description": "Per-module coverage notes for all 9 modules; feature mapping components added (ModuleFeatureMap, FeatureEvidenceBoard, FeatureActionCard); implementation rule (INPUT→ANALYSIS→INSIGHT→PRIORITY→ACTION); feature-focus simplification pass notes"
     },
     {
       "id": 16,
       "path": "ops/ITERATION_PASS_LOG.md",
       "status": "LOG",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Controlled refinement pass record — documents each structured iteration pass after structural remediation so polish work stays scoped and does not regress structure",
+      "description": "5 passes recorded: structural refinement, hierarchy refinement, design-language application, design-system enforcement, density and clarity tuning — each with goal, inputs, changes, validation, and approval status"
     },
     {
       "id": 17,
       "path": "ops/UI_IMPLEMENTATION_HISTORY.md",
       "status": "LOG",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Chronological history of all UI implementation sessions — allows future sessions to resume without drift by showing which phases were completed and what each produced",
+      "description": "Phase-by-phase summary for all 13 phases: archetypes/mapping, behaviour overlay, market overlay, pattern extraction, pattern library, design language, design system, SVG icon layer, component system, archetype assembly, iteration passes, and implementation sequence"
     },
     {
       "id": 18,
       "path": "ops/MARKET_RESEARCH_PLAYSTORE.md",
       "status": "ARCHIVE",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Historical Play Store market research validating the original product direction — retained as a decision record explaining why the product was positioned as a unified mobile-first SEO/ASO platform",
+      "description": "Google Play ecosystem signal analysis: market reality (fragmented, no dominant mobile-first platform), 4 observed product types (keyword tools, rank trackers, website SEO tools, multi-tool bundles), review-derived pain points (fragmentation, no actionability, weak workflow)"
     },
     {
       "id": 19,
       "path": "README.md",
       "status": "LIVE",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "GitHub-facing project overview and quick-start guide — the first file any contributor or evaluator reads; must stay authoritative and up-to-date at all times",
+      "description": "Project structure tree, 18-module table, 27-route API surface, Supabase connection details, env var reference (11 core + 8 adapter vars), npm script reference, deployment and local dev instructions"
     },
     {
       "id": 20,
       "path": "CONTRIBUTING.md",
       "status": "LIVE",
       "batch": 2,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Contributor rules enforcing code quality and doc hygiene — read before opening a PR; defines the standards all changes must meet",
+      "description": "Branch naming conventions, commit message style, pre-commit/pre-push hook rules, 5-file backend module contract, doc update table (DOC_CATALOGUE, PRODUCTION_READINESS_GAPS, PROGRESS, CHANGELOG, BACKEND_DATA_AND_PERSISTENCE, OPENAPI)"
     },
     {
       "id": 21,

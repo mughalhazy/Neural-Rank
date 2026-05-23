@@ -1,7 +1,7 @@
 # DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-23 | **Total documents:** 87 (.md) + 1 (.yaml) | **Purpose audit:** 10 / 88 done (Batch 1 complete)
+**Last updated:** 2026-05-23 | **Total documents:** 87 (.md) + 1 (.yaml) | **Purpose audit:** 20 / 88 done (Batches 1–2 complete)
 
 ---
 
@@ -58,10 +58,10 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 
 | File | Status | Purpose | Description |
 |------|--------|---------|-------------|
-| [ops/RUNBOOK.md](ops/RUNBOOK.md) | `LIVE` | — | Operational runbook — 7 scenarios: cold-start latency, DB unreachable, SERP rate-limited, Supabase outage, force restart, credential rotation, database backup procedure *(created 2026-05-19, T2-10; updated T3-27)* |
-| [ops/SLO.md](ops/SLO.md) | `LIVE` | — | Service Level Objectives — availability 99.5%, p99 latency targets for /health and /run/default, 0.5% error rate; error budget policy; review cadence *(created 2026-05-19, T3-19)* |
-| [ops/PROGRESS.md](ops/PROGRESS.md) | `LIVE` | — | Session milestone log and resume anchors — running record of every build session |
-| [ops/CHANGELOG.md](ops/CHANGELOG.md) | `LOG` | — | All notable changes — keepachangelog.com format; append on every significant milestone |
+| [ops/RUNBOOK.md](ops/RUNBOOK.md) | `LIVE` | Step-by-step operator guide for resolving live incidents — read immediately when an alert fires; covers every expected failure mode on the free-tier Render + Supabase stack | 7 scenarios: cold-start latency, DB unreachable, SERP rate-limited, Supabase outage, force restart, credential rotation, and DB backup — each with symptom, cause, and numbered resolution steps |
+| [ops/SLO.md](ops/SLO.md) | `LIVE` | Defines the binding service level objectives for the production backend — establishes measurable uptime, latency, and error-rate targets and their breach consequences | 4 SLOs: availability 99.5% (3.6 hr/month budget), p99 /health <500ms, p99 /run/default <20s, error rate <0.5%/24h rolling window, module timeout rate <1%; error budget policy table; 30-day review cadence |
+| [ops/PROGRESS.md](ops/PROGRESS.md) | `LIVE` | Session-by-session milestone log and project state tracker — the canonical resume anchor; read this first at the start of any new work session to understand current state | Project state header (deploy status, backend QC, rebuild plan progress), milestone table per phase, session anchors with resolved items and dates, suggested next work |
+| [ops/CHANGELOG.md](ops/CHANGELOG.md) | `LOG` | Append-only record of all notable changes following Keep a Changelog format — provides a clean history for contributors and downstream release notes | Per-release entries with Added/Changed/Fixed/Owner-pending sections; covers all T1/T2/T3 milestones, doc restructures, backend changes, Flutter wiring, and adapter work from 2026-05-19 to 2026-05-22 |
 
 ---
 
@@ -69,9 +69,9 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 
 | File | Status | Purpose | Description |
 |------|--------|---------|-------------|
-| [ops/FRONTEND_CONTENT_IMPLEMENTATION_LOG.md](ops/FRONTEND_CONTENT_IMPLEMENTATION_LOG.md) | `LOG` | — | Running log of content implementation decisions and changes made session by session |
-| [ops/ITERATION_PASS_LOG.md](ops/ITERATION_PASS_LOG.md) | `LOG` | — | Log of all iteration passes run on frontend screens — what changed, what was improved, pass outcomes |
-| [ops/UI_IMPLEMENTATION_HISTORY.md](ops/UI_IMPLEMENTATION_HISTORY.md) | `LOG` | — | Chronological history of all UI implementation sessions with key decisions and outcomes |
+| [ops/FRONTEND_CONTENT_IMPLEMENTATION_LOG.md](ops/FRONTEND_CONTENT_IMPLEMENTATION_LOG.md) | `LOG` | Running log of content implementation decisions — tracks what content rules were applied to which screens so future sessions do not undo prior work | Per-module coverage notes for all 9 modules; feature mapping components added (ModuleFeatureMap, FeatureEvidenceBoard, FeatureActionCard); implementation rule (INPUT→ANALYSIS→INSIGHT→PRIORITY→ACTION); feature-focus simplification pass notes |
+| [ops/ITERATION_PASS_LOG.md](ops/ITERATION_PASS_LOG.md) | `LOG` | Controlled refinement pass record — documents each structured iteration pass after structural remediation so polish work stays scoped and does not regress structure | 5 passes recorded: structural refinement, hierarchy refinement, design-language application, design-system enforcement, density and clarity tuning — each with goal, inputs, changes, validation, and approval status |
+| [ops/UI_IMPLEMENTATION_HISTORY.md](ops/UI_IMPLEMENTATION_HISTORY.md) | `LOG` | Chronological history of all UI implementation sessions — allows future sessions to resume without drift by showing which phases were completed and what each produced | Phase-by-phase summary for all 13 phases: archetypes/mapping, behaviour overlay, market overlay, pattern extraction, pattern library, design language, design system, SVG icon layer, component system, archetype assembly, iteration passes, and implementation sequence |
 
 ---
 
@@ -79,7 +79,7 @@ Gap registers, pending work, build specs, product planning, operational runbooks
 
 | File | Status | Purpose | Description |
 |------|--------|---------|-------------|
-| [ops/MARKET_RESEARCH_PLAYSTORE.md](ops/MARKET_RESEARCH_PLAYSTORE.md) | `ARCHIVE` | — | Historical Play Store competitor market validation — written pre-backend build as initial market context; retained as a historical decision record |
+| [ops/MARKET_RESEARCH_PLAYSTORE.md](ops/MARKET_RESEARCH_PLAYSTORE.md) | `ARCHIVE` | Historical Play Store market research validating the original product direction — retained as a decision record explaining why the product was positioned as a unified mobile-first SEO/ASO platform | Google Play ecosystem signal analysis: market reality (fragmented, no dominant mobile-first platform), 4 observed product types (keyword tools, rank trackers, website SEO tools, multi-tool bundles), review-derived pain points (fragmentation, no actionability, weak workflow) |
 
 ---
 
@@ -97,8 +97,8 @@ GitHub-recognized special files and the master doc index. All must remain at roo
 
 | File | Status | Purpose | Description |
 |------|--------|---------|-------------|
-| [README.md](README.md) | `LIVE` | — | Project overview — 18-module table, 27-route API surface, Supabase details, env var reference, project tree |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | `LIVE` | — | Branch naming, commit style, pre-push checklist, doc update rules, backend module contract |
+| [README.md](README.md) | `LIVE` | GitHub-facing project overview and quick-start guide — the first file any contributor or evaluator reads; must stay authoritative and up-to-date at all times | Project structure tree, 18-module table, 27-route API surface, Supabase connection details, env var reference (11 core + 8 adapter vars), npm script reference, deployment and local dev instructions |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | `LIVE` | Contributor rules enforcing code quality and doc hygiene — read before opening a PR; defines the standards all changes must meet | Branch naming conventions, commit message style, pre-commit/pre-push hook rules, 5-file backend module contract, doc update table (DOC_CATALOGUE, PRODUCTION_READINESS_GAPS, PROGRESS, CHANGELOG, BACKEND_DATA_AND_PERSISTENCE, OPENAPI) |
 | [SECURITY.md](SECURITY.md) | `LIVE` | — | Responsible disclosure policy — contact, scope, SLA; in-scope: backend API, auth, schema, governance |
 | [DOC_CATALOGUE.md](DOC_CATALOGUE.md) | `LIVE` | — | Master index of all 88 docs (87 .md + 1 .yaml) — Section 1 (ops), Section 2 (repo/code); this file |
 
