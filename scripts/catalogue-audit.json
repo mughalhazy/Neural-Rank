@@ -1,0 +1,805 @@
+{
+  "meta": {
+    "created": "2026-05-23",
+    "process": "scripts/CATALOGUE_AUDIT_PROCESS.md",
+    "total": 88,
+    "batch_size": 10,
+    "batches_total": 9,
+    "batches_done": 1,
+    "entries_done": 10
+  },
+  "entries": [
+    {
+      "id": 1,
+      "path": "ops/REBUILD_PLAN.md",
+      "status": "LIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "Primary working document driving all T1/T2/T3 rebuild work — single source of truth for gap status, effort/risk, and implementation steps across every tracked item",
+      "description": "77-item gap register (T1 18 resolved, T2 23 resolved + 3 owner-pending, T3 25 resolved + 8 owner-pending); grading summary per dimension vs A+ target; per-item implementation steps, effort, risk, and definition of done"
+    },
+    {
+      "id": 2,
+      "path": "ops/PRODUCTION_READINESS_GAPS.md",
+      "status": "LIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "Detailed P0/P1/P2 gap register from the 2026-05-17 4-agent audit — provides exact file/line evidence and fix instructions; used to prioritise remediation order",
+      "description": "29 gaps (5 P0, 14 P1, 10 P2); 15 of 29 resolved as of 2026-05-19; each item lists affected files, step-by-step fix, and resolution status with commit reference"
+    },
+    {
+      "id": 3,
+      "path": "ops/GAP_REGISTER.md",
+      "status": "LIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "Frontend-specific gap register gating pre-polish remediation — records implementation gaps found by overlaying architecture docs against frontend code",
+      "description": "Gaps classified Critical/High/Medium with source authority, current state, evidence, risk, required remediation, and resolution status; scoped to ui/ codebase (now deleted)"
+    },
+    {
+      "id": 4,
+      "path": "ops/BACKEND_GAP_ANALYSIS_2026_05_16.md",
+      "status": "LIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "Point-in-time code-vs-docs health scan (2026-05-16) — identifies stale claims in all 25 backend docs before Phase 2 expansion; provides per-doc health score for each file",
+      "description": "Doc inventory of 25 backend files with stale claim evidence table; code inventory summary (18 modules, 8 domains, 5 adapters, 15-route API); stale claim table per doc with actual code state vs claimed state"
+    },
+    {
+      "id": 5,
+      "path": "ops/SEO_OS_BACKEND_GAP_FILL_REPORT.md",
+      "status": "LIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "Gap fill summary establishing what was implemented, partial, and missing in the original 8-module backend — historical baseline reference before Phase 2; carries explicit scope notice",
+      "description": "Implemented (execution lifecycle, governance, measurement, technical-ops, search-intelligence, BI, recommendation scoring, API hardening, test harness); partial (SERP provider, rendered DOM, metric ingestion, BI import); missing (live DB migrations, real auth, persistent rate limiting)"
+    },
+    {
+      "id": 6,
+      "path": "ops/SEO_OS_DELTA_ANALYSIS_REPORT.md",
+      "status": "LIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "Capability gap analysis comparing the pre-Phase-2 repo state against the full SEO OS target model — historical baseline; all maturity figures must be recalculated for the 18-module state before use in planning",
+      "description": "Overall maturity 11% (commercial 18%, white-hat 6%, self-serve 8%); per-capability coverage matrix across 8 dimensions; biggest gap: no execution/governance/measurement system; biggest risk: polished frontend obscures shallow backend at time of writing"
+    },
+    {
+      "id": 7,
+      "path": "ops/PRODUCT_SEO_OS_BUILD_PLAN.md",
+      "status": "LIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "Authoritative full-product expansion build plan for the 18-module target state — planning authority for all new modules and enhancements; supersedes MASTER_BUILD_SPEC for all planning decisions",
+      "description": "Architecture principles (5-file module contract); 10 new module specs with full analysis.js/insights.js/actions.js logic; 7 existing module enhancements; integration adapter roadmap; schema additions; 6-phase implementation sequence"
+    },
+    {
+      "id": 8,
+      "path": "ops/MASTER_BUILD_SPEC.md",
+      "status": "LIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "Original product build specification establishing core product principles, positioning, and behavior contract — core principles and UI system authority remain valid; superseded by PRODUCT_SEO_OS_BUILD_PLAN for active planning",
+      "description": "Product type (unified SEO + ASO), market gaps addressed, 7+ module definitions with purpose/inputs/outputs/acceptance criteria, behavior contract (action-first, not dashboard-only), tech stack decisions; updated 2026-05-17 noting 18-module state"
+    },
+    {
+      "id": 9,
+      "path": "ops/SYSTEMATIC_UI_ARCHITECTURE.md",
+      "status": "LIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "UI architecture governance — defines the required layered build order for the frontend; must be consulted before any UI work to ensure each layer is frozen before the next begins",
+      "description": "8 required layers in freeze order: archetypes → behaviour overlay → market overlay → inspiration patterns → pattern language → design language → design system → component layer → SVG icons → iteration passes; per-phase purpose, inputs, outputs, and freeze criteria"
+    },
+    {
+      "id": 10,
+      "path": "ops/MVP_TO_FULL_SUITE_ROLLOUT.md",
+      "status": "ARCHIVE",
+      "batch": 1,
+      "done": true,
+      "purpose": "Historical 7-phase rollout plan establishing the original MVP boundary for the 8-module product — retained as a decision record; superseded by PRODUCT_SEO_OS_BUILD_PLAN Part 7 for all active planning",
+      "description": "MVP defined as Phase 1 (review + content) + Phase 2 (keyword) + Phase 3 (rank tracking); full suite expansion Phases 4–7; scope: web SEO + ASO; superseded by PRODUCT_SEO_OS_BUILD_PLAN which covers all 18 modules"
+    },
+    {
+      "id": 11,
+      "path": "ops/RUNBOOK.md",
+      "status": "LIVE",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 12,
+      "path": "ops/SLO.md",
+      "status": "LIVE",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 13,
+      "path": "ops/PROGRESS.md",
+      "status": "LIVE",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 14,
+      "path": "ops/CHANGELOG.md",
+      "status": "LOG",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 15,
+      "path": "ops/FRONTEND_CONTENT_IMPLEMENTATION_LOG.md",
+      "status": "LOG",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 16,
+      "path": "ops/ITERATION_PASS_LOG.md",
+      "status": "LOG",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 17,
+      "path": "ops/UI_IMPLEMENTATION_HISTORY.md",
+      "status": "LOG",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 18,
+      "path": "ops/MARKET_RESEARCH_PLAYSTORE.md",
+      "status": "ARCHIVE",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 19,
+      "path": "README.md",
+      "status": "LIVE",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 20,
+      "path": "CONTRIBUTING.md",
+      "status": "LIVE",
+      "batch": 2,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 21,
+      "path": "SECURITY.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 22,
+      "path": "DOC_CATALOGUE.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 23,
+      "path": "docs/backend/reference/BACKEND_MASTER_SPEC.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 24,
+      "path": "docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 25,
+      "path": "docs/backend/reference/BACKEND_ACTIVATION_AND_GATING.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 26,
+      "path": "docs/backend/reference/BACKEND_SERVICES_AND_ORCHESTRATION.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 27,
+      "path": "docs/backend/reference/BACKEND_DATA_AND_PERSISTENCE.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 28,
+      "path": "docs/backend/reference/BACKEND_CORE_UTILITIES.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 29,
+      "path": "docs/backend/reference/BACKEND_INTEGRATION_BOUNDARIES.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 30,
+      "path": "docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md",
+      "status": "LIVE",
+      "batch": 3,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 31,
+      "path": "docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md",
+      "status": "LIVE",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 32,
+      "path": "docs/backend/reference/OPENAPI.yaml",
+      "status": "LIVE",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 33,
+      "path": "docs/backend/decisions/ADR_001_ZERO_RUNTIME_DEPENDENCIES.md",
+      "status": "DECISION",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 34,
+      "path": "docs/backend/decisions/ADR_002_PURE_NODE_HTTP.md",
+      "status": "DECISION",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 35,
+      "path": "docs/backend/decisions/ADR_003_IN_MEMORY_DEFAULT_REPOSITORY.md",
+      "status": "DECISION",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 36,
+      "path": "docs/backend/decisions/BACKEND_DOMAIN_SERVICE_ROUTES.md",
+      "status": "DECISION",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 37,
+      "path": "docs/backend/decisions/BACKEND_DUAL_CLASSIFIER_DECISION.md",
+      "status": "DECISION",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 38,
+      "path": "docs/backend/implementation/BACKEND_QC_PHASE2.md",
+      "status": "LIVE",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 39,
+      "path": "docs/backend/implementation/BACKEND_TEST_HARNESS_REPORT.md",
+      "status": "LIVE",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 40,
+      "path": "docs/backend/implementation/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md",
+      "status": "LIVE",
+      "batch": 4,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 41,
+      "path": "docs/backend/implementation/BACKEND_EXECUTION_LIFECYCLE_IMPLEMENTATION_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 42,
+      "path": "docs/backend/implementation/BACKEND_GOVERNANCE_ENGINE_IMPLEMENTATION_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 43,
+      "path": "docs/backend/implementation/BACKEND_MEASUREMENT_ATTRIBUTION_IMPLEMENTATION_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 44,
+      "path": "docs/backend/implementation/BACKEND_TECHNICAL_OPERATIONS_IMPLEMENTATION_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 45,
+      "path": "docs/backend/implementation/BACKEND_SEARCH_INTELLIGENCE_IMPLEMENTATION_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 46,
+      "path": "docs/backend/implementation/BACKEND_BUSINESS_INTELLIGENCE_IMPLEMENTATION_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 47,
+      "path": "docs/backend/implementation/BACKEND_RECOMMENDATION_SCORING_IMPLEMENTATION_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 48,
+      "path": "docs/backend/archive/BACKEND_QC_FINAL.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 49,
+      "path": "docs/backend/archive/BACKEND_QC_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 50,
+      "path": "docs/backend/archive/BACKEND_V1_FROZEN.md",
+      "status": "ARCHIVE",
+      "batch": 5,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 51,
+      "path": "docs/backend/archive/BACKEND_V1_HARDENED.md",
+      "status": "ARCHIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 52,
+      "path": "docs/backend/archive/BACKEND_BUILD_SEQUENCE.md",
+      "status": "ARCHIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 53,
+      "path": "docs/backend/archive/BACKEND_IMPLEMENTATION_GAP_SCAN.md",
+      "status": "ARCHIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 54,
+      "path": "docs/backend/archive/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 55,
+      "path": "docs/backend/archive/BACKEND_DOMAIN_BOUNDARY_MAP.md",
+      "status": "ARCHIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 56,
+      "path": "docs/backend/archive/BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md",
+      "status": "ARCHIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 57,
+      "path": "docs/backend/archive/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_PHASE2.md",
+      "status": "ARCHIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 58,
+      "path": "docs/frontend/reference/FRONTEND_DESIGN_LANGUAGE.md",
+      "status": "LIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 59,
+      "path": "docs/frontend/reference/FRONTEND_DESIGN_SYSTEM.md",
+      "status": "LIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 60,
+      "path": "docs/frontend/reference/CURRENT_UI_BASELINE.md",
+      "status": "LIVE",
+      "batch": 6,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 61,
+      "path": "docs/frontend/reference/FRONTEND_MICROCOPY_RULES.md",
+      "status": "LIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 62,
+      "path": "docs/frontend/reference/FRONTEND_BACKEND_CONTENT_MAPPING.md",
+      "status": "LIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 63,
+      "path": "docs/frontend/reference/FRONTEND_MODULE_FEATURE_MAPPING.md",
+      "status": "LIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 64,
+      "path": "docs/frontend/planning/FRONTEND_MASTER_PLAN.md",
+      "status": "LIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 65,
+      "path": "docs/frontend/planning/FRONTEND_SCREEN_ARCHETYPES.md",
+      "status": "LIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 66,
+      "path": "docs/frontend/planning/FRONTEND_BACKEND_CAPABILITY_AUDIT.md",
+      "status": "LIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 67,
+      "path": "docs/frontend/planning/FRONTEND_CAPABILITY_TO_FEATURE_WORKFLOW_MAP.md",
+      "status": "LIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 68,
+      "path": "docs/frontend/planning/FRONTEND_CONTENT_FULL_SYSTEM.md",
+      "status": "LIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 69,
+      "path": "docs/frontend/planning/FRONTEND_PHASE_INDEX.md",
+      "status": "LIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 70,
+      "path": "docs/frontend/phases/PHASE_01_ARCHETYPES_AND_MAPPING.md",
+      "status": "ARCHIVE",
+      "batch": 7,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 71,
+      "path": "docs/frontend/phases/PHASE_02_BEHAVIOUR_AND_MARKET_OVERLAY.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 72,
+      "path": "docs/frontend/phases/PHASE_03_MARKET_OVERLAY.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 73,
+      "path": "docs/frontend/phases/PHASE_03_PATTERNS_LANGUAGE_AND_SYSTEM.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 74,
+      "path": "docs/frontend/phases/PHASE_04_IMPLEMENTATION_BLUEPRINT.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 75,
+      "path": "docs/frontend/phases/PHASE_04_INSPIRATION_PATTERN_EXTRACTION.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 76,
+      "path": "docs/frontend/phases/PHASE_04_INSPIRATION_VISUAL_AUDIT.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 77,
+      "path": "docs/frontend/phases/PHASE_05_PATTERN_EXTRACTION_CHECKLIST.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 78,
+      "path": "docs/frontend/phases/PHASE_12_ITERATION_PASSES.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 79,
+      "path": "docs/frontend/phases/PHASE_13_IMPLEMENTATION_SEQUENCE.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 80,
+      "path": "docs/frontend/archive/FRONTEND_CONTENT_SYSTEM.md",
+      "status": "ARCHIVE",
+      "batch": 8,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 81,
+      "path": "docs/frontend/archive/FRONTEND_CONTENT_PATTERNS_BASE.md",
+      "status": "ARCHIVE",
+      "batch": 9,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 82,
+      "path": "docs/frontend/archive/FRONTEND_INSIGHT_STRUCTURE.md",
+      "status": "ARCHIVE",
+      "batch": 9,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 83,
+      "path": "docs/frontend/archive/PHASE_06_PATTERN_LIBRARY.md",
+      "status": "ARCHIVE",
+      "batch": 9,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 84,
+      "path": "docs/frontend/archive/PHASE_09_SVG_ICON_LAYER.md",
+      "status": "ARCHIVE",
+      "batch": 9,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 85,
+      "path": "docs/frontend/archive/PHASE_10_COMPONENT_SYSTEM.md",
+      "status": "ARCHIVE",
+      "batch": 9,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 86,
+      "path": "docs/frontend/archive/PHASE_11_ARCHETYPE_ASSEMBLY.md",
+      "status": "ARCHIVE",
+      "batch": 9,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 87,
+      "path": "docs/frontend/logs/IMAGE_PROTOCOL.md",
+      "status": "DECISION",
+      "batch": 9,
+      "done": false,
+      "purpose": null,
+      "description": null
+    },
+    {
+      "id": 88,
+      "path": "app/README.md",
+      "status": "LIVE",
+      "batch": 9,
+      "done": false,
+      "purpose": null,
+      "description": null
+    }
+  ]
+}
