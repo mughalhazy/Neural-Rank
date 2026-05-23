@@ -5,8 +5,8 @@
     "total": 88,
     "batch_size": 10,
     "batches_total": 9,
-    "batches_done": 5,
-    "entries_done": 50
+    "batches_done": 6,
+    "entries_done": 60
   },
   "entries": [
     {
@@ -464,90 +464,90 @@
       "path": "docs/backend/archive/BACKEND_V1_HARDENED.md",
       "status": "ARCHIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Validation record confirming the original 8-module backend met the corrected QC rule set before freeze — the pre-freeze hardening certificate; read when verifying which checks ran before the V1 QC sign-off",
+      "description": "7 checks run (entrypoint load, module catalog, activation, orchestration, per-module tests, prioritization, HTTP server); all 8 modules present and active; hardened verdict; 2 remaining known gaps (repository binding pattern, concrete providers)"
     },
     {
       "id": 52,
       "path": "docs/backend/archive/BACKEND_BUILD_SEQUENCE.md",
       "status": "ARCHIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Defines the documentation-first and module implementation sequence that governed V1 backend construction — retained as the architectural sequencing record explaining why docs preceded code and why built-but-inactive modules existed from day one",
+      "description": "Documentation-first sequence (7 docs in order), architecture setup sequence (5 steps), module implementation sequence (MVP-active first then built-but-inactive), orchestration/prioritization sequence, guardrails against omissions and structural shortcuts"
     },
     {
       "id": 53,
       "path": "docs/backend/archive/BACKEND_IMPLEMENTATION_GAP_SCAN.md",
       "status": "ARCHIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Point-in-time gap scan of V1 implementation against frozen backend docs — records which gaps were fixed and which P1 items remain open (repository factory, concrete providers); read when investigating unresolved persistence wiring",
+      "description": "P1/P2 priority gap list; per-module status (all 8 fixed in current implementation); cross-cutting gaps (quality cleanup, prioritization consistency, runtime persistence wiring, integration adapters, activation enforcement) — all resolved except P1 database binding factory"
     },
     {
       "id": 54,
       "path": "docs/backend/archive/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_REPORT.md",
       "status": "ARCHIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Schema/repository alignment report for the original 8-module backend (2026-05-06) — records the 5 systemic field-name mismatches found and fixed without a migration; the V1 Phase 1 alignment record",
+      "description": "5 systemic field mismatches (target_ref, target_type, product_target_id, module_key, action_payload → canonical_ref, target_kind, target_id, actions_payload); shared persistence.js helper added; all 8 module repositories aligned; persistence-alignment.test.js verification"
     },
     {
       "id": 55,
       "path": "docs/backend/archive/BACKEND_DOMAIN_BOUNDARY_MAP.md",
       "status": "ARCHIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Compact domain boundary map created when the domain folder structure was introduced (2026-05-06) — the quick-reference compatibility mapping of all 8 legacy modules to 8 bounded contexts; superseded by BACKEND_DOMAIN_BOUNDARIES.md",
+      "description": "8 bounded contexts listed; 8-module-to-domain compatibility mapping table; boundary folder file paths; shared core additions (targeting.js, domainContracts.js); compatibility rule (existing module services remain runtime source of truth)"
     },
     {
       "id": 56,
       "path": "docs/backend/archive/BACKEND_DOMAIN_BOUNDARIES_IMPLEMENTATION_REPORT.md",
       "status": "ARCHIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Implementation record for the domain boundary restructuring (2026-05-06) — traces every domain folder, compatibility adapter, and shared core file created; read when auditing how legacy modules were wired into domain services without breaking existing endpoints",
+      "description": "8 bounded-context domain folders with service contract/interface files and compatibility adapters; centralized target normalization across all 8 analysis.js files; getDomainBoundaryMap/getDomainServices/normalizeProductTarget exposed from index.js; domain-boundaries.test.js verification"
     },
     {
       "id": 57,
       "path": "docs/backend/archive/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT_PHASE2.md",
       "status": "ARCHIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Schema/repository alignment audit for the 10 Phase 2 expansion modules (2026-05-16) — confirms all 10 repositories use the shared createPostgresModuleRunRepository factory correctly with no deviations; the Phase 2 alignment record",
+      "description": "Factory pattern documented (2-query sequence: product_targets upsert + module run record insert); per-module alignment check for all 10 modules (10/10 PASS, no deviations); migration coverage check (constraint expansion, catalog registration, activation defaults, updated_at triggers)"
     },
     {
       "id": 58,
       "path": "docs/frontend/reference/FRONTEND_DESIGN_LANGUAGE.md",
       "status": "LIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Defines and freezes the premium-minimal visual language governing all UI work — the governing document for visual tone, density, hierarchy, and anti-patterns; consult before any new screen or component work",
+      "description": "10 design language axes (visual tone, density, hierarchy, spacing, card treatment, border/radius, shadow, icons, data-display feel, trust cues); palette direction (off-white base, strong blue accent, restrained aqua/teal); parent/subpage screen language rules; mobile canvas rules; anti-language rules"
     },
     {
       "id": 59,
       "path": "docs/frontend/reference/FRONTEND_DESIGN_SYSTEM.md",
       "status": "LIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Translates the design language into enforceable implementation rules for components, spacing, color, and typography — the implementation authority for the design language; consult before building or modifying any shared component",
+      "description": "Rules for typography (3-level heading system), spacing (outer/internal/density), color (base canvas, accents, contrast), layout (parent screen = header + feature area + optional list), cards (surface, count, no nesting), buttons, inputs, navigation, icons, elevation, interaction states; component reduction and preferred parent-screen component rules"
     },
     {
       "id": 60,
       "path": "docs/frontend/reference/CURRENT_UI_BASELINE.md",
       "status": "LIVE",
       "batch": 6,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Authoritative snapshot of the current frontend baseline — overrides older visual assumptions; read at the start of any frontend session to understand what has been built and what the parent-page rules are",
+      "description": "Premium-minimal light-first module shell; per-module personality table (page role, tone, content) for all 10 screens; current technical baseline (CommandHeader with symbol/tone, CommercialFeatureData with iconKey); parent-page rules; next planned layer (archetype subpages)"
     },
     {
       "id": 61,

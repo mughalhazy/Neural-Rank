@@ -44,7 +44,7 @@ If a session ends mid-audit:
 | 3 | 21–30 | root docs + docs/backend/reference/ (first 8) | **DONE** (2026-05-23) |
 | 4 | 31–40 | docs/backend/reference/ (last 2) + decisions + implementation (first 3) | **DONE** (2026-05-23) |
 | 5 | 41–50 | docs/backend/implementation/ (last 7) + docs/backend/archive/ (first 3) | **DONE** (2026-05-23) |
-| 6 | 51–60 | docs/backend/archive/ (last 7) + docs/frontend/reference/ (first 3) | pending |
+| 6 | 51–60 | docs/backend/archive/ (last 7) + docs/frontend/reference/ (first 3) | **DONE** (2026-05-23) |
 | 7 | 61–70 | docs/frontend/reference/ (last 3) + docs/frontend/planning/ + phases (first 1) | pending |
 | 8 | 71–80 | docs/frontend/phases/ (last 9) + docs/frontend/archive/ (first 1) | pending |
 | 9 | 81–88 | docs/frontend/archive/ (last 6) + logs + app/README.md | pending |
@@ -53,6 +53,6 @@ If a session ends mid-audit:
 
 ## Progress tracker
 
-- Entries done: **50 / 88**
-- Batches done: **5 / 9**
-- Last commit: `386959e` (Batch 4) · Batch 5 pending commit
+- Entries done: **60 / 88**
+- Batches done: **6 / 9**
+- Last commit: `267e88c` (Batch 5) · Batch 6 pending commit
