@@ -5,8 +5,8 @@
     "total": 88,
     "batch_size": 10,
     "batches_total": 9,
-    "batches_done": 4,
-    "entries_done": 40
+    "batches_done": 5,
+    "entries_done": 50
   },
   "entries": [
     {
@@ -374,90 +374,90 @@
       "path": "docs/backend/implementation/BACKEND_EXECUTION_LIFECYCLE_IMPLEMENTATION_REPORT.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Implementation record for Issue 03 (Execution Lifecycle) — traces every file, API endpoint, acceptance criterion, and test written for the execution domain; the traceability record for any execution-domain change",
+      "description": "Execution schema migration, lifecycle service, models/statuses, audit log writer, repository (in-memory + Postgres), 9 API endpoints; acceptance coverage (recommendation-to-task flow, status history, audit logging); verification test list"
     },
     {
       "id": 42,
       "path": "docs/backend/implementation/BACKEND_GOVERNANCE_ENGINE_IMPLEMENTATION_REPORT.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Implementation record for Issue 04 (Governance Engine) — traces all governance files, guardrails, and Google policy anchors built; read when debugging why a recommendation was blocked or verifying which SEO risk policies are enforced",
+      "description": "Governance policy registry, result model, evaluation service, execution lifecycle integration, persistence migration; 9 guardrail categories; 4-tier classification (allow/warn/require_approval/block); Google Search Essentials, spam policies, and people-first guidance as policy anchors"
     },
     {
       "id": 43,
       "path": "docs/backend/implementation/BACKEND_MEASUREMENT_ATTRIBUTION_IMPLEMENTATION_REPORT.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Implementation record for Issue 05 (Measurement + Attribution Foundation) — documents schema, metric source registry, attribution model, and persistence layer; traceability record for extending measurement or debugging attribution data",
+      "description": "Measurement schema migration, metric source registry, before/after and attribution models, repository, service, contract; 5 metric types (rankings, traffic, ctr, conversions_leads, page_level_trend placeholders); 3-tier attribution (unknown, observed_correlation, confirmed_impact); null stored when data unavailable"
     },
     {
       "id": 44,
       "path": "docs/backend/implementation/BACKEND_TECHNICAL_OPERATIONS_IMPLEMENTATION_REPORT.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Implementation record for Issue 06 (Technical SEO Backend Foundation) — traces source HTML analyzers and output contracts built; read when extending technical SEO checks or debugging analyzer findings",
+      "description": "Technical operations service, analyzer contract, 11 source HTML analyzers (metadata, headings, canonical, robots, sitemap, indexability, internal links, duplicate risk, redirect chain, broken links, rendered DOM placeholder); output contract (findingKey, severity, evidence, recommendedAction, governanceRisk, confidence)"
     },
     {
       "id": 45,
       "path": "docs/backend/implementation/BACKEND_SEARCH_INTELLIGENCE_IMPLEMENTATION_REPORT.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Implementation record for Issue 07 (Search Intelligence Foundation) — documents provider interface, 7-intent classifier, and opportunity scoring built; read when extending SERP analysis or adding new search providers",
+      "description": "Search intelligence contracts/models, provider interface, 7-intent classifier v1, opportunity scoring model v1, service, schema migration; compatibility adapters for keyword/rank/competitor modules preserved; provider_unavailable status when no compliant provider exists"
     },
     {
       "id": 46,
       "path": "docs/backend/implementation/BACKEND_BUSINESS_INTELLIGENCE_IMPLEMENTATION_REPORT.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Implementation record for Issue 08 (Business Intelligence Layer) — documents business profile model, scoring service, and priority score extension built; read when extending business value inputs or debugging priority ordering",
+      "description": "Business intelligence contract update, business profile/score models, repository, scoring service, schema migration, prioritization.js extension; 7 business coverage areas (objective, target page value, funnel stage, lead/revenue relevance, conversion risk, keyword mapping, content ROI placeholder); unknown values stored as null"
     },
     {
       "id": 47,
       "path": "docs/backend/implementation/BACKEND_RECOMMENDATION_SCORING_IMPLEMENTATION_REPORT.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Implementation record for Issue 09 (Recommendation Scoring Engine) — documents the multi-dimensional scoring service and execution lifecycle persistence changes; read when debugging score values or adding new scoring dimensions",
+      "description": "Recommendation scoring service (recommendationScoring.js), execution lifecycle score persistence updates, schema migration; 9 score dimensions (severity, traffic impact, conversion impact, implementation difficulty, confidence, governance risk, business value, expected effort, reversibility); legacy high/medium/low labels preserved as derived output"
     },
     {
       "id": 48,
       "path": "docs/backend/archive/BACKEND_QC_FINAL.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Final QC verdict and freeze declaration for the original 8-module backend (audit date 2026-04-22) — the authoritative sign-off establishing the V1 baseline; includes scope notice that Phase 2 modules are not covered",
+      "description": "10/10 QC score; 8-module pass matrix (exists, active by default, flow complete, tested — all PASS); 7 shared-system checks (all PASS); FREEZE verdict; scope notice scoping this document to original 8 modules only"
     },
     {
       "id": 49,
       "path": "docs/backend/archive/BACKEND_QC_REPORT.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Detailed QC evidence report for the original 8-module backend (rerun 2026-04-22) — the per-module evidence log backing the BACKEND_QC_FINAL FREEZE verdict; read when auditing which tests and runtime checks validated each V1 module",
+      "description": "10/10 overall score, PASS verdict; executive findings (all 8 modules active and flow-complete); evidence summary (runtime checks run); per-module pass/fail with reasons and file references for all 8 modules; architecture/data/orchestration/integration findings; no residual remediation items"
     },
     {
       "id": 50,
       "path": "docs/backend/archive/BACKEND_V1_FROZEN.md",
       "status": "ARCHIVE",
       "batch": 5,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Formal V1 freeze certificate for the original 8-module backend — the freeze declaration anchoring QC_FINAL and QC_REPORT; read when verifying that V1 was formally frozen before Phase 2 expansion",
+      "description": "FROZEN status declaration; backend activation confirmation (all 8 modules active, none inactive); QC confirmation (10/10, no gaps); deployment readiness (DEPLOYMENT_READY, Render health URL live); scope notice that Phase 2 modules are not covered"
     },
     {
       "id": 51,
