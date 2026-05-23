@@ -5,8 +5,8 @@
     "total": 88,
     "batch_size": 10,
     "batches_total": 9,
-    "batches_done": 3,
-    "entries_done": 30
+    "batches_done": 4,
+    "entries_done": 40
   },
   "entries": [
     {
@@ -284,90 +284,90 @@
       "path": "docs/backend/reference/BACKEND_DOMAIN_BOUNDARIES.md",
       "status": "LIVE",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Maps all 18 modules to 8 bounded contexts and explains why the domain layer exists — the architectural rationale document for the domain structure; read before touching any domain folder",
+      "description": "Domain layer rationale (bounded-context structure for growth without monolith collapse), 8 bounded context definitions, full 18-module-to-domain assignment table with activation states, compatibility adapter approach"
     },
     {
       "id": 32,
       "path": "docs/backend/reference/OPENAPI.yaml",
       "status": "LIVE",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Machine-readable OpenAPI 3.1 specification for all 27 API routes — the contract for client generation, Swagger UI, and API documentation; served live at GET /v1/openapi.json",
+      "description": "27 paths with request/response schemas, Bearer JWT security scheme, common headers (actor, clientId, workspaceId), reusable schemas (Recommendation, Task, AuditLog, Snapshot, Attribution, BusinessProfile), error response shapes, pagination parameters"
     },
     {
       "id": 33,
       "path": "docs/backend/decisions/ADR_001_ZERO_RUNTIME_DEPENDENCIES.md",
       "status": "DECISION",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Documents and locks the zero runtime npm dependencies decision — prevents future engineers from casually adding packages without understanding the security and cold-start implications",
+      "description": "Context (Render free tier, 512MB RAM, cold-start penalty), decision, rationale (attack surface, cold-start latency, auditability, stability), alternatives considered (Express/Fastify/Hono all rejected), consequences, review trigger conditions"
     },
     {
       "id": 34,
       "path": "docs/backend/decisions/ADR_002_PURE_NODE_HTTP.md",
       "status": "DECISION",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Documents and locks the pure node:http server decision — prevents future engineers from adding Express or Fastify without revisiting the trade-off",
+      "description": "Context (HTTP server choice), decision (node:http with explicit if/else routing), rationale (ADR 001 consistency, full control, testability), routing pattern (createRequestHandler → OPTIONS → auth → dispatch → sendEnvelope), alternatives considered, review trigger"
     },
     {
       "id": 35,
       "path": "docs/backend/decisions/ADR_003_IN_MEMORY_DEFAULT_REPOSITORY.md",
       "status": "DECISION",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Documents and locks the dual-repository pattern — prevents engineers from removing the in-memory path or adding unnecessary DB requirements for testing",
+      "description": "Context (persistence needs, Render spin-down), decision (dual impl per domain, resolved by context.query presence, JS catalog as activation truth), rationale (CI without DB, graceful cold-start), resolveRepository() logic, alternatives considered, review trigger"
     },
     {
       "id": 36,
       "path": "docs/backend/decisions/BACKEND_DOMAIN_SERVICE_ROUTES.md",
       "status": "DECISION",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Documents the decision to expose all 4 domain services via direct HTTP routes — supersedes the original 'routeless' decision and provides the complete 26-route inventory as the authoritative reference",
+      "description": "History (original routeless decision, routes added 2026-05-15), current 26-route inventory table, per-domain service route detail (measurement, technical-operations, search-intelligence, business-intelligence); historical routeless rationale preserved"
     },
     {
       "id": 37,
       "path": "docs/backend/decisions/BACKEND_DUAL_CLASSIFIER_DECISION.md",
       "status": "DECISION",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Records the intentional existence of two separate intent classifiers — prevents future consolidation attempts by documenting why they must stay at different abstraction layers",
+      "description": "core/intentClassifier.js (4-intent heuristic token-based, consumed by search_intent_classifier module) vs domains/search-intelligence/intentClassifier.js (7-intent rule-based, consumed by domain services for SERP analysis); why they must not be merged"
     },
     {
       "id": 38,
       "path": "docs/backend/implementation/BACKEND_QC_PHASE2.md",
       "status": "LIVE",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Quality check audit record proving all 10 Phase 2 expansion modules meet the 6-criterion contract — the verification record for the SEO OS expansion; read to confirm any Phase 2 module was properly built",
+      "description": "6 check criteria (5 files, activation state, flow contract, 3-type tests, createPostgresModuleRunRepository pattern, recordsTable migration match); per-module verdict for all 10 expansion modules; all 10 PASS (60/60)"
     },
     {
       "id": 39,
       "path": "docs/backend/implementation/BACKEND_TEST_HARNESS_REPORT.md",
       "status": "LIVE",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Test harness coverage map and CI command reference — read when adding new tests or debugging CI failures to understand which suites exist and what each covers",
+      "description": "CI commands (test:backend, test:backend:ci), covered areas (schema/repository, governance, execution lifecycle, scoring, measurement, technical fixtures, search intent, API validation), P0 flow coverage list, no-live-API policy"
     },
     {
       "id": 40,
       "path": "docs/backend/implementation/BACKEND_SCHEMA_REPOSITORY_ALIGNMENT.md",
       "status": "LIVE",
       "batch": 4,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Unified schema/repository alignment audit — the authoritative record of how repository field names were aligned to the Supabase migration schema; read before modifying any repository to avoid reintroducing mismatches",
+      "description": "Phase 1 (2026-05-06): 5 systemic field-name mismatches fixed across 8 original modules without schema migration; Phase 2 (2026-05-16): all 10 expansion modules confirmed clean; shared persistence.js helper added"
     },
     {
       "id": 41,
