@@ -41,7 +41,7 @@ If a session ends mid-audit:
 |-------|-----|---------|--------|
 | 1 | 1–10 | ops/ gap registers + product planning | **DONE** (2026-05-23) |
 | 2 | 11–20 | ops/ runbooks, logs, market research + root docs | **DONE** (2026-05-23) |
-| 3 | 21–30 | root docs + docs/backend/reference/ (first 8) | pending |
+| 3 | 21–30 | root docs + docs/backend/reference/ (first 8) | **DONE** (2026-05-23) |
 | 4 | 31–40 | docs/backend/reference/ (last 2) + decisions + implementation (first 3) | pending |
 | 5 | 41–50 | docs/backend/implementation/ (last 4) + docs/backend/archive/ (first 3) | pending |
 | 6 | 51–60 | docs/backend/archive/ (last 7) + docs/frontend/reference/ (first 3) | pending |
@@ -53,6 +53,6 @@ If a session ends mid-audit:
 
 ## Progress tracker
 
-- Entries done: **20 / 88**
-- Batches done: **2 / 9**
-- Last commit: `456cdd8` (Batch 1) · Batch 2 pending commit
+- Entries done: **30 / 88**
+- Batches done: **3 / 9**
+- Last commit: `123c32a` (Batch 2) · Batch 3 pending commit

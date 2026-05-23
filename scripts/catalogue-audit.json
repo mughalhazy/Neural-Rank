@@ -5,8 +5,8 @@
     "total": 88,
     "batch_size": 10,
     "batches_total": 9,
-    "batches_done": 2,
-    "entries_done": 20
+    "batches_done": 3,
+    "entries_done": 30
   },
   "entries": [
     {
@@ -194,90 +194,90 @@
       "path": "SECURITY.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Responsible disclosure policy — tells security researchers how to report vulnerabilities privately and sets response time expectations; keeps security reports off public GitHub issues",
+      "description": "Email contact, 48h acknowledgement / 14-day critical resolution SLA, supported versions (latest main only), in-scope assets (backend API, auth, schema, governance, credentials), out-of-scope (Render, Supabase, third-party providers)"
     },
     {
       "id": 22,
       "path": "DOC_CATALOGUE.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Master index of all 88 documents — first place to look before searching the repo; keeps the document set navigable as the project grows",
+      "description": "Two sections (ops docs, repo/code docs) covering 87 .md + 1 .yaml; each entry has file link, status, purpose, and description; purpose audit progress tracked in header and in scripts/catalogue-audit.json"
     },
     {
       "id": 23,
       "path": "docs/backend/reference/BACKEND_MASTER_SPEC.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Top-level backend specification translating the product build spec into backend scope — single source of truth for what the backend must do, which modules it contains, and what flow it must enforce",
+      "description": "Backend purpose and coverage (web SEO + ASO), stack constraints (Supabase + Postgres), 18-module table with module key/display name/defaultActive/initialState, per-module responsibility summary, mandatory execution flow (INPUT→ANALYSIS→INSIGHT→PRIORITY→ACTION)"
     },
     {
       "id": 24,
       "path": "docs/backend/reference/BACKEND_MODULE_BOUNDARIES.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Per-module boundary contract preventing implementation drift — read before modifying any module to ensure module ownership and responsibility separation is not violated",
+      "description": "Boundary rules (no merging, no shared-ownership drift), then per-module definitions for all 18 modules covering backend purpose, core responsibility, input/analysis/insight-action/persistence/orchestration relationship, and activation state"
     },
     {
       "id": 25,
       "path": "docs/backend/reference/BACKEND_ACTIVATION_AND_GATING.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Defines the runtime activation model — distinguishes built from active modules and enforces the invariant that local_seo cannot enter default orchestration without an explicit override",
+      "description": "Activation model (18 built, 17 default-active, 1 opt-in), DEFAULT_ACTIVE_MODULES list, BUILT_BUT_INACTIVE_MODULES (local_seo only), built vs active definitions, assertModuleCatalogIntegrity() contract, activation override mechanism"
     },
     {
       "id": 26,
       "path": "docs/backend/reference/BACKEND_SERVICES_AND_ORCHESTRATION.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Service layer and orchestration architecture reference — defines domain/data/orchestration separation so implementation stays structured as the module count grows",
+      "description": "Service layer principles (module ownership, mandatory flow, built-but-inactive support), domain/data/orchestration separation definitions, per-module service contract (run → insights/actions/metadata), 18-module execution order, domain service layer overview"
     },
     {
       "id": 27,
       "path": "docs/backend/reference/BACKEND_DATA_AND_PERSISTENCE.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Persistence architecture specification — ensures Postgres is used correctly as the source of truth and module ownership is preserved in all schema decisions",
+      "description": "Persistence principles, Supabase role boundaries (Auth/Storage/Edge Functions), 18-module persistence ownership table (records table, defaultActive, migration file), 12-migration inventory, schema conventions"
     },
     {
       "id": 28,
       "path": "docs/backend/reference/BACKEND_CORE_UTILITIES.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Catalogue of all 14 shared utility modules in backend/src/core/ — prevents duplication by ensuring developers know what shared infrastructure exists before writing new logic",
+      "description": "14 utilities each with file path, purpose, key exports, consuming modules, and design decision: runtimeContext, createProviderAdapter, seoScorer, domainAuthorityScorer, targeting, persistence, recommendationScoring, domainContracts, intentClassifier, moduleInputRequirements, prioritization, rateLimiter, metrics, errorReporter"
     },
     {
       "id": 29,
       "path": "docs/backend/reference/BACKEND_INTEGRATION_BOUNDARIES.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Integration architecture reference defining clean provider boundaries — read before adding any new external API adapter to ensure provider concerns stay separate from module business logic",
+      "description": "Integration boundary principles, 18-boundary catalog table (module key, adapter name, isImplemented, adapter file), detail sections for all 5 implemented adapters (GSC, GA4, PageSpeed, backlink-provider, serp-provider) with credentials, endpoints, and collect paths"
     },
     {
       "id": 30,
       "path": "docs/backend/reference/BACKEND_API_HARDENING_ENDPOINT_AUDIT_REPORT.md",
       "status": "LIVE",
       "batch": 3,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Audit record confirming API hardening compliance across all 27 routes — read before adding new routes to ensure the same envelope, validation, actor-identity, and rate-limit pattern is applied",
+      "description": "Hardening summary (response envelope, safe errors, request validation, actor identity header, rate-limit headers, workspace headers, versioning, OpenAPI spec); per-endpoint audit table for all 27 routes with validation, auditable-mutation, and envelope status"
     },
     {
       "id": 31,
