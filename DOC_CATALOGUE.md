@@ -1,7 +1,7 @@
 # DOC_CATALOGUE — Neural Rank
 
 All `.md` files in the repository, indexed with purpose and status.
-**Last updated:** 2026-05-23 | **Total documents:** 87 (.md) + 1 (.yaml) | **Purpose audit:** 80 / 88 done (Batches 1–8 complete)
+**Last updated:** 2026-05-23 | **Total documents:** 87 (.md) + 1 (.yaml) | **Purpose audit:** 88 / 88 done — COMPLETE
 
 ---
 
@@ -255,12 +255,12 @@ Superseded or stub-only docs moved here during 2026-05-17 deduplication pass. No
 | File | Status | Purpose | Description |
 |------|--------|---------|-------------|
 | [FRONTEND_CONTENT_SYSTEM.md](docs/frontend/archive/FRONTEND_CONTENT_SYSTEM.md) | `ARCHIVE` | Original content system defining the signal→insight→priority→action flow, per-archetype content contracts, and pattern-level content rules; superseded by FRONTEND_CONTENT_FULL_SYSTEM.md but retained as the conceptual foundation record | Base content system spec — fully subsumed by FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
-| [FRONTEND_CONTENT_PATTERNS_BASE.md](docs/frontend/archive/FRONTEND_CONTENT_PATTERNS_BASE.md) | `ARCHIVE` | — | Base pattern rules — unique "Pattern Combination Rules" section migrated to FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
-| [FRONTEND_INSIGHT_STRUCTURE.md](docs/frontend/archive/FRONTEND_INSIGHT_STRUCTURE.md) | `ARCHIVE` | — | Insight structure spec — unique sections migrated to FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
-| [PHASE_06_PATTERN_LIBRARY.md](docs/frontend/archive/PHASE_06_PATTERN_LIBRARY.md) | `ARCHIVE` | — | Phase 6 stub — thin spec (42 lines); actual pattern library is in code under app/lib/presentation/widgets/ *(archived 2026-05-17)* |
-| [PHASE_09_SVG_ICON_LAYER.md](docs/frontend/archive/PHASE_09_SVG_ICON_LAYER.md) | `ARCHIVE` | — | Phase 9 stub — requirements spec only (28 lines); icon layer implemented in code; content covered by PHASE_10 *(archived 2026-05-17)* |
-| [PHASE_10_COMPONENT_SYSTEM.md](docs/frontend/archive/PHASE_10_COMPONENT_SYSTEM.md) | `ARCHIVE` | — | Phase 10 stub — requirements spec only (31 lines); component system implemented in code; governance covered by PHASE_05 *(archived 2026-05-17)* |
-| [PHASE_11_ARCHETYPE_ASSEMBLY.md](docs/frontend/archive/PHASE_11_ARCHETYPE_ASSEMBLY.md) | `ARCHIVE` | — | Phase 11 stub — spec and closure notes only (45 lines); assembly covered by PHASE_01 + PHASE_04; closure notes are in ITERATION_PASS_LOG *(archived 2026-05-17)* |
+| [FRONTEND_CONTENT_PATTERNS_BASE.md](docs/frontend/archive/FRONTEND_CONTENT_PATTERNS_BASE.md) | `ARCHIVE` | Defines 4 system-native content patterns (Decision Insight, Reasoned Explanation, Executable Action, Decision Priority) with combination rules; superseded by FRONTEND_CONTENT_FULL_SYSTEM.md but retained as the pattern-level writing rules record | Base pattern rules — unique "Pattern Combination Rules" section migrated to FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
+| [FRONTEND_INSIGHT_STRUCTURE.md](docs/frontend/archive/FRONTEND_INSIGHT_STRUCTURE.md) | `ARCHIVE` | Standardizes the 5 required insight fields (title, explanation, evidence, impact, action) with usage rules, 5 insight formats, and module-specific guidance; superseded by FRONTEND_CONTENT_FULL_SYSTEM.md but retained as the insight writing rules record | Insight structure spec — unique sections migrated to FRONTEND_CONTENT_FULL_SYSTEM.md *(archived 2026-05-17)* |
+| [PHASE_06_PATTERN_LIBRARY.md](docs/frontend/archive/PHASE_06_PATTERN_LIBRARY.md) | `ARCHIVE` | Phase 6 stub — establishes the required pattern library inventory and library rules before implementation in code; retained as the phase boundary record for pattern library work | Phase 6 stub — thin spec (42 lines); actual pattern library is in code under app/lib/presentation/widgets/ *(archived 2026-05-17)* |
+| [PHASE_09_SVG_ICON_LAYER.md](docs/frontend/archive/PHASE_09_SVG_ICON_LAYER.md) | `ARCHIVE` | Phase 9 stub — defines icon layer scope, wrapper API, sizing tiers, and color behavior requirements before implementation; retained as the phase boundary record for icon layer work | Phase 9 stub — requirements spec only (28 lines); icon layer implemented in code; content covered by PHASE_10 *(archived 2026-05-17)* |
+| [PHASE_10_COMPONENT_SYSTEM.md](docs/frontend/archive/PHASE_10_COMPONENT_SYSTEM.md) | `ARCHIVE` | Phase 10 stub — specifies 9 required component categories and design-system enforcement rules governing the component build; retained as the component boundary specification record before code implementation | Phase 10 stub — requirements spec only (31 lines); component system implemented in code; governance covered by PHASE_05 *(archived 2026-05-17)* |
+| [PHASE_11_ARCHETYPE_ASSEMBLY.md](docs/frontend/archive/PHASE_11_ARCHETYPE_ASSEMBLY.md) | `ARCHIVE` | Phase 11 stub — defines assembly targets and rules for composing all prior phase outputs into 8 screen scaffolds; the assembly gate document before product screen refinement; retained as the assembly traceability record | Phase 11 stub — spec and closure notes only (45 lines); assembly covered by PHASE_01 + PHASE_04; closure notes are in ITERATION_PASS_LOG *(archived 2026-05-17)* |
 
 ---
 
@@ -268,7 +268,7 @@ Superseded or stub-only docs moved here during 2026-05-17 deduplication pass. No
 
 | File | Status | Purpose | Description |
 |------|--------|---------|-------------|
-| [IMAGE_PROTOCOL.md](docs/frontend/logs/IMAGE_PROTOCOL.md) | `DECISION` | — | Protocol for handling images in the frontend — naming conventions, compression rules, placeholder standards |
+| [IMAGE_PROTOCOL.md](docs/frontend/logs/IMAGE_PROTOCOL.md) | `DECISION` | Defines the approved end-to-end process for sourcing, verifying, and presenting design inspiration images — the governing protocol preventing noisy screenshots from entering the review workflow; must be read at the start of any inspiration image session | Protocol for handling images in the frontend — naming conventions, compression rules, placeholder standards |
 
 ---
 
@@ -276,7 +276,7 @@ Superseded or stub-only docs moved here during 2026-05-17 deduplication pass. No
 
 | File | Status | Purpose | Description |
 |------|--------|---------|-------------|
-| [app/README.md](app/README.md) | `LIVE` | — | BLoC Flutter app README — canonical production app; setup, BLoC architecture overview, state management guide |
+| [app/README.md](app/README.md) | `LIVE` | Primary entry point for developers and stakeholders opening the Flutter app repository — provides product positioning, module structure, tech stack, design system summary, and Play Store build instructions | BLoC Flutter app README — canonical production app; setup, BLoC architecture overview, state management guide |
 
 ---
 

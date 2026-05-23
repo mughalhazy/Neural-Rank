@@ -5,8 +5,8 @@
     "total": 88,
     "batch_size": 10,
     "batches_total": 9,
-    "batches_done": 8,
-    "entries_done": 80
+    "batches_done": 9,
+    "entries_done": 88
   },
   "entries": [
     {
@@ -734,72 +734,72 @@
       "path": "docs/frontend/archive/FRONTEND_CONTENT_PATTERNS_BASE.md",
       "status": "ARCHIVE",
       "batch": 9,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Defines 4 system-native content patterns (Decision Insight, Reasoned Explanation, Executable Action, Decision Priority) with combination rules; superseded by FRONTEND_CONTENT_FULL_SYSTEM.md but retained as the pattern-level writing rules record",
+      "description": "Base pattern rules — 4 patterns each with structure template, required/optional fields, usage rules, and native examples; combination rules for insight blocks, action queue items, alerts, and table rows"
     },
     {
       "id": 82,
       "path": "docs/frontend/archive/FRONTEND_INSIGHT_STRUCTURE.md",
       "status": "ARCHIVE",
       "batch": 9,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Standardizes the 5 required insight fields (title, explanation, evidence, impact, action) with usage rules, 5 insight formats, and module-specific guidance; superseded by FRONTEND_CONTENT_FULL_SYSTEM.md but retained as the insight writing rules record",
+      "description": "Insight structure spec — 5 required fields with rules and examples; 5 insight formats (Compact, Full, Row, Alert, Action Insight); module-specific guidance for all 5 active modules; impact expression and action structure rules"
     },
     {
       "id": 83,
       "path": "docs/frontend/archive/PHASE_06_PATTERN_LIBRARY.md",
       "status": "ARCHIVE",
       "batch": 9,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 6 stub — establishes the required pattern library inventory and library rules before implementation in code; retained as the phase boundary record for pattern library work",
+      "description": "Phase 6 deliverable — thin spec (42 lines); required library inventory (keyword tables, review clusters, competitor blocks, insight cards, etc.); library rules; closure notes confirming patterns added to shared screen composition"
     },
     {
       "id": 84,
       "path": "docs/frontend/archive/PHASE_09_SVG_ICON_LAYER.md",
       "status": "ARCHIVE",
       "batch": 9,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 9 stub — defines icon layer scope, wrapper API, sizing tiers, and color behavior requirements before implementation; retained as the phase boundary record for icon layer work",
+      "description": "Phase 9 deliverable — thin spec (28 lines); required scope (SVG set, wrapper API, sizing tiers, active/muted/warning/locked color states); rules phasing out ad hoc icon usage"
     },
     {
       "id": 85,
       "path": "docs/frontend/archive/PHASE_10_COMPONENT_SYSTEM.md",
       "status": "ARCHIVE",
       "batch": 9,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 10 stub — specifies 9 required component categories and design-system enforcement rules governing the component build; retained as the component boundary specification record before code implementation",
+      "description": "Phase 10 deliverable — thin spec (31 lines); 9 required component categories (cards, tables, filters, chart containers, insight blocks, alerts, buttons, inputs, navigation); mapping to shared/widgets"
     },
     {
       "id": 86,
       "path": "docs/frontend/archive/PHASE_11_ARCHETYPE_ASSEMBLY.md",
       "status": "ARCHIVE",
       "batch": 9,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Phase 11 stub — defines assembly targets and rules for composing all prior phase outputs into 8 screen scaffolds; the assembly gate document before product screen refinement; retained as the assembly traceability record",
+      "description": "Phase 11 deliverable — 45-line spec and closure notes; 8 assembly targets; closure notes confirming active screens assembled through state host, shared pattern blocks, and SVG icon layer"
     },
     {
       "id": 87,
       "path": "docs/frontend/logs/IMAGE_PROTOCOL.md",
       "status": "DECISION",
       "batch": 9,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Defines the approved end-to-end process for sourcing, verifying, and presenting design inspiration images — the governing protocol preventing noisy screenshots from entering the review workflow; must be read at the start of any inspiration image session",
+      "description": "5-step workflow (source → save locally → verify raw → create plain HTML → final review); rejection rules; naming and batch rules; session anchor rule requiring this file be read first in any new inspiration image session"
     },
     {
       "id": 88,
       "path": "app/README.md",
       "status": "LIVE",
       "batch": 9,
-      "done": false,
-      "purpose": null,
-      "description": null
+      "done": true,
+      "purpose": "Primary entry point for developers and stakeholders opening the Flutter app repository — provides product positioning, module structure, tech stack, design system summary, and Play Store build instructions",
+      "description": "SEOSync product overview — MVP/full-suite module list; tech stack table (Flutter/BLoC/go_router/Supabase/Hive/fl_chart); design system summary; primary INPUT→ACTION flow; flutter build appbundle instructions; future expansion notes"
     }
   ]
 }

@@ -47,12 +47,12 @@ If a session ends mid-audit:
 | 6 | 51–60 | docs/backend/archive/ (last 7) + docs/frontend/reference/ (first 3) | **DONE** (2026-05-23) |
 | 7 | 61–70 | docs/frontend/reference/ (last 3) + docs/frontend/planning/ + phases (first 1) | **DONE** (2026-05-23) |
 | 8 | 71–80 | docs/frontend/phases/ (last 9) + docs/frontend/archive/ (first 1) | **DONE** (2026-05-23) |
-| 9 | 81–88 | docs/frontend/archive/ (last 6) + logs + app/README.md | pending |
+| 9 | 81–88 | docs/frontend/archive/ (last 6) + logs + app/README.md | **DONE** (2026-05-23) |
 
 ---
 
 ## Progress tracker
 
-- Entries done: **80 / 88**
-- Batches done: **8 / 9**
-- Last commit: Batch 8 · Batches 1–8 complete
+- Entries done: **88 / 88** — COMPLETE
+- Batches done: **9 / 9** — COMPLETE
+- Last commit: Batch 9 · All 9 batches done (2026-05-23)
